@@ -1,0 +1,113 @@
+@use '../../assets/scss/variables' as vars;
+
+.editorWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 2rem 2rem 2rem 3rem;
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
+  gap: 4rem;
+}
+
+.titleColumn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+
+  &:first-child {
+    justify-content: flex-start;
+  }
+
+  &:last-child {
+    justify-content: flex-end;
+  }
+}
+
+.editorTitle,
+.styleTitle {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: vars.$text-primary-dark;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+
+  [data-theme='light'] & {
+    color: vars.$text-primary-light;
+  }
+}
+
+.contentSection {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  gap: 4rem;
+  height: 100%;
+}
+
+.editorColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 800px;
+}
+
+.editor {
+  flex: 1;
+  width: 100%;
+  min-height: 400px;
+  padding: 1.5rem;
+  border: 1px solid vars.$text-secondary-dark;
+  border-radius: 12px;
+  background: vars.$card-dark;
+  color: vars.$text-primary-dark;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  resize: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    border-color: vars.$action-color;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(vars.$action-color, 0.2);
+  }
+
+  [data-theme='light'] & {
+    border: 1px solid vars.$text-secondary-light;
+    background: vars.$card-light;
+    color: vars.$text-primary-light;
+  }
+}
+
+.styleColumn {
+  flex: 1;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.focusMode {
+  .editorColumn {
+    flex: 1;
+    margin: 0 auto;
+    max-width: 900px;
+  }
+
+  .styleColumn {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+}

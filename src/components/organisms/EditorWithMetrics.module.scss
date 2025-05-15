@@ -1,0 +1,130 @@
+@use '../../assets/scss/variables' as vars;
+
+/* Layout principal */
+.editorWrapper {
+  display: grid;
+  grid-template-columns: 60% 40%; /* Proporção fixa entre colunas */
+  grid-template-rows: auto 1fr; /* Primeira linha para títulos, segunda para conteúdo */
+  grid-template-areas: 
+    "editor-title metrics-title"
+    "editor metrics";
+  gap: 2rem;
+  width: 100%; /* Garante que ocupe toda a largura disponível */
+  height: 100%; /* Garante que ocupe toda a altura disponível */
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Títulos */
+.editorTitle {
+  grid-area: editor-title;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: vars.$text-primary-dark;
+  margin: 0 0 1rem 0;
+  
+  [data-theme='light'] & {
+    color: vars.$text-primary-light;
+  }
+}
+
+.metricsTitle {
+  grid-area: metrics-title;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: vars.$text-primary-dark;
+  margin: 0 0 1rem 0;
+  text-align: left;
+  padding-right: 10rem;
+  
+  [data-theme='light'] & {
+    color: vars.$text-primary-light;
+  }
+}
+
+/* Conteúdo */
+.editorColumn {
+  grid-area: editor;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Aumentado de 1rem para 1.5rem para dar mais espaço ao carrossel */
+  overflow: hidden;
+  min-width: 0;
+  padding-bottom: 1rem; /* Adiciona um pouco de espaço na parte inferior */
+}
+
+.metricsColumn {
+  grid-area: metrics;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto; /* Permite scroll vertical se necessário */
+  min-width: 0; /* Importante para grid items */
+  padding-right: 2rem;
+}
+
+/* Editor de texto */
+.editor {
+  flex: 1;
+  width: 100%;
+  padding: 1.5rem;
+  border: 1px solid vars.$text-secondary-dark;
+  border-radius: 12px;
+  background: vars.$card-dark;
+  color: vars.$text-primary-dark;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  resize: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  box-sizing: border-box;
+  
+  &:focus {
+    border-color: vars.$action-color;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(vars.$action-color, 0.2);
+  }
+  
+  [data-theme='light'] & {
+    border: 1px solid vars.$text-secondary-light;
+    background: vars.$card-light;
+    color: vars.$text-primary-light;
+  }
+}
+
+/* Modo de foco */
+.focusMode {
+  grid-template-columns: 1fr; /* Uma única coluna */
+  grid-template-areas: 
+    "editor-title"
+    "editor";
+  
+  .metricsTitle,
+  .metricsColumn {
+    display: none;
+  }
+  
+  .editorColumn {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 768px) {
+  .editorWrapper {
+    grid-template-columns: 1fr; /* Uma única coluna */
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas: 
+      "editor-title"
+      "editor"
+      "metrics-title"
+      "metrics";
+  }
+  
+  .metricsTitle {
+    text-align: right;
+  }
+}

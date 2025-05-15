@@ -1,0 +1,13 @@
+@import '../../assets/scss/variables';
+
+.card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+}

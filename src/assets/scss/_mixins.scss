@@ -1,0 +1,23 @@
+// Centraliza absoluto
+@mixin center-absolute {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  // Responde no hover (pra botões e links)
+  @mixin hover-scale {
+    transition: $transition-default;
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+  
+  // Truncar texto com "..."
+  @mixin text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  

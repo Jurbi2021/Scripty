@@ -1,0 +1,29 @@
+// Reset moderninho (sem dor de cabeça)
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-primary;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-color: $color-light-background; // depois vamos dinamizar no Theme
+  color: $color-light-text-primary;
+  transition: $transition-default;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}

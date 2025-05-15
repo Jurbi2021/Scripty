@@ -1,0 +1,14 @@
+@use '../../assets/scss/variables' as vars;
+
+.page {
+  h1 {
+    color: vars.$text-primary-dark;
+    margin-bottom: 1rem;
+  }
+
+  [data-theme='light'] & {
+    h1 {
+      color: vars.$text-primary-light;
+    }
+  }
+}

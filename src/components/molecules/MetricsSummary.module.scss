@@ -1,0 +1,33 @@
+@use '../../assets/scss/variables' as vars;
+
+.metricsSummary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto; // Permite rolagem se houver muitas métricas
+}
+
+.metric {
+  background: vars.$card-dark;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid vars.$action-color;
+  color: vars.$text-primary-dark;
+  
+  [data-theme='light'] & {
+    background: vars.$card-light;
+    color: vars.$text-primary-light;
+  }
+}
+
+.name {
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.value {
+  color: vars.$action-color;
+  font-size: 1.2rem;
+}

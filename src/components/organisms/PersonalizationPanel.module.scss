@@ -1,0 +1,27 @@
+@use '../../assets/scss/variables' as vars;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: vars.$card-dark;
+  border-radius: 8px;
+
+  [data-theme='light'] & {
+    background: vars.$card-light;
+  }
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}

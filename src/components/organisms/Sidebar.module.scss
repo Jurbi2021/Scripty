@@ -1,0 +1,47 @@
+@use '../../assets/scss/variables' as vars;
+
+.sidebar {
+  background: vars.$sidebar-dark;
+  height: 100vh;
+  width: 250px;
+  padding: 0;
+  transition: width 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6); // Transição suave personalizada
+
+  &.collapsed {
+    width: 90px;
+    :global([class*="SidebarItem_sidebarItem"]) {
+      justify-content: center;
+      padding: 0.8rem;
+      
+      :global([class*="SidebarItem_label"]) {
+        opacity: 0;
+        max-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      
+      :global([class*="SidebarItem_icon"]) {
+        margin: 0 auto; // Centraliza o ícone
+      }
+    }
+  }
+  [data-theme='light'] & {
+    background: vars.$sidebar-light;
+  }
+}
+
+.toggleButton {
+  margin: 1rem;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  .sidebar.collapsed & {
+    transform: rotate(180deg); // Se você estiver usando um ícone de seta
+  }
+}
+.menu {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}

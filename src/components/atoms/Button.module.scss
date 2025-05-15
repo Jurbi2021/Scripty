@@ -1,0 +1,46 @@
+@use 'sass:color';
+@use '../../assets/scss/variables' as vars;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  background-color: vars.$action-color;
+  color: vars.$white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color.adjust(vars.$action-color, $lightness: 5%);
+    transform: scale(1.02);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background-color: vars.$gray-medium;
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    background-color: vars.$action-color;
+    color: vars.$white;
+  }
+
+  &.secondary {
+    background-color: vars.$gray-medium;
+    color: vars.$white;
+
+    // Ajustes para tema claro (se necessário)
+    [data-theme='light'] & {
+      color: vars.$white;
+    }
+  }
+}

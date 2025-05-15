@@ -1,0 +1,49 @@
+/* Resetzinho básico */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Tipografia base */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Variáveis de Tema */
+:root {
+  /* Modo Claro */
+  --background: #f9f5f1;
+  --sidebar-bg: #ffffff;
+  --card-bg: #f2ede8;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent: #b497ff;
+  --hover-bg: #eae5de;
+  --success: #70d2a0;
+  --error: #ff6b6b;
+}
+
+[data-theme='dark'] {
+  /* Modo Escuro */
+  --background: #121821;
+  --sidebar-bg: #1a1f29;
+  --card-bg: #202632;
+  --text-primary: #d3d7de;
+  --text-secondary: #a0a5af;
+  --accent: #b497ff;
+  --hover-bg: #2c3240;
+  --success: #58d6a3;
+  --error: #ff6b6b;
+}
+
+/* Transições suaves pro app todo */
+html {
+  scroll-behavior: smooth;
+}

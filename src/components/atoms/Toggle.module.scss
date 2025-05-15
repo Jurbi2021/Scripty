@@ -1,0 +1,35 @@
+@use '../../assets/scss/variables' as vars;
+
+.toggle {
+  width: 42px;
+  height: 24px;
+  background-color: vars.$gray-medium;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+
+  &.on {
+    background-color: vars.$action-color;
+  }
+
+  .toggle-thumb {
+    width: 18px;
+    height: 18px;
+    background-color: vars.$white;
+    border-radius: 50%;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+
+    .on & {
+      transform: translateX(18px);
+      background-color: vars.$success-color-dark;
+
+      [data-theme='light'] & {
+        background-color: vars.$success-color-light;
+      }
+    }
+  }
+}
