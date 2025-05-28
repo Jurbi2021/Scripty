@@ -1,0 +1,35 @@
+@import '../../App.css'; // Import global variables
+
+.layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; // Prevent scrolling at the top level
+  background-color: var(--bg-main-dark); // Use main dark background
+}
+
+.mainContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  // Ensure this container shrinks and grows correctly
+  // It will take the remaining space after the sidebar
+  min-width: 0; // Important for flex items to shrink properly
+  overflow: hidden; // Prevent this container from scrolling itself
+}
+
+.pageContent {
+  flex-grow: 1;
+  // Removed padding here, apply padding within the specific page components if needed
+  // This ensures the layout structure itself doesn't cause overflow issues
+  overflow-y: auto; // Allow scrolling only within the page content area
+  background-color: var(--bg-main-dark); // Match main background
+  transition: background-color 0.3s ease;
+  // The actual page component (e.g., EditorWithMetrics) will be rendered here
+  // and should handle its own internal padding and layout.
+}
+
+// Adjustments might be needed in the page components themselves
+// to ensure they respect the container boundaries.
+

@@ -1,130 +1,306 @@
-@use '../../assets/scss/variables' as vars;
+@import "../../App.css"; // Import global variables
 
-/* Layout principal */
-.editorWrapper {
-  display: grid;
-  grid-template-columns: 60% 40%; /* Proporção fixa entre colunas */
-  grid-template-rows: auto 1fr; /* Primeira linha para títulos, segunda para conteúdo */
-  grid-template-areas: 
-    "editor-title metrics-title"
-    "editor metrics";
+.editorLayout {
+  display: flex;
   gap: 2rem;
-  width: 100%; /* Garante que ocupe toda a largura disponível */
-  height: 100%; /* Garante que ocupe toda a altura disponível */
-  padding: 2rem;
+  height: 100%;
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
-/* Títulos */
-.editorTitle {
-  grid-area: editor-title;
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: vars.$text-primary-dark;
-  margin: 0 0 1rem 0;
-  
-  [data-theme='light'] & {
-    color: vars.$text-primary-light;
-  }
-}
-
-.metricsTitle {
-  grid-area: metrics-title;
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: vars.$text-primary-dark;
-  margin: 0 0 1rem 0;
-  text-align: left;
-  padding-right: 10rem;
-  
-  [data-theme='light'] & {
-    color: vars.$text-primary-light;
-  }
-}
-
-/* Conteúdo */
-.editorColumn {
-  grid-area: editor;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* Aumentado de 1rem para 1.5rem para dar mais espaço ao carrossel */
-  overflow: hidden;
-  min-width: 0;
-  padding-bottom: 1rem; /* Adiciona um pouco de espaço na parte inferior */
-}
-
-.metricsColumn {
-  grid-area: metrics;
+// Main content area (Editor + Basic Metrics)
+.mainContentArea {
+  flex: 2;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow-y: auto; /* Permite scroll vertical se necessário */
-  min-width: 0; /* Importante para grid items */
-  padding-right: 2rem;
+  min-width: 0;
 }
 
-/* Editor de texto */
-.editor {
-  flex: 1;
-  width: 100%;
-  padding: 1.5rem;
-  border: 1px solid vars.$text-secondary-dark;
-  border-radius: 12px;
-  background: vars.$card-dark;
-  color: vars.$text-primary-dark;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  resize: none;
-  overflow-y: auto;
-  overflow-x: hidden;
-  word-wrap: break-word;
-  box-sizing: border-box;
-  
-  &:focus {
-    border-color: vars.$action-color;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(vars.$action-color, 0.2);
-  }
-  
-  [data-theme='light'] & {
-    border: 1px solid vars.$text-secondary-light;
-    background: vars.$card-light;
-    color: vars.$text-primary-light;
-  }
+.editorTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-main-dark);
+  margin: 0;
+  white-space: nowrap;
+  overflow: visible;
 }
 
-/* Modo de foco */
-.focusMode {
-  grid-template-columns: 1fr; /* Uma única coluna */
-  grid-template-areas: 
-    "editor-title"
-    "editor";
-  
-  .metricsTitle,
-  .metricsColumn {
+.editorSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary-dark);
+  margin: -0.5rem 0 0.5rem 0;
+}
+
+.toolbar {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color-dark);
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+// Swiper specific styles for Basic Metrics
+.metricsSwiper {
+  padding: 0.5rem 0;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
     display: none;
   }
-  
-  .editorColumn {
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
+}
+
+.metricSlide {
+  width: auto !important;
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
   }
 }
 
-/* Responsividade para telas pequenas */
-@media (max-width: 768px) {
-  .editorWrapper {
-    grid-template-columns: 1fr; /* Uma única coluna */
-    grid-template-rows: auto auto 1fr auto;
-    grid-template-areas: 
-      "editor-title"
-      "editor"
-      "metrics-title"
-      "metrics";
+.metricCard {
+  background-color: var(--bg-card-dark);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(180, 151, 255, 0.15);
+    border-color: var(--action-highlight-dark);
   }
-  
-  .metricsTitle {
-    text-align: right;
+
+  .metricName {
+    color: var(--text-secondary-dark);
+    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .metricValue {
+    font-weight: 500;
+    color: var(--text-main-dark);
+    font-size: 1rem;
   }
 }
+
+.editorArea {
+  flex-grow: 1;
+  border: 1px solid var(--border-color-dark);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--bg-container-dark);
+  color: var(--text-main-dark);
+  font-family: inherit;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+  &:focus {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 2px rgba(180, 151, 255, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary-dark);
+    opacity: 0.7;
+  }
+}
+
+// Advanced Metrics Panel Styles (Right Side)
+.advancedMetricsPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; // Gap between title/subtitle and grid
+  padding: 1.5rem;
+  background-color: var(--bg-container-dark);
+  border-radius: 8px;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  min-width: 0; // Prevent flex item overflow
+
+  .advancedPanelTitle {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-main-dark);
+    margin: 0;
+    flex-shrink: 0; // Prevent shrinking
+  }
+
+  .advancedSubtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary-dark);
+    margin-top: -0.5rem;
+    flex-shrink: 0; // Prevent shrinking
+  }
+}
+
+// Grid Container for Advanced Metrics
+.advancedGridContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); // Ensure 2 equal columns
+  grid-template-rows: repeat(2, auto); // 2 rows, height auto
+  gap: 1.25rem;
+  flex-grow: 1;
+  min-height: 0; // Allow grid items to shrink if needed
+}
+
+// Style for each item in the grid
+.advancedGridItem {
+  background-color: var(--bg-card-dark);
+  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // Prevent content overflow within grid item
+  overflow: hidden; // Hide overflow within card
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  h4, // Title for Readability Carousel
+  .advancedCardTitle {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary-dark);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .advancedCardContent {
+    color: var(--text-main-dark);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex-grow: 1;
+    min-height: 0; // Allow content to shrink
+    p {
+      margin: 0.3rem 0;
+    }
+    .metricFeedback {
+      font-size: 0.8rem;
+      color: var(--text-secondary-dark);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+  }
+}
+
+// Specific styles for Readability Carousel within the grid
+.readabilityCarouselContainer {
+  padding: 1.25rem;
+  overflow: hidden; // Ensure swiper doesn't overflow card
+
+  h4 {
+    margin-bottom: 1rem;
+  }
+}
+
+.readabilitySwiper {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%; // Try to make swiper fill the container height
+  min-height: 150px; // Ensure minimum height for readability
+  position: relative; // Needed for pagination positioning
+  margin-bottom: 1rem; // Space for pagination
+
+  .swiper-pagination {
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+  }
+  .swiper-pagination-bullet {
+    background-color: var(--text-secondary-dark);
+    opacity: 0.5;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .swiper-pagination-bullet-active {
+    background-color: var(--action-highlight-dark);
+    opacity: 1;
+  }
+}
+
+.readabilitySlide {
+  cursor: grab;
+  height: auto; // Let content define height
+  display: flex; // Use flex for centering
+  align-items: center; // Center vertically
+  justify-content: center; // Center horizontally
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.readabilityCard {
+  text-align: center;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  width: 100%; // Ensure card takes full slide width
+
+  .readabilityName {
+    display: block;
+    color: var(--text-main-dark);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .readabilityValue {
+    display: block;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--action-highlight-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .readabilityLevel {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary-dark);
+      margin-bottom: 0.5rem;
+  }
+
+  .readabilityFeedback {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary-dark);
+    line-height: 1.4;
+    min-height: 2.8em;
+    white-space: normal; // Allow feedback text to wrap
+  }
+}
+
+// General Advanced Card Styles (already part of .advancedGridItem)
+.advancedCard {
+  // Specific content styles are inside .advancedGridItem .advancedCardContent
+}
+
+// Level specific classes (add colors if desired)
+.levelMuitoFacil, .levelExcelente { color: var(--success-color-dark); }
+.levelFacil, .levelBom { color: #a0d911; } // Example: Light Green
+.levelMedio, .levelRegular { color: #faad14; } // Example: Orange
+.levelDificil, .levelRuim { color: #f5222d; } // Example: Red
+

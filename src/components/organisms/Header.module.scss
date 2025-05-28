@@ -1,30 +1,73 @@
-@use '../../assets/scss/variables' as vars;
+@import '../../App.css'; // Import global variables if needed
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 2rem;
-  background: vars.$background-dark;
-  border-bottom: 1px solid vars.$text-secondary-dark;
+  padding: 0 1.5rem; // Keep horizontal padding
+  background-color: var(--bg-container-dark); // Match sidebar container background
+  border-bottom: 1px solid var(--border-color-dark); // Use dark border color
+  height: 65px; // Match sidebar header height
+  flex-shrink: 0; // Prevent header from shrinking
+  width: 100%; // Explicitly set width to 100% of its container (.mainContent)
+  box-sizing: border-box; // Include padding and border in the element's total width and height
 
-  [data-theme='light'] & {
-    background: vars.$background-light;
-    border-bottom: 1px solid vars.$text-secondary-light;
+  .leftSection {
+    // Styles for logo or title area
+    .logo {
+      height: 35px; // Slightly larger logo
+      // Add filter for dark mode if needed
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-main-dark);
+    }
+  }
+
+  .rightSection {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; // Slightly reduced gap
+
+    .button {
+      padding: 0.6rem 1.2rem; // Adjust padding
+      border: 1px solid var(--border-color-dark); // Use dark border
+      border-radius: 6px; // Slightly more rounded
+      background-color: transparent; // Transparent background by default
+      color: var(--text-secondary-dark); // Use secondary text color
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(180, 151, 255, 0.1); // Use highlight color with low opacity
+        border-color: var(--action-highlight-dark);
+        color: var(--action-highlight-dark);
+      }
+
+      // Specific styles if needed
+      &.focusButton {
+        // Example: Maybe a different hover or active state
+      }
+      &.backButton {
+         &:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary-dark);
+            color: var(--text-main-dark);
+         }
+      }
+      &.helpButton {
+         border: none;
+         padding: 0.6rem; // Adjust padding if only icon
+         &:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-main-dark);
+            border: none;
+         }
+      }
+    }
   }
 }
 
-.logo {
-  font-size: 2.5rem; // Tamanho menor, já que é só o logo
-  font-weight: 700;
-  color: vars.$text-primary-dark;
-
-  [data-theme='light'] & {
-    color: vars.$text-primary-light;
-  }
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-}

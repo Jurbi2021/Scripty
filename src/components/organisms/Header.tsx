@@ -1,26 +1,41 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Substitui useHistory por useNavigate
-import { useEditor } from '../../contexts/EditorContext';
-import Button from '../atoms/Button';
 import styles from './Header.module.scss';
 
-const Header: React.FC = () => {
-  const { isFocusMode, toggleFocusMode } = useEditor();
-  const navigate = useNavigate(); // Substitui useHistory
+interface HeaderProps {
+  // Props can be added later, e.g., for dynamic titles or button actions
+}
+
+const Header: React.FC<HeaderProps> = () => {
+  // Determine which buttons to show based on context (e.g., current page)
+  // For now, showing placeholders based on wireframes
+  const showFocusButton = true; // Example logic
+  const showBackButton = false; // Example logic
 
   return (
     <header className={styles.header}>
-      <div className={styles.logo}>Scripty</div>
-      <div className={styles.actions}>
-        <Button onClick={toggleFocusMode}>
-          {isFocusMode ? 'Desativar Modo Foco' : 'Ativar Modo Foco'}
-        </Button>
-        <Button onClick={() => navigate('/help')} variant="secondary">
+      <div className={styles.leftSection}>
+        {/* Placeholder for Logo or dynamic title based on context */}
+        {/* <img src="/path/to/logo.png" alt="Scripty Logo" className={styles.logo} /> */}
+        {/* <span className={styles.title}>Editor Scripty</span> */}
+      </div>
+      <div className={styles.rightSection}>
+        {showFocusButton && (
+          <button className={`${styles.button} ${styles.focusButton}`}>
+            Ativar/Desativar Modo Foco
+          </button>
+        )}
+        {showBackButton && (
+          <button className={`${styles.button} ${styles.backButton}`}>
+            Voltar para o editor
+          </button>
+        )}
+        <button className={`${styles.button} ${styles.helpButton}`}>
           Abrir Ajuda
-        </Button>
+        </button>
       </div>
     </header>
   );
 };
 
 export default Header;
+

@@ -1,113 +1,157 @@
-@use '../../assets/scss/variables' as vars;
+@import "../../App.css"; // Import global variables
+@import "./EditorWithMetrics.module.scss"; // Import basic layout styles if needed
 
-.editorWrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  padding: 2rem 2rem 2rem 3rem;
-}
-
-.titleSection {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 1rem;
-  gap: 4rem;
-}
-
-.titleColumn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-
-  &:first-child {
-    justify-content: flex-start;
-  }
-
-  &:last-child {
-    justify-content: flex-end;
-  }
-}
-
-.editorTitle,
-.styleTitle {
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: vars.$text-primary-dark;
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-  display: inline-block;
-  vertical-align: middle;
-
-  [data-theme='light'] & {
-    color: vars.$text-primary-light;
-  }
-}
-
-.contentSection {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  gap: 4rem;
-  height: 100%;
-}
-
-.editorColumn {
+.styleAnalysisPanel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-width: 800px;
-}
-
-.editor {
-  flex: 1;
-  width: 100%;
-  min-height: 400px;
+  gap: 1rem;
   padding: 1.5rem;
-  border: 1px solid vars.$text-secondary-dark;
-  border-radius: 12px;
-  background: vars.$card-dark;
-  color: vars.$text-primary-dark;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  resize: none;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--bg-container-dark);
+  border-radius: 8px;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  min-width: 0; // Prevent flex item overflow
+  overflow-y: auto; // Allow scrolling if content exceeds height
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) var(--bg-container-dark);
 
-  &:focus {
-    border-color: vars.$action-color;
-    outline: none;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(vars.$action-color, 0.2);
+  &::-webkit-scrollbar {
+    width: 6px;
   }
-
-  [data-theme='light'] & {
-    border: 1px solid vars.$text-secondary-light;
-    background: vars.$card-light;
-    color: vars.$text-primary-light;
+  &::-webkit-scrollbar-track {
+    background: var(--bg-container-dark);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--action-highlight-dark);
+    border-radius: 3px;
+    border: 1px solid var(--bg-container-dark);
   }
 }
 
-.styleColumn {
-  flex: 1;
-  max-width: 450px;
+.panelTitle {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-main-dark);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.panelSubtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark);
+  margin-top: -0.5rem;
+  margin-bottom: 1rem; // Add space before feedback cards
+  flex-shrink: 0;
+}
+
+.feedbackContainer {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
+  gap: 1rem;
+  flex-grow: 1;
 }
 
-.focusMode {
-  .editorColumn {
-    flex: 1;
-    margin: 0 auto;
-    max-width: 900px;
-  }
+.feedbackCard {
+  background-color: var(--bg-card-dark);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-color-dark);
+  border-left: 4px solid var(--border-color-dark); // Default border
+  transition: border-left-color 0.3s ease;
 
-  .styleColumn {
-    opacity: 0;
-    transform: translateX(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+  &.levelExcelente {
+    border-left-color: var(--success-color-dark);
+  }
+  &.levelBom {
+    border-left-color: #a0d911; // Light Green
+  }
+  &.levelRegular {
+    border-left-color: #faad14; // Orange
+  }
+  &.levelRuim {
+    border-left-color: #f5222d; // Red
   }
 }
+
+.feedbackTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main-dark);
+  margin: 0 0 0.5rem 0;
+}
+
+.feedbackText {
+  font-size: 0.9rem;
+  color: var(--text-secondary-dark);
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+}
+
+.details {
+  summary {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--action-highlight-dark);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    display: inline-block;
+    &:hover {
+      text-decoration: underline;
+    }
+    &::marker {
+        content: "> ";
+        font-size: 0.7em;
+    }
+  }
+  &[open] summary::marker {
+      content: "v ";
+  }
+}
+
+.sentenceList {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark);
+  max-height: 150px; // Limit height
+  overflow-y: auto; // Allow scroll if many sentences
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--action-highlight-dark);
+    border-radius: 2px;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    span {
+      font-weight: 500;
+      color: var(--text-main-dark);
+      margin-right: 0.3rem;
+    }
+  }
+}
+
+.wordList {
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark);
+  line-height: 1.6;
+  margin: 0.5rem 0 0 1rem;
+  word-break: break-word;
+}
+
+// Level specific classes (used for border-left-color in .feedbackCard)
+.levelExcelente {}
+.levelBom {}
+.levelRegular {}
+.levelRuim {}
+

@@ -1,56 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { SidebarItem } from '../molecules/SidebarItem';
-import Button from '../atoms/Button';
+import React, { useState } from 'react';
 import styles from './Sidebar.module.scss';
-import Icon from '../atoms/Icon';
+import { FaChevronLeft, FaChevronRight, FaEdit, FaPenFancy, FaSearch, FaCog, FaQuestionCircle, FaSun, FaMoon } from 'react-icons/fa'; // Assuming Font Awesome icons
 
-const Sidebar: React.FC = () => {
-  // Inicializa o estado com o valor armazenado no localStorage ou true como padrão
-  const [isExpanded, setIsExpanded] = useState(() => {
-    const savedState = localStorage.getItem('sidebarExpanded');
-    return savedState !== null ? JSON.parse(savedState) : true;
-  });
-  
-  const location = useLocation();
-  const navigate = useNavigate();
+// Define the possible views that the sidebar can navigate to
+type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help'; // Added help
 
-  // Salva o estado no localStorage sempre que ele mudar
-  useEffect(() => {
-    localStorage.setItem('sidebarExpanded', JSON.stringify(isExpanded));
-  }, [isExpanded]);
+interface SidebarProps {
+  onNavigate: (view: View) => void; // Callback to notify App.tsx of navigation
+  initialView?: View; // Optional initial view
+}
 
-  const menuItems = [
-    { icon: 'editor', label: 'Editor de Texto', path: '/editor/metrics' },
-    { icon: 'style', label: 'Análise de Estilo', path: '/editor/style' },
-    { icon: 'seo', label: 'Análise de SEO', path: '/editor/seo' },
-    { icon: 'personalize', label: 'Personalizar', path: '/personalization' },
-    { icon: 'help', label: 'Central de Ajuda', path: '/help' },
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [activeView, setActiveView] = useState<View>(initialView);
+  const [isDarkMode, setIsDarkMode] = useState(true); // Assuming dark mode is default
+
+  const handleToggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleToggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    // TODO: Implement actual theme switching logic (e.g., adding/removing class on body)
+    console.log('Theme toggled, dark mode:', !isDarkMode);
+  };
+
+  const handleItemClick = (view: View) => {
+    setActiveView(view);
+    onNavigate(view);
+  };
+
+  const menuItems: { view: View; icon: React.ElementType; label: string }[] = [
+    { view: 'metrics', icon: FaEdit, label: 'Editor de Texto' },
+    { view: 'style', icon: FaPenFancy, label: 'Análise de Estilo' },
+    { view: 'seo', icon: FaSearch, label: 'Análise de SEO' }, // Placeholder
+    { view: 'personalization', icon: FaCog, label: 'Personalizar' }, // Placeholder
   ];
 
-  const toggleSidebar = () => setIsExpanded(!isExpanded);
-
   return (
-    <div className={`${styles.sidebar} ${isExpanded ? '' : styles.collapsed}`}>
-      <Button onClick={toggleSidebar} className={styles.toggleButton}>
-        <span className={`${styles.toggleArrow} ${isExpanded ? '' : styles.rotated}`}>
-        <Icon name="arrow" />
-        </span>
-      </Button>
-      <div className={styles.menu}>
-        {menuItems.map((item) => (
-          <SidebarItem
-            key={item.path}
-            icon={item.icon}
-            label={item.label}
-            isActive={location.pathname === item.path}
-            isCollapsed={!isExpanded}
-            onClick={() => navigate(item.path)}
-          />
-        ))}
+    <aside className={`${styles.sidebar} ${isExpanded ? styles.expanded : styles.collapsed}`}>
+      <div className={styles.logoSection}>
+        {isExpanded && <span className={styles.logoText}>Scripty</span>}
+        <button onClick={handleToggleExpand} className={styles.toggleButton} aria-label={isExpanded ? 'Recolher sidebar' : 'Expandir sidebar'}>
+          {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
+        </button>
       </div>
-    </div>
+
+      <nav className={styles.menu}>
+        <ul>
+          {menuItems.map((item) => (
+            <li key={item.view} className={activeView === item.view ? styles.active : ''}>
+              <button onClick={() => handleItemClick(item.view)}>
+                <item.icon className={styles.icon} />
+                {isExpanded && <span className={styles.label}>{item.label}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className={styles.footer}>
+        <div className={`${styles.menuItem} ${activeView === 'help' ? styles.active : ''}`}>
+           <button onClick={() => handleItemClick('help')}> {/* Placeholder for help */} 
+            <FaQuestionCircle className={styles.icon} />
+            {isExpanded && <span className={styles.label}>Central de Ajuda</span>}
+          </button>
+        </div>
+        <div className={styles.themeToggle}>
+          {isExpanded && <span className={styles.label}>{isDarkMode ? 'Modo Escuro' : 'Modo Claro'}</span>}
+          <button onClick={handleToggleTheme} className={styles.toggleThemeButton} aria-label="Mudar tema">
+            {isDarkMode ? <FaSun /> : <FaMoon />}
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 };
 
 export default Sidebar;
+
