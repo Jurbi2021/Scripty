@@ -1,0 +1,52 @@
+// src/components/molecules/MetricsToolbar.module.scss
+@import "../../App.css"; // Import global variables
+
+.toolbarContainer {
+  margin-bottom: 1.5rem; // Maintain spacing from original organism layout
+  flex-shrink: 0;
+  overflow: hidden; // Prevent potential overflow issues with swiper
+}
+
+.metricsSwiper {
+  // Swiper specific styles if needed
+  padding-bottom: 5px; // Add some padding if mousewheel causes clipping
+}
+
+.metricSlide {
+  width: auto !important; // Ensure slides size based on content
+  display: flex; // Use flex for alignment within slide if needed
+}
+
+.metricCard {
+  // Copied from EditorWithMetrics.module.scss
+  background-color: var(--card-bg);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  min-width: 120px; // Keep min-width for consistency
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.metricName {
+  // Copied from EditorWithMetrics.module.scss
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  // Copied from EditorWithMetrics.module.scss
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+

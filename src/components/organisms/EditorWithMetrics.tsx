@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styles from './EditorWithMetrics.module.scss';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Mousewheel, Pagination } from 'swiper/modules';
+import MetricsToolbar from '../molecules/MetricsToolbar'; // Import the new molecule
+import { Swiper, SwiperSlide } from 'swiper/react'; // Keep for advanced metrics carousel
+import { Pagination, Mousewheel } from 'swiper/modules'; // Keep for advanced metrics carousel
 
-// Import Swiper styles
+// Import Swiper styles (only for advanced carousel now)
 import 'swiper/css';
-import 'swiper/css/free-mode';
 import 'swiper/css/pagination';
 
 // Import metric functions and types
@@ -17,8 +17,8 @@ import {
   calculateAdvancedMetrics,
   AdvancedMetricsData,
   ReadabilityIndices,
-  ReadabilityIndexResult, // Import this type
-  RedundancyResult, // Import this type
+  ReadabilityIndexResult,
+  RedundancyResult,
   getEmptyAdvancedMetrics,
   SentimentScore
 } from '../../utils/AdvancedMetrics';
@@ -39,19 +39,6 @@ interface Lexico {
 }
 
 const lexico: Lexico = lexicoData as Lexico;
-
-// Define the structure and order for basic metrics display
-const basicMetricDisplayOrder: { key: keyof BasicMetricsData; label: string }[] = [
-  { key: 'words', label: 'Palavras' },
-  { key: 'charsWithSpaces', label: 'Caracteres' },
-  { key: 'sentences', label: 'Sentenças' },
-  { key: 'paragraphs', label: 'Parágrafos' },
-  { key: 'readingTime', label: 'Tempo Leitura' },
-  { key: 'uniqueWords', label: 'Palavras Únicas' },
-  { key: 'avgWordsPerSentence', label: 'Média Palavras/Sentença' },
-  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' },
-  { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
-];
 
 // Define structure for advanced readability display
 const readabilityIndicesDisplayOrder: { key: keyof ReadabilityIndices; label: string }[] = [
@@ -91,7 +78,7 @@ const EditorWithMetrics: React.FC = () => {
 
   // Helper to get CSS class based on level (optional, for styling)
   const getLevelClass = (level: string): string => {
-    switch (level.toLowerCase()) {
+    switch (level?.toLowerCase()) { // Added optional chaining
       case 'muito fácil': return styles.levelMuitoFacil;
       case 'fácil': return styles.levelFacil;
       case 'médio': return styles.levelMedio;
@@ -111,26 +98,8 @@ const EditorWithMetrics: React.FC = () => {
         <h2 className={styles.editorTitle}>Editor Scripty</h2>
         <p className={styles.editorSubtitle}>Metrifique o seu texto da melhor forma.</p>
 
-        {/* Basic Metrics Toolbar */}
-        <div className={styles.toolbar}>
-          <Swiper
-            modules={[FreeMode, Mousewheel]}
-            slidesPerView={'auto'}
-            spaceBetween={12}
-            freeMode={true}
-            mousewheel={true}
-            className={styles.metricsSwiper}
-          >
-            {basicMetricDisplayOrder.map(({ key, label }) => (
-              <SwiperSlide key={key} className={styles.metricSlide}>
-                <div className={styles.metricCard}>
-                  <span className={styles.metricName}>{label}</span>
-                  <span className={styles.metricValue}>{basicMetrics[key]}</span>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+        {/* Use the MetricsToolbar molecule */}
+        <MetricsToolbar metrics={basicMetrics} />
 
         {/* Text Area */}
         <textarea
@@ -159,7 +128,7 @@ const EditorWithMetrics: React.FC = () => {
               className={styles.readabilitySwiper}
             >
               {readabilityIndicesDisplayOrder.map(({ key, label }) => {
-                const result: ReadabilityIndexResult | undefined = advancedMetrics.readability[key];
+                const result: ReadabilityIndexResult | undefined = advancedMetrics.readability?.[key]; // Optional chaining
                 return (
                   <SwiperSlide key={key} className={styles.readabilitySlide}>
                     <div className={styles.readabilityCard}>
@@ -180,11 +149,10 @@ const EditorWithMetrics: React.FC = () => {
           <div className={`${styles.advancedGridItem} ${styles.advancedCard}`}>
             <span className={styles.advancedCardTitle}>Comprimento do Texto</span>
             <div className={styles.advancedCardContent}>
-              {/* Display only length feedback */}
               {advancedMetrics.feedbackComprimento ? (
                   <p className={styles.metricFeedback}>{advancedMetrics.feedbackComprimento}</p>
               ) : (
-                  <p className={styles.metricFeedback}>Digite algo para ver o feedback.</p> // Placeholder if no feedback
+                  <p className={styles.metricFeedback}>Digite algo para ver o feedback.</p>
               )}
             </div>
           </div>
@@ -193,9 +161,8 @@ const EditorWithMetrics: React.FC = () => {
           <div className={`${styles.advancedGridItem} ${styles.advancedCard}`}>
             <span className={styles.advancedCardTitle}>Redundância</span>
             <div className={styles.advancedCardContent}>
-              <p>Índice: {advancedMetrics.redundancy.index}%</p>
-              {/* Display redundancy feedback */}
-              {advancedMetrics.redundancy.feedback && <p className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.redundancy.level)}`}>{advancedMetrics.redundancy.feedback}</p>}
+              <p>Índice: {advancedMetrics.redundancy?.index?.toFixed(1) ?? 'N/A'}%</p> {/* Optional chaining */}
+              {advancedMetrics.redundancy?.feedback && <p className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.redundancy.level)}`}>{advancedMetrics.redundancy.feedback}</p>}
             </div>
           </div>
 
@@ -203,7 +170,12 @@ const EditorWithMetrics: React.FC = () => {
           <div className={`${styles.advancedGridItem} ${styles.advancedCard}`}>
             <span className={styles.advancedCardTitle}>Análise de Sentimento</span>
             <div className={styles.advancedCardContent}>
-              <p>{formatSentiment(advancedMetrics.sentiment)}</p>
+              {/* Add check for sentiment object */}
+              {advancedMetrics.sentiment ? (
+                <p>{formatSentiment(advancedMetrics.sentiment)}</p>
+              ) : (
+                <p>N/A</p>
+              )}
             </div>
           </div>
         </div>

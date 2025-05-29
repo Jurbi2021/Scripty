@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './EditorWithSEO.module.scss';
 import basicStyles from './EditorWithMetrics.module.scss'; // Reuse basic metrics styles
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Mousewheel } from 'swiper/modules';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/free-mode';
+import MetricsToolbar from '../molecules/MetricsToolbar'; // Import the new molecule
 
 // Import metric functions and types
 import {
@@ -17,19 +12,6 @@ import {
   analyzeSeo,
   SeoAnalysisResult
 } from '../../utils/SeoAnalysis';
-
-// Reuse basic metric display order
-const basicMetricDisplayOrder: { key: keyof BasicMetricsData; label: string }[] = [
-  { key: 'words', label: 'Palavras' },
-  { key: 'charsWithSpaces', label: 'Caracteres' },
-  { key: 'sentences', label: 'Sentenças' },
-  { key: 'paragraphs', label: 'Parágrafos' },
-  { key: 'readingTime', label: 'Tempo Leitura' },
-  { key: 'uniqueWords', label: 'Palavras Únicas' },
-  { key: 'avgWordsPerSentence', label: 'Média Palavras/Sentença' },
-  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' },
-  { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
-];
 
 const EditorWithSEO: React.FC = () => {
   const [text, setText] = useState<string>('');
@@ -49,7 +31,7 @@ const EditorWithSEO: React.FC = () => {
   }, [text]);
 
   // Helper to get CSS class based on status
-  const getStatusClass = (status: string): string => {
+  const getStatusClass = (status: string | undefined): string => { // Added undefined type
     switch (status?.toLowerCase()) { // Added optional chaining for safety
       case 'bom': return styles.statusBom;
       case 'ideal': return styles.statusBom;
@@ -70,26 +52,8 @@ const EditorWithSEO: React.FC = () => {
         <h2 className={basicStyles.editorTitle}>Editor Scripty</h2>
         <p className={basicStyles.editorSubtitle}>Otimize seu texto para SEO da forma!</p>
 
-        {/* Basic Metrics Toolbar - Reused */}
-        <div className={basicStyles.toolbar}>
-          <Swiper
-            modules={[FreeMode, Mousewheel]}
-            slidesPerView={'auto'}
-            spaceBetween={12}
-            freeMode={true}
-            mousewheel={true}
-            className={basicStyles.metricsSwiper}
-          >
-            {basicMetricDisplayOrder.map(({ key, label }) => (
-              <SwiperSlide key={key} className={basicStyles.metricSlide}>
-                <div className={basicStyles.metricCard}>
-                  <span className={basicStyles.metricName}>{label}</span>
-                  <span className={basicStyles.metricValue}>{basicMetrics[key]}</span>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+        {/* Use the MetricsToolbar molecule */}
+        <MetricsToolbar metrics={basicMetrics} />
 
         {/* Text Area - Reused */}
         <textarea
@@ -112,7 +76,7 @@ const EditorWithSEO: React.FC = () => {
               {/* Keyword Density Feedback */}
               <div className={`${styles.feedbackCard} ${getStatusClass(seoAnalysis.keywordDensity < 1 ? 'baixa' : seoAnalysis.keywordDensity > 2 ? 'alta' : 'ideal')}`}>
                 <h4 className={styles.feedbackTitle}>Palavra-Chave Principal</h4>
-                <p className={styles.feedbackText}>{seoAnalysis.feedbackKeyword}</p>
+                <p className={styles.feedbackText}>{seoAnalysis.feedbackKeyword ?? 'Calculando...'}</p>
                 {seoAnalysis.mainKeyword && (
                   <div className={styles.keywordInfo}>
                     <span className={styles.keywordLabel}>Palavra-chave:</span>
@@ -124,7 +88,7 @@ const EditorWithSEO: React.FC = () => {
               {/* LSI Density Feedback */}
               <div className={`${styles.feedbackCard} ${getStatusClass(seoAnalysis.lsiResult?.density < 1 ? 'baixa' : seoAnalysis.lsiResult?.density > 2 ? 'alta' : 'ideal')}`}>
                 <h4 className={styles.feedbackTitle}>Densidade LSI</h4>
-                <p className={styles.feedbackText}>{seoAnalysis.lsiResult?.feedback}</p>
+                <p className={styles.feedbackText}>{seoAnalysis.lsiResult?.feedback ?? 'Calculando...'}</p>
                 {(seoAnalysis.lsiResult?.synonymsUsed?.length ?? 0) > 0 && (
                   <details className={styles.details}>
                     <summary>Sinônimos usados ({seoAnalysis.lsiResult.synonymsUsed.length})</summary>
@@ -142,19 +106,19 @@ const EditorWithSEO: React.FC = () => {
               {/* Readability Feedback */}
               <div className={`${styles.feedbackCard} ${getStatusClass(seoAnalysis.seoReadability)}`}>
                 <h4 className={styles.feedbackTitle}>Legibilidade para SEO</h4>
-                <p className={styles.feedbackText}>{seoAnalysis.feedbackReadability}</p>
+                <p className={styles.feedbackText}>{seoAnalysis.feedbackReadability ?? 'Calculando...'}</p>
               </div>
 
               {/* Text Length Feedback */}
               <div className={`${styles.feedbackCard} ${getStatusClass(seoAnalysis.seoTextLength)}`}>
                 <h4 className={styles.feedbackTitle}>Comprimento do Texto</h4>
-                <p className={styles.feedbackText}>{seoAnalysis.feedbackLength}</p>
+                <p className={styles.feedbackText}>{seoAnalysis.feedbackLength ?? 'Calculando...'}</p>
               </div>
 
               {/* Text Structure Feedback (Updated) */}
               <div className={`${styles.feedbackCard} ${getStatusClass(seoAnalysis.headingResult?.hasStructure ? 'bom' : 'precisa de ajustes')}`}>
                 <h4 className={styles.feedbackTitle}>Estrutura Textual</h4>
-                <p className={styles.feedbackText}>{seoAnalysis.feedbackHeadings}</p>
+                <p className={styles.feedbackText}>{seoAnalysis.feedbackHeadings ?? 'Calculando...'}</p>
                 {(seoAnalysis.headingResult?.potentialHeadings?.length ?? 0) > 0 && (
                   <details className={styles.details}>
                     <summary>Títulos potenciais detectados ({seoAnalysis.headingResult.potentialHeadings.length})</summary>

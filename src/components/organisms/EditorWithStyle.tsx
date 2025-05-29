@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './EditorWithStyle.module.scss'; // Use specific styles
 import basicStyles from './EditorWithMetrics.module.scss'; // Reuse basic metrics styles
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Mousewheel } from 'swiper/modules';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/free-mode';
+import MetricsToolbar from '../molecules/MetricsToolbar'; // Import the new molecule
 
 // Import metric functions and types
 import {
@@ -20,19 +15,6 @@ import {
   SentenceInfo,
   ComplexSentenceInfo
 } from '../../utils/StyleAnalysis';
-
-// Reuse basic metric display order
-const basicMetricDisplayOrder: { key: keyof BasicMetricsData; label: string }[] = [
-  { key: 'words', label: 'Palavras' },
-  { key: 'charsWithSpaces', label: 'Caracteres' },
-  { key: 'sentences', label: 'Sentenças' },
-  { key: 'paragraphs', label: 'Parágrafos' },
-  { key: 'readingTime', label: 'Tempo Leitura' },
-  { key: 'uniqueWords', label: 'Palavras Únicas' },
-  { key: 'avgWordsPerSentence', label: 'Média Palavras/Sentença' },
-  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' },
-  { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
-];
 
 const EditorWithStyle: React.FC = () => {
   const [text, setText] = useState<string>('');
@@ -53,10 +35,10 @@ const EditorWithStyle: React.FC = () => {
 
   // Helper to get CSS class based on level
   const getLevelClass = (level: string): string => {
-    switch (level.toLowerCase()) {
+    switch (level?.toLowerCase()) { // Added optional chaining
       case 'excelente': return styles.levelExcelente;
       case 'bom': return styles.levelBom;
-      case 'regular': return styles.levelRegular; // Added for potential use
+      case 'regular': return styles.levelRegular;
       case 'ruim': return styles.levelRuim;
       default: return '';
     }
@@ -64,10 +46,10 @@ const EditorWithStyle: React.FC = () => {
 
   // Function to render sentences with highlighting (optional)
   const renderSentences = (sentences: SentenceInfo[] | ComplexSentenceInfo[]) => {
-    if (sentences.length === 0) return <p>Nenhuma frase para destacar.</p>;
+    if (!sentences || sentences.length === 0) return <p>Nenhuma frase para destacar.</p>; // Added check for undefined
     return (
       <ul className={styles.sentenceList}>
-        {sentences.slice(0, 5).map((info) => ( // Limit displayed sentences
+        {sentences.slice(0, 5).map((info) => (
           <li key={info.index}>
             <span>{info.index}:</span> {info.sentence}
           </li>
@@ -84,26 +66,8 @@ const EditorWithStyle: React.FC = () => {
         <h2 className={basicStyles.editorTitle}>Editor Scripty</h2>
         <p className={basicStyles.editorSubtitle}>Descubra mais sobre a forma que você escreve!</p>
 
-        {/* Basic Metrics Toolbar - Reused */}
-        <div className={basicStyles.toolbar}>
-          <Swiper
-            modules={[FreeMode, Mousewheel]}
-            slidesPerView={'auto'}
-            spaceBetween={12}
-            freeMode={true}
-            mousewheel={true}
-            className={basicStyles.metricsSwiper}
-          >
-            {basicMetricDisplayOrder.map(({ key, label }) => (
-              <SwiperSlide key={key} className={basicStyles.metricSlide}>
-                <div className={basicStyles.metricCard}>
-                  <span className={basicStyles.metricName}>{label}</span>
-                  <span className={basicStyles.metricValue}>{basicMetrics[key]}</span>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+        {/* Use the MetricsToolbar molecule */}
+        <MetricsToolbar metrics={basicMetrics} />
 
         {/* Text Area - Reused */}
         <textarea
@@ -121,10 +85,10 @@ const EditorWithStyle: React.FC = () => {
 
         <div className={styles.feedbackContainer}>
           {/* Passive Voice Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.passiveVoice.level)}`}>
+          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.passiveVoice?.level)}`}> {/* Optional chaining */}
             <h4 className={styles.feedbackTitle}>Voz Passiva</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.passiveVoice.feedback}</p>
-            {styleAnalysis.passiveVoice.count > 0 && (
+            <p className={styles.feedbackText}>{styleAnalysis.passiveVoice?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
+            {(styleAnalysis.passiveVoice?.count ?? 0) > 0 && (
               <details className={styles.details}>
                 <summary>Ver frases ({styleAnalysis.passiveVoice.count})</summary>
                 {renderSentences(styleAnalysis.passiveVoice.sentences)}
@@ -133,10 +97,10 @@ const EditorWithStyle: React.FC = () => {
           </div>
 
           {/* Adverbs Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.adverbs.level)}`}>
+          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.adverbs?.level)}`}> {/* Optional chaining */}
             <h4 className={styles.feedbackTitle}>Advérbios</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.adverbs.feedback}</p>
-            {styleAnalysis.adverbs.count > 0 && (
+            <p className={styles.feedbackText}>{styleAnalysis.adverbs?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
+            {(styleAnalysis.adverbs?.count ?? 0) > 0 && (
               <details className={styles.details}>
                 <summary>Ver advérbios ({styleAnalysis.adverbs.count})</summary>
                 <p className={styles.wordList}>{styleAnalysis.adverbs.adverbs.slice(0, 15).join(', ')}{styleAnalysis.adverbs.adverbs.length > 15 ? '...' : ''}</p>
@@ -145,10 +109,10 @@ const EditorWithStyle: React.FC = () => {
           </div>
 
           {/* Complex Sentences Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.complexSentences.level)}`}>
+          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.complexSentences?.level)}`}> {/* Optional chaining */}
             <h4 className={styles.feedbackTitle}>Frases Complexas</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.complexSentences.feedback}</p>
-            {styleAnalysis.complexSentences.count > 0 && (
+            <p className={styles.feedbackText}>{styleAnalysis.complexSentences?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
+            {(styleAnalysis.complexSentences?.count ?? 0) > 0 && (
               <details className={styles.details}>
                 <summary>Ver frases ({styleAnalysis.complexSentences.count})</summary>
                 {renderSentences(styleAnalysis.complexSentences.sentences)}
@@ -156,11 +120,11 @@ const EditorWithStyle: React.FC = () => {
             )}
           </div>
 
-          {/* Discourse Connectors Feedback - Added */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.discourseConnectors.level)}`}>
+          {/* Discourse Connectors Feedback */}
+          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.discourseConnectors?.level)}`}> {/* Optional chaining */}
             <h4 className={styles.feedbackTitle}>Conectores Discursivos</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.discourseConnectors.feedback}</p>
-            {styleAnalysis.discourseConnectors.count > 0 && (
+            <p className={styles.feedbackText}>{styleAnalysis.discourseConnectors?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
+            {(styleAnalysis.discourseConnectors?.count ?? 0) > 0 && (
               <details className={styles.details}>
                 <summary>Ver conectores ({styleAnalysis.discourseConnectors.count})</summary>
                 <p className={styles.wordList}>{styleAnalysis.discourseConnectors.connectors.slice(0, 15).join(', ')}{styleAnalysis.discourseConnectors.connectors.length > 15 ? '...' : ''}</p>
@@ -168,11 +132,10 @@ const EditorWithStyle: React.FC = () => {
             )}
           </div>
 
-          {/* Lexical Diversity Feedback - Added */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.lexicalDiversity.level)}`}>
+          {/* Lexical Diversity Feedback */}
+          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.lexicalDiversity?.level)}`}> {/* Optional chaining */}
             <h4 className={styles.feedbackTitle}>Diversidade Léxica</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.lexicalDiversity.feedback}</p>
-            {/* No details needed for Shannon Index, just the feedback */}
+            <p className={styles.feedbackText}>{styleAnalysis.lexicalDiversity?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
           </div>
 
         </div>
