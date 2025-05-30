@@ -1,35 +1,36 @@
-@import '../../App.css'; // Import global variables
+// src/components/templates/MainLayout.module.scss
+@import '../../App.css'; //
 
 .layout {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; // Prevent scrolling at the top level
-  background-color: var(--bg-main-dark); // Use main dark background
+  display: flex; //
+  height: 100vh; //
+  width: 100vw; //
+  overflow: hidden; // Evita scroll no nível mais alto
+  background-color: var(--bg-main-dark); // Fundo principal
+
+  [data-theme='light'] & {
+    background-color: var(--bg-main-light);
+  }
 }
 
 .mainContent {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  // Ensure this container shrinks and grows correctly
-  // It will take the remaining space after the sidebar
-  min-width: 0; // Important for flex items to shrink properly
-  overflow: hidden; // Prevent this container from scrolling itself
+  flex-grow: 1; //
+  display: flex; //
+  flex-direction: column; //
+  height: 100vh; //
+  min-width: 0; // Importante para flex items encolherem corretamente
+  overflow: hidden; // Evita que este container tenha scroll próprio
+  position: relative; // Para contextos de empilhamento se necessário
 }
 
 .pageContent {
-  flex-grow: 1;
-  // Removed padding here, apply padding within the specific page components if needed
-  // This ensures the layout structure itself doesn't cause overflow issues
-  overflow-y: auto; // Allow scrolling only within the page content area
-  background-color: var(--bg-main-dark); // Match main background
-  transition: background-color 0.3s ease;
-  // The actual page component (e.g., EditorWithMetrics) will be rendered here
-  // and should handle its own internal padding and layout.
+  flex-grow: 1; //
+  overflow-y: auto; // Permite scroll APENAS na área de conteúdo da página
+  // O fundo é o mesmo do .layout por padrão, ou pode ser var(--bg-container-dark) se quiser diferenciar
+  // background-color: var(--bg-main-dark); Foi removido pois o pai .layout já tem
+  // O padding é aplicado dentro dos organismos de editor (ex: .editorLayout)
+  // Se precisar de um padding global aqui, adicione:
+  // padding: 1.5rem; 
+  // e ajuste os paddings dos filhos para evitar duplicidade.
+  position: relative; // Para contextos de empilhamento se necessário (ex: AnimatePresence)
 }
-
-// Adjustments might be needed in the page components themselves
-// to ensure they respect the container boundaries.
-

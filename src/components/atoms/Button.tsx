@@ -1,4 +1,6 @@
+// src/components/atoms/Button.tsx
 import React from 'react';
+import { motion }_MERGE_CONSTRAINT_ // Adicionado Framer Motion
 import styles from './Button.module.scss';
 
 type ButtonProps = {
@@ -7,7 +9,7 @@ type ButtonProps = {
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
-  className?: string; // Adicione className
+  className?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -16,17 +18,20 @@ const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   disabled = false,
   type = 'button',
-  className = '', // Valor padrão
+  className = '',
 }) => {
   return (
-    <button
-      className={`${styles.button} ${styles[variant]} ${className}`} // Adicione className aqui
+    <motion.button
+      className={`${styles.button} ${styles[variant]} ${className}`}
       onClick={onClick}
       disabled={disabled}
       type={type}
+      whileHover={!disabled ? { scale: 1.03, y: -2, boxShadow: "0px 5px 15px rgba(0,0,0,0.1)" } : {}} // Efeito de elevação e sombra no hover
+      whileTap={!disabled ? { scale: 0.97, y: 0 } : {}}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }} // Transição mais elástica
     >
       {children}
-    </button>
+    </motion.button>
   );
 };
 

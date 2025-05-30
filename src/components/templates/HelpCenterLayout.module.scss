@@ -1,17 +1,27 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/templates/HelpCenterLayout.module.scss
+// @use '../../assets/scss/variables' as vars; // Comentado se usar vars CSS
 
 .layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  display: flex; //
+  flex-direction: column; //
+  min-height: 100vh; //
+  background-color: var(--bg-main-dark); // Usar variável CSS
+
+  [data-theme='light'] & {
+    background-color: var(--bg-main-light);
+  }
 }
 
 .content {
-  flex: 1;
-  padding: 1rem;
-  background: vars.$background-dark;
+  flex: 1; //
+  padding: 2rem; // // Aumentar padding para conteúdo textual
+  // A cor de fundo pode vir do .layout ou ser definida aqui se for diferente
+  // Ex: background: var(--bg-container-dark);
+  max-width: 900px; // Limitar largura para melhor legibilidade de texto
+  margin: 0 auto; // Centralizar conteúdo se max-width for usado
+  width: 100%; // Garantir que ocupe a largura disponível até o max-width
 
-  [data-theme='light'] & {
-    background: vars.$background-light;
-  }
+  // [data-theme='light'] & {
+  //   background: var(--bg-container-light); // Exemplo
+  // }
 }

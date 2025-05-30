@@ -1,148 +1,198 @@
+// src/components/organisms/EditorWithStyle.tsx
 import React, { useState, useEffect } from 'react';
-import styles from './EditorWithStyle.module.scss'; // Use specific styles
-import basicStyles from './EditorWithMetrics.module.scss'; // Reuse basic metrics styles
-import MetricsToolbar from '../molecules/MetricsToolbar'; // Import the new molecule
+import styles from './EditorWithStyle.module.scss'; // Estilos específicos para este editor
+import editorLayoutStyles from './EditorWithMetrics.module.scss'; // Reutilizar estilos de layout do EditorWithMetrics
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaLightbulb } from 'react-icons/fa'; // Para o empty state
 
-// Import metric functions and types
+// Componentes
+import TextArea from '../atoms/TextArea';
+import MetricsToolbar from '../molecules/MetricsToolbar';
+
+// Utils e Tipos
 import {
   calculateBasicMetrics,
   BasicMetricsData,
-} from '../../utils/BasicMetrics';
+} from '../../utils/BasicMetrics';;
 import {
   performStyleAnalysis,
   StyleAnalysisData,
   getEmptyStyleAnalysis,
-  SentenceInfo,
-  ComplexSentenceInfo
-} from '../../utils/StyleAnalysis';
+  SentenceInfo, //
+  ComplexSentenceInfo //
+} from '../../utils/StyleAnalysis'; //
+
+// Ordem das métricas básicas (igual ao EditorWithMetrics)
+const basicMetricDisplayOrder: { key: keyof BasicMetricsData; label: string }[] = [
+  { key: 'words', label: 'Palavras' },
+  { key: 'charsWithSpaces', label: 'Caracteres' },
+  { key: 'readingTime', label: 'Tempo Leitura' },
+  { key: 'sentences', label: 'Sentenças' },
+  { key: 'paragraphs', label: 'Parágrafos' },
+  { key: 'uniqueWords', label: 'Palavras Únicas' },
+  { key: 'avgWordsPerSentence', label: 'Média Palavras/Sentença' },
+  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' },
+  { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
+];
 
 const EditorWithStyle: React.FC = () => {
   const [text, setText] = useState<string>('');
   const [basicMetrics, setBasicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
-  const [styleAnalysis, setStyleAnalysis] = useState<StyleAnalysisData>(getEmptyStyleAnalysis());
+  const [styleAnalysis, setStyleAnalysis] = useState<StyleAnalysisData>(getEmptyStyleAnalysis()); //
 
-  // Calculate metrics and style analysis when text changes
   useEffect(() => {
     const handler = setTimeout(() => {
       setBasicMetrics(calculateBasicMetrics(text));
-      setStyleAnalysis(performStyleAnalysis(text));
-    }, 300); // Slightly longer delay for potentially heavier analysis
-
-    return () => {
-      clearTimeout(handler);
-    };
+      setStyleAnalysis(performStyleAnalysis(text)); //
+    }, 300);
+    return () => clearTimeout(handler);
   }, [text]);
 
-  // Helper to get CSS class based on level
-  const getLevelClass = (level: string): string => {
-    switch (level?.toLowerCase()) { // Added optional chaining
+  const toolbarMetrics = basicMetricDisplayOrder.map(metric => ({
+    label: metric.label,
+    value: basicMetrics[metric.key]
+  }));
+
+  const getLevelClass = (level: string): string => { //
+    switch (level?.toLowerCase()) {
       case 'excelente': return styles.levelExcelente;
       case 'bom': return styles.levelBom;
       case 'regular': return styles.levelRegular;
       case 'ruim': return styles.levelRuim;
-      default: return '';
+      default: return styles.levelNA || '';
     }
   };
 
-  // Function to render sentences with highlighting (optional)
-  const renderSentences = (sentences: SentenceInfo[] | ComplexSentenceInfo[]) => {
-    if (!sentences || sentences.length === 0) return <p>Nenhuma frase para destacar.</p>; // Added check for undefined
+  const renderSentences = (sentences: SentenceInfo[] | ComplexSentenceInfo[], type: string) => { //
+    if (!sentences || sentences.length === 0) return <p className={styles.noDetails}>Nenhuma frase para destacar nesta categoria.</p>;
     return (
       <ul className={styles.sentenceList}>
         {sentences.slice(0, 5).map((info) => (
-          <li key={info.index}>
+          <li key={`${type}-${info.index}`}>
             <span>{info.index}:</span> {info.sentence}
+            {/* Para frases complexas, podemos adicionar mais detalhes se quisermos */}
+            {(info as ComplexSentenceInfo).wordCount && (
+              <span className={styles.sentenceMeta}> ({ (info as ComplexSentenceInfo).wordCount} palavras)</span>
+            )}
           </li>
         ))}
-        {sentences.length > 5 && <li>... e mais {sentences.length - 5}.</li>}
+        {sentences.length > 5 && <li className={styles.moreDetails}>... e mais {sentences.length - 5}.</li>}
       </ul>
     );
   };
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.07,
+      duration: 0.4,
+      // ease: [0.6, 0.05, -0.01, 0.9] // <--- Linha problemática
+      ease: "easeOut" // <--- SUBSTITUA POR UM EASING VÁLIDO
+      // ou tente ajustar os valores da sua cubic-bezier, ex:
+      // ease: [0.6, 0.05, 0.1, 0.9]
+    }
+  })
+};
+
+  const analysisItems = [
+    { key: 'passiveVoice', data: styleAnalysis.passiveVoice, title: 'Voz Passiva', detailsContent: styleAnalysis.passiveVoice.sentences, detailType: 'passive' },
+    { key: 'adverbs', data: styleAnalysis.adverbs, title: 'Advérbios', detailsContent: styleAnalysis.adverbs.adverbs, detailType: 'adverbs' },
+    { key: 'complexSentences', data: styleAnalysis.complexSentences, title: 'Frases Complexas', detailsContent: styleAnalysis.complexSentences.sentences, detailType: 'complex' },
+    { key: 'discourseConnectors', data: styleAnalysis.discourseConnectors, title: 'Conectores Discursivos', detailsContent: styleAnalysis.discourseConnectors.connectors, detailType: 'connectors'},
+    { key: 'lexicalDiversity', data: styleAnalysis.lexicalDiversity, title: 'Diversidade Léxica', detailsContent: null }
+  ];
+
+
   return (
-    <div className={basicStyles.editorLayout}> {/* Reuse overall layout */}
-      {/* Main Editor Area (Left/Center) - Reused */}
-      <div className={basicStyles.mainContentArea}>
-        <h2 className={basicStyles.editorTitle}>Editor Scripty</h2>
-        <p className={basicStyles.editorSubtitle}>Descubra mais sobre a forma que você escreve!</p>
+    <div className={editorLayoutStyles.editorLayout}>
+      <div className={editorLayoutStyles.mainContentArea}>
+        <motion.h2
+          className={editorLayoutStyles.editorTitle}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+          Análise de Estilo
+        </motion.h2>
+        <motion.p
+          className={editorLayoutStyles.editorSubtitle}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
+        >
+          Descubra mais sobre a forma como você escreve!
+        </motion.p>
 
-        {/* Use the MetricsToolbar molecule */}
-        <MetricsToolbar metrics={basicMetrics} />
+        <div className={editorLayoutStyles.toolbarWrapper}>
+          <MetricsToolbar metrics={basicMetrics} />
+        </div>
 
-        {/* Text Area - Reused */}
-        <textarea
-          className={basicStyles.editorArea}
+        <TextArea
+          className={editorLayoutStyles.editorAreaAdapter}
           placeholder="Cole seu texto aqui para analisar o estilo..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          rows={15}
         />
       </div>
 
-      {/* Style Analysis Panel (Right) */}
-      <div className={styles.styleAnalysisPanel}>
+      <motion.div
+        className={styles.styleAnalysisPanel} // Usar o estilo específico do painel
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+      >
         <h3 className={styles.panelTitle}>Análise de Estilo</h3>
-        <p className={styles.panelSubtitle}>Todo o feedback de análise de estilo</p>
+        <p className={styles.panelSubtitle}>Todo o feedback de análise de estilo.</p>
 
-        <div className={styles.feedbackContainer}>
-          {/* Passive Voice Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.passiveVoice?.level)}`}> {/* Optional chaining */}
-            <h4 className={styles.feedbackTitle}>Voz Passiva</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.passiveVoice?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
-            {(styleAnalysis.passiveVoice?.count ?? 0) > 0 && (
-              <details className={styles.details}>
-                <summary>Ver frases ({styleAnalysis.passiveVoice.count})</summary>
-                {renderSentences(styleAnalysis.passiveVoice.sentences)}
-              </details>
-            )}
-          </div>
-
-          {/* Adverbs Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.adverbs?.level)}`}> {/* Optional chaining */}
-            <h4 className={styles.feedbackTitle}>Advérbios</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.adverbs?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
-            {(styleAnalysis.adverbs?.count ?? 0) > 0 && (
-              <details className={styles.details}>
-                <summary>Ver advérbios ({styleAnalysis.adverbs.count})</summary>
-                <p className={styles.wordList}>{styleAnalysis.adverbs.adverbs.slice(0, 15).join(', ')}{styleAnalysis.adverbs.adverbs.length > 15 ? '...' : ''}</p>
-              </details>
-            )}
-          </div>
-
-          {/* Complex Sentences Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.complexSentences?.level)}`}> {/* Optional chaining */}
-            <h4 className={styles.feedbackTitle}>Frases Complexas</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.complexSentences?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
-            {(styleAnalysis.complexSentences?.count ?? 0) > 0 && (
-              <details className={styles.details}>
-                <summary>Ver frases ({styleAnalysis.complexSentences.count})</summary>
-                {renderSentences(styleAnalysis.complexSentences.sentences)}
-              </details>
-            )}
-          </div>
-
-          {/* Discourse Connectors Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.discourseConnectors?.level)}`}> {/* Optional chaining */}
-            <h4 className={styles.feedbackTitle}>Conectores Discursivos</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.discourseConnectors?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
-            {(styleAnalysis.discourseConnectors?.count ?? 0) > 0 && (
-              <details className={styles.details}>
-                <summary>Ver conectores ({styleAnalysis.discourseConnectors.count})</summary>
-                <p className={styles.wordList}>{styleAnalysis.discourseConnectors.connectors.slice(0, 15).join(', ')}{styleAnalysis.discourseConnectors.connectors.length > 15 ? '...' : ''}</p>
-              </details>
-            )}
-          </div>
-
-          {/* Lexical Diversity Feedback */}
-          <div className={`${styles.feedbackCard} ${getLevelClass(styleAnalysis.lexicalDiversity?.level)}`}> {/* Optional chaining */}
-            <h4 className={styles.feedbackTitle}>Diversidade Léxica</h4>
-            <p className={styles.feedbackText}>{styleAnalysis.lexicalDiversity?.feedback ?? 'Calculando...'}</p> {/* Optional chaining */}
-          </div>
-
-        </div>
-      </div>
+        <AnimatePresence>
+          {text.length > 0 ? (
+            <div className={styles.feedbackContainer}>
+              {analysisItems.map((item, index) => (
+                <motion.div
+                  key={item.key}
+                  className={`${styles.feedbackCard} ${getLevelClass(item.data.level)}`}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible" // Animar quando o texto > 0
+                  exit="hidden" // Pode não ser necessário se o container some
+                >
+                  <h4 className={styles.feedbackTitle}>{item.title}</h4>
+                  <p className={styles.feedbackText}>{item.data.feedback}</p>
+                  {item.detailsContent && item.data.count > 0 && (
+                    <details className={styles.details}>
+                      <summary>Ver {item.title === 'Advérbios' || item.title === 'Conectores Discursivos' ? 'lista' : 'frases'} ({item.data.count})</summary>
+                      {Array.isArray(item.detailsContent) ? (
+                        (item.detailType === 'adverbs' || item.detailType === 'connectors') ?
+                          <p className={styles.wordList}>{(item.detailsContent as string[]).slice(0,15).join(', ')}{(item.detailsContent.length > 15 ? '...' : '')}</p> :
+                          renderSentences(item.detailsContent as SentenceInfo[] | ComplexSentenceInfo[], item.detailType!)
+                      ) : null}
+                    </details>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+             <motion.div
+                key="empty-style"
+                className={editorLayoutStyles.emptyStateAdvancedMetrics} // Reutilizar estilo do empty state
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+             >
+                <FaLightbulb />
+                <p>Sua análise de estilo aparecerá aqui quando você digitar.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };
 
 export default EditorWithStyle;
-

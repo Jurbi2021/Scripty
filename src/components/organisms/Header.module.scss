@@ -1,73 +1,109 @@
-@import '../../App.css'; // Import global variables if needed
+// src/components/organisms/Header.module.scss
+@import '../../App.css'; //
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1.5rem; // Keep horizontal padding
-  background-color: var(--bg-container-dark); // Match sidebar container background
-  border-bottom: 1px solid var(--border-color-dark); // Use dark border color
-  height: 65px; // Match sidebar header height
-  flex-shrink: 0; // Prevent header from shrinking
-  width: 100%; // Explicitly set width to 100% of its container (.mainContent)
-  box-sizing: border-box; // Include padding and border in the element's total width and height
+  display: flex; //
+  justify-content: space-between; //
+  align-items: center; //
+  padding: 0 1.5rem; //
+  background-color: var(--bg-container-dark); //
+  border-bottom: 1px solid var(--border-color-dark); //
+  height: 65px; //
+  flex-shrink: 0; //
+  width: 100%; //
+  box-sizing: border-box; //
+  position: relative; // Para z-index se necessário
+  z-index: 10; // Para garantir que fique acima de outros conteúdos da página
+
+  [data-theme='light'] & {
+    background-color: var(--bg-container-light);
+    border-bottom: 1px solid var(--border-color-light);
+  }
 
   .leftSection {
-    // Styles for logo or title area
-    .logo {
-      height: 35px; // Slightly larger logo
-      // Add filter for dark mode if needed
-    }
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    // .logo { height: 35px; } //
     .title {
-      font-size: 1.3rem;
-      font-weight: 500;
-      color: var(--text-main-dark);
+      font-size: 1.2rem; // Ajustar tamanho
+      font-weight: 600; // Mais peso
+      color: var(--text-main-dark); //
+      [data-theme='light'] & {
+        color: var(--text-main-light);
+      }
+    }
+    .logoPlaceholder { // Para manter o alinhamento se não houver título
+        width: 1px; // Apenas para ocupar espaço se necessário
     }
   }
 
   .rightSection {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem; // Slightly reduced gap
+    display: flex; //
+    align-items: center; //
+    gap: 0.75rem; //
 
     .button {
-      padding: 0.6rem 1.2rem; // Adjust padding
-      border: 1px solid var(--border-color-dark); // Use dark border
-      border-radius: 6px; // Slightly more rounded
-      background-color: transparent; // Transparent background by default
-      color: var(--text-secondary-dark); // Use secondary text color
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      padding: 0.5rem 1rem; // Ajustar padding
+      border: 1px solid var(--border-color-dark); //
+      border-radius: 8px; // Mais arredondado
+      background-color: transparent; //
+      color: var(--text-secondary-dark); //
+      cursor: pointer; //
+      font-size: 0.85rem; //
+      font-weight: 500; //
+      // transições controladas por Framer Motion
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
 
-      &:hover {
-        background-color: rgba(180, 151, 255, 0.1); // Use highlight color with low opacity
-        border-color: var(--action-highlight-dark);
-        color: var(--action-highlight-dark);
+      .buttonIcon {
+        font-size: 1rem; // Tamanho do ícone dentro do botão
       }
 
-      // Specific styles if needed
+      &:hover:not(:disabled) { // Framer Motion fará o scale, aqui apenas cor
+        // background-color: rgba(180, 151, 255, 0.08); //
+        // border-color: var(--action-highlight-dark); //
+        // color: var(--action-highlight-dark); //
+      }
+
       &.focusButton {
-        // Example: Maybe a different hover or active state
+        // Estilo específico para o botão de foco
+        &.focusActive {
+            background-color: var(--action-highlight-dark);
+            color: var(--bg-main-dark); // Texto escuro para contraste com fundo lilás
+            border-color: var(--action-highlight-dark);
+             [data-theme='light'] & {
+                color: var(--bg-main-light); // Ou #FFFFFF para contraste máximo
+             }
+        }
       }
-      &.backButton {
-         &:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: var(--text-secondary-dark);
-            color: var(--text-main-dark);
-         }
-      }
-      &.helpButton {
+      &.iconButton { // Botão que é apenas um ícone
+         padding: 0.6rem;
          border: none;
-         padding: 0.6rem; // Adjust padding if only icon
+         background-color: transparent;
          &:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text-main-dark);
-            border: none;
+            // background-color: rgba(255, 255, 255, 0.05); //
+            color: var(--action-highlight-dark); //
+            border: none; //
          }
+         svg { font-size: 1.2rem; } // Ícone um pouco maior para botões de ícone
+      }
+
+
+      [data-theme='light'] & {
+        border-color: var(--border-color-light);
+        color: var(--text-secondary-light);
+        // &:hover:not(:disabled) {
+        //   background-color: rgba(180, 151, 255, 0.08);
+        //   border-color: var(--action-highlight-light);
+        //   color: var(--action-highlight-light);
+        // }
+        // &.iconButton:hover {
+        //    background-color: rgba(0,0,0,0.03);
+        //    color: var(--action-highlight-light);
+        // }
       }
     }
   }
 }
-

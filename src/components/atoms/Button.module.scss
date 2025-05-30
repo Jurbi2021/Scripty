@@ -1,46 +1,70 @@
+// src/components/atoms/Button.module.scss
 @use 'sass:color';
-@use '../../assets/scss/variables' as vars;
+@use '../../assets/scss/variables' as vars; //
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  background-color: vars.$action-color;
-  color: vars.$white;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  border: none;
-  cursor: pointer;
+  padding: 0.7rem 1.4rem; // Levemente mais padding para um toque premium
+  border-radius: 8px; // Mantido
+  background-color: vars.$action-color; //
+  color: vars.$white; //
+  font-weight: 600; //
+  font-size: 1rem; //
+  // A transição de transform será gerenciada pelo Framer Motion.
+  // Mantemos a transição de background-color para o caso de variantes.
+  transition: background-color 0.2s ease-out;
+  border: none; //
+  cursor: pointer; //
+  // Remover as transições de hover e active daqui se Framer Motion estiver controlando
+  // &:hover {
+  //   background-color: color.adjust(vars.$action-color, $lightness: 5%);
+  //   // transform: scale(1.02); // Controlado por Framer Motion
+  // }
 
-  &:hover {
-    background-color: color.adjust(vars.$action-color, $lightness: 5%);
-    transform: scale(1.02);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
+  // &:active {
+  //   // transform: scale(0.98); // Controlado por Framer Motion
+  // }
 
   &:disabled {
-    background-color: vars.$gray-medium;
-    cursor: not-allowed;
+    background-color: vars.$gray-medium; //
+    cursor: not-allowed; //
+    opacity: 0.6; // Adicionar opacidade para feedback visual de desabilitado
   }
 
   &.primary {
-    background-color: vars.$action-color;
-    color: vars.$white;
+    background-color: vars.$action-color; //
+    color: vars.$white; //
+
+    [data-theme='light'] & {
+        // Para tema claro, a cor de ação já é usada, mas pode-se ajustar o texto se necessário.
+        // Ex: Se a cor de ação no tema claro for muito clara, o texto branco pode não ter contraste.
+        // No seu caso --action-highlight-light: #b497ff; (lilás), texto branco deve funcionar bem.
+    }
   }
 
   &.secondary {
-    background-color: vars.$gray-medium;
-    color: vars.$white;
+    background-color: var(--bg-card-dark); // Usar uma cor de fundo mais sutil, como a dos cards
+    color: var(--text-main-dark); // Usar a cor de texto principal
+    border: 1px solid var(--border-color-dark); // Adicionar uma borda sutil
 
-    // Ajustes para tema claro (se necessário)
+    &:hover:not(:disabled) {
+      background-color: color.adjust(vars.$action-color, $alpha: -0.8); // Um leve tom da cor de ação
+      border-color: var(--action-highlight-dark);
+      color: var(--action-highlight-dark);
+    }
+
     [data-theme='light'] & {
-      color: vars.$white;
+      background-color: var(--bg-card-light); //
+      color: var(--text-main-light); //
+      border: 1px solid var(--border-color-light); //
+
+      &:hover:not(:disabled) {
+        background-color: color.adjust(vars.$action-color, $lightness: 40%, $alpha: -0.7);
+        border-color: var(--action-highlight-light); //
+        color: var(--action-highlight-light); //
+      }
     }
   }
 }

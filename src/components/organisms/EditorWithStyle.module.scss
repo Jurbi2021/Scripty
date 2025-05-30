@@ -1,157 +1,176 @@
-@import "../../App.css"; // Import global variables
-@import "./EditorWithMetrics.module.scss"; // Import basic layout styles if needed
+// src/components/organisms/EditorWithStyle.module.scss
+@import "../../App.css";
+// Não precisa importar EditorWithMetrics.module.scss diretamente,
+// pois as classes de layout são usadas de editorLayoutStyles no TSX.
 
+// Estilos para o painel de análise de estilo
 .styleAnalysisPanel {
-  flex: 1;
+  flex: 1.5; // Consistente com advancedMetricsPanel
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
-  background-color: var(--bg-container-dark);
-  border-radius: 8px;
-  border: 1px solid var(--border-color-dark);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background-color: var(--bg-container-dark); //
+  border-radius: 12px; // Consistente
+  border: 1px solid var(--border-color-dark); //
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07); // Consistente
   box-sizing: border-box;
-  min-width: 0; // Prevent flex item overflow
-  overflow-y: auto; // Allow scrolling if content exceeds height
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--action-highlight-dark) var(--bg-container-dark);
+  scrollbar-color: var(--action-highlight-dark) transparent;
 
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-track {
-    background: var(--bg-container-dark);
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--action-highlight-dark);
-    border-radius: 3px;
-    border: 1px solid var(--bg-container-dark);
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+
+  [data-theme='light'] & {
+    background-color: var(--bg-container-light);
+    border-color: var(--border-color-light);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    scrollbar-color: var(--action-highlight-light) transparent;
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); }
   }
 }
 
 .panelTitle {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--text-main-dark);
-  margin: 0;
-  flex-shrink: 0;
+  font-size: 1.1rem; // Consistente
+  font-weight: 600;
+  color: var(--text-main-dark); //
+  margin: 0 0 0.1rem 0;
+  [data-theme='light'] & { color: var(--text-main-light); }
 }
 
 .panelSubtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary-dark);
-  margin-top: -0.5rem;
-  margin-bottom: 1rem; // Add space before feedback cards
-  flex-shrink: 0;
+  font-size: 0.8rem; // Consistente
+  color: var(--text-secondary-dark); //
+  margin: 0 0 1rem 0;
+  [data-theme='light'] & { color: var(--text-secondary-light); }
 }
 
 .feedbackContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  flex-grow: 1;
+  display: flex; //
+  flex-direction: column; //
+  gap: 0.85rem; // Espaço entre cards
+  flex-grow: 1; //
 }
 
 .feedbackCard {
-  background-color: var(--bg-card-dark);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border-color-dark);
-  border-left: 4px solid var(--border-color-dark); // Default border
-  transition: border-left-color 0.3s ease;
+  background-color: var(--bg-card-dark); //
+  border-radius: 10px; // Consistente
+  padding: 0.9rem 1.1rem; // Ajustar padding
+  border: 1px solid var(--border-color-dark); //
+  border-left-width: 4px; // Manter borda proeminente
+  // box-shadow: 0 1px 3px rgba(0,0,0,0.05); // Sombra mais leve para estes cards
+  transition: border-left-color 0.3s ease; //
 
-  &.levelExcelente {
-    border-left-color: var(--success-color-dark);
-  }
-  &.levelBom {
-    border-left-color: #a0d911; // Light Green
-  }
-  &.levelRegular {
-    border-left-color: #faad14; // Orange
-  }
-  &.levelRuim {
-    border-left-color: #f5222d; // Red
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    border-color: var(--border-color-light);
+    // box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
 }
 
 .feedbackTitle {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main-dark);
-  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem; // Ajuste
+  font-weight: 600; //
+  color: var(--text-main-dark); //
+  margin: 0 0 0.4rem 0; //
+  [data-theme='light'] & { color: var(--text-main-light); }
 }
 
 .feedbackText {
-  font-size: 0.9rem;
-  color: var(--text-secondary-dark);
-  line-height: 1.5;
-  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem; // Ajuste
+  color: var(--text-secondary-dark); //
+  line-height: 1.5; //
+  margin: 0 0 0.6rem 0; //
+  [data-theme='light'] & { color: var(--text-secondary-light); }
 }
 
 .details {
   summary {
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: var(--action-highlight-dark);
-    font-weight: 500;
-    margin-top: 0.5rem;
-    display: inline-block;
+    cursor: pointer; //
+    font-size: 0.8rem; //
+    color: var(--action-highlight-dark); //
+    font-weight: 500; //
+    margin-top: 0.25rem; // Ajuste
+    display: inline-block; //
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
     &:hover {
-      text-decoration: underline;
+      // text-decoration: underline; //
+      background-color: rgba(180, 151, 255, 0.1);
     }
-    &::marker {
-        content: "> ";
-        font-size: 0.7em;
+    &::marker { content: "+ "; font-size: 0.8em; } //
+    [data-theme='light'] & {
+        color: var(--action-highlight-light);
+         &:hover { background-color: rgba(180, 151, 255, 0.1); }
     }
   }
-  &[open] summary::marker {
-      content: "v ";
-  }
+  &[open] summary::marker { content: "- "; } //
 }
 
-.sentenceList {
-  list-style: none;
-  padding-left: 1rem;
-  margin: 0.5rem 0 0 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary-dark);
-  max-height: 150px; // Limit height
-  overflow-y: auto; // Allow scroll if many sentences
-  scrollbar-width: thin;
-  scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
+.sentenceList, .wordList { // Combinado para estilos comuns
+  list-style: none; //
+  padding-left: 0.5rem; // Reduzir padding
+  margin: 0.5rem 0 0 0.5rem; // Ajuste de margem
+  font-size: 0.8rem; // Ajuste
+  color: var(--text-secondary-dark); //
+  max-height: 120px; // Ajuste
+  overflow-y: auto; //
+  scrollbar-width: thin; //
+  scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark); //
+  border-top: 1px dashed var(--border-color-dark);
+  padding-top: 0.5rem;
 
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--action-highlight-dark);
-    border-radius: 2px;
-  }
+  &::-webkit-scrollbar { width: 4px; } //
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 2px; } //
 
   li {
-    margin-bottom: 0.4rem;
-    line-height: 1.4;
-    span {
-      font-weight: 500;
-      color: var(--text-main-dark);
-      margin-right: 0.3rem;
+    margin-bottom: 0.3rem; //
+    line-height: 1.4; //
+    span:first-child { // Para o "index:"
+      font-weight: 500; //
+      color: var(--text-main-dark); //
+      margin-right: 0.3rem; //
+      [data-theme='light'] & { color: var(--text-main-light); }
     }
+    .sentenceMeta {
+        font-style: italic;
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-left: 0.3rem;
+    }
+  }
+  .moreDetails {
+    font-style: italic;
+    opacity: 0.8;
+  }
+  .noDetails {
+    font-style: italic;
+    opacity: 0.7;
+    padding: 0.5rem 0;
+  }
+
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    scrollbar-color: var(--action-highlight-light) var(--bg-card-light);
+    border-top-color: var(--border-color-light);
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); }
   }
 }
 
-.wordList {
-  font-size: 0.85rem;
-  color: var(--text-secondary-dark);
-  line-height: 1.6;
-  margin: 0.5rem 0 0 1rem;
-  word-break: break-word;
+.wordList { // Estilos específicos para .wordList se necessário, senão herda de .sentenceList
+  word-break: break-word; //
+  padding-left: 0.5rem; // Reduzir padding
 }
 
-// Level specific classes (used for border-left-color in .feedbackCard)
-.levelExcelente {}
-.levelBom {}
-.levelRegular {}
-.levelRuim {}
-
+// Classes de nível (usadas para border-left-color e cor de texto em alguns casos)
+.levelExcelente { border-left-color: var(--success-dark) !important; [data-theme='light'] & { border-left-color: var(--success-light) !important; } } //
+.levelBom { border-left-color: #a0d911 !important; } //
+.levelRegular { border-left-color: #faad14 !important; } //
+.levelRuim { border-left-color: #f5222d !important; } //
+.levelNA { border-left-color: var(--border-color-dark) !important; [data-theme='light'] & { border-left-color: var(--border-color-light) !important; }}

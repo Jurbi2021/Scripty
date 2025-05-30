@@ -1,35 +1,51 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/atoms/Toggle.module.scss
+@use '../../assets/scss/variables' as vars; //
 
 .toggle {
-  width: 42px;
-  height: 24px;
-  background-color: vars.$gray-medium;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  padding: 3px;
-  cursor: pointer;
-  position: relative;
-  transition: background-color 0.3s ease;
+  width: 44px; // Levemente maior para um clique mais fácil
+  height: 24px; //
+  background-color: var(--border-color-dark); // Cor base mais sutil para estado 'off'
+  border-radius: 999px; //
+  display: flex; //
+  align-items: center; //
+  padding: 3px; //
+  cursor: pointer; //
+  position: relative; //
+  transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1); // Easing mais suave
+  border: none; // Garantir que não haja borda padrão de botão
 
-  &.on {
-    background-color: vars.$action-color;
+  &.on { // Classe para estado ativo
+    background-color: var(--action-highlight-dark); // Usar a cor de ação principal
+
+    .toggleThumb {
+      transform: translateX(20px); // Ajustar conforme o novo width (44px - 24px (thumb) - 2*padding?)
+      background-color: vars.$white; // Thumb branco no estado ativo
+    }
+
+    [data-theme='light'] & {
+        background-color: var(--action-highlight-light);
+         .toggleThumb {
+            background-color: vars.$white; // Manter branco ou um tom muito claro de --bg-main-light
+        }
+    }
   }
 
-  .toggle-thumb {
-    width: 18px;
-    height: 18px;
-    background-color: vars.$white;
-    border-radius: 50%;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+  // Classe para estado inativo (adicionada para clareza, mas o padrão já é 'off')
+  &.off {
+    [data-theme='light'] & {
+      background-color: var(--border-color-light);
+    }
+  }
 
-    .on & {
-      transform: translateX(18px);
-      background-color: vars.$success-color-dark;
+  .toggleThumb {
+    width: 18px; //
+    height: 18px; //
+    background-color: vars.$white; //
+    border-radius: 50%; //
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease; // Easing mais suave
 
-      [data-theme='light'] & {
-        background-color: vars.$success-color-light;
-      }
+    [data-theme='light'] & {
+        background-color: var(--text-secondary-light); // No tema claro, thumb pode ser mais escuro no estado 'off'
     }
   }
 }

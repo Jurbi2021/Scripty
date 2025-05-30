@@ -1,26 +1,40 @@
+// src/components/templates/MainLayout.tsx
 import React from 'react';
 import styles from './MainLayout.module.scss';
 import Sidebar from '../organisms/Sidebar';
 import Header from '../organisms/Header';
 
-// Define the possible views that the sidebar can navigate to
 type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  onNavigate: (view: View) => void; // Receive navigation handler from App
-  initialView?: View; // Optional: to set the initial active item in Sidebar if needed
+  onNavigate: (view: View) => void;
+  initialView?: View;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children, onNavigate, initialView }) => {
+  
+  const handleNavigateToHelp = () => {
+    onNavigate('help');
+  };
+
+  let headerTitle = "Scripty Editor";
+  if (initialView) {
+    if (initialView === 'metrics') headerTitle = "Editor Principal";
+    else if (initialView === 'style') headerTitle = "Análise de Estilo";
+    else if (initialView === 'seo') headerTitle = "Análise de SEO";
+    else if (initialView === 'personalization') headerTitle = "Personalização";
+    else if (initialView === 'help') headerTitle = "Central de Ajuda";
+  }
+
   return (
     <div className={styles.layout}>
-      {/* Pass initialView to Sidebar if it needs to highlight an item on load */}
-      <Sidebar onNavigate={onNavigate} initialView={initialView} /> 
-      {/* Corrected class name to match SCSS for proper flex behavior */}
-      <div className={styles.mainContent}> 
-        <Header />
-        {/* Corrected class name to match SCSS for proper flex behavior and scrolling */}
+      <Sidebar onNavigate={onNavigate} initialView={initialView} />
+      <div className={styles.mainContent}>
+        <Header
+          title={headerTitle}
+          onHelpButtonClick={handleNavigateToHelp}
+        />
         <main className={styles.pageContent}>
           {children}
         </main>
@@ -30,4 +44,3 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onNavigate, initialVi
 };
 
 export default MainLayout;
-

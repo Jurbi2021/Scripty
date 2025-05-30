@@ -1,34 +1,46 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/templates/DashboardLayout.module.scss
+@use '../../assets/scss/variables' as vars; //
 
 .layout {
-  display: flex;
-  min-height: 100vh;
-  width: 100vw;
+  display: flex; //
+  min-height: 100vh; //
+  width: 100vw; //
+  overflow: hidden; // Consistência com MainLayout
+  background-color: var(--bg-main-dark);
+
+  [data-theme='light'] & {
+    background-color: var(--bg-main-light);
+  }
 }
 
 .main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%; // Garante que ocupe toda a largura disponível
+  flex: 1; //
+  display: flex; //
+  flex-direction: column; //
+  // width: 100%; // Removido, flex:1 cuida disso
+  min-width: 0; // Para flexbox encolher corretamente
+  height: 100vh; // Ocupar altura total
+  overflow: hidden; // Para controlar scroll interno
+  position: relative;
 }
 
 .content {
-  flex: 1;
-  background: vars.$background-dark;
-  display: flex;
-  width: 100%; /* Já estava correto */
-  height: calc(100vh - 60px);
-  overflow-y: auto; /* Permite scroll vertical */
-  overflow-x: hidden; /* Previne scroll horizontal */
-    
-  /* IMPORTANTE: Garante que o conteúdo filho ocupe toda a largura */
-  > * {
-    width: 100%;
-    max-width: 100%;
-  }
+  flex: 1; // Ocupa o espaço restante após o Header
+  // background: vars.$background-dark; // Removido, o pai .layout já tem ou pode ser var(--bg-container-dark)
+  // display: flex; // Remover, a menos que o conteúdo direto deva ser flex
+  // width: 100%; // Removido
+  // height: calc(100vh - 65px); // Removido, flex:1 cuida da altura. Header tem 65px.
+  overflow-y: auto; // Permite scroll vertical
+  overflow-x: hidden; // Previne scroll horizontal
+  padding: 1.5rem; // Adicionar padding padrão consistente com os organismos de editor
+
+  // Remover se não for realmente necessário, pode restringir layout dos filhos.
+  // > * {
+  //   width: 100%;
+  //   max-width: 100%;
+  // }
   
-  [data-theme='light'] & {
-    background: vars.$background-light;
-  }
+  // [data-theme='light'] & { // O fundo virá do pai ou pode ser explicitamente setado
+  //   background: vars.$background-light;
+  // }
 }

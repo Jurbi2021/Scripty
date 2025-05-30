@@ -2,7 +2,7 @@ import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Mousewheel } from 'swiper/modules';
 import styles from './MetricsToolbar.module.scss';
-import { BasicMetricsData } from '../../utils/basicmetrics'; // Assuming path is correct
+import { BasicMetricsData } from '../../utils/BasicMetrics'; // Assuming path is correct
 
 // Import Swiper styles
 import 'swiper/css';
