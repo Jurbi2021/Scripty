@@ -1,6 +1,6 @@
 // src/components/atoms/Button.tsx
 import React from 'react';
-import { motion }_MERGE_CONSTRAINT_ // Adicionado Framer Motion
+import { motion } from 'framer-motion' // Adicionado Framer Motion
 import styles from './Button.module.scss';
 
 type ButtonProps = {

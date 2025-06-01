@@ -1,52 +1,80 @@
 // src/components/molecules/MetricsToolbar.module.scss
-@import "../../App.css"; // Import global variables
+// @import "../../App.css"; // Não é estritamente necessário importar aqui se as variáveis CSS
+                         // são globais e definidas no :root em App.css
 
 .toolbarContainer {
-  margin-bottom: 1.5rem; // Maintain spacing from original organism layout
+  margin-bottom: 1.5rem;
   flex-shrink: 0;
-  overflow: hidden; // Prevent potential overflow issues with swiper
+  overflow: hidden;
 }
 
 .metricsSwiper {
-  // Swiper specific styles if needed
-  padding-bottom: 5px; // Add some padding if mousewheel causes clipping
+  padding-bottom: 5px; // Para dar espaço, especialmente se o mousewheel estiver ativo
+  padding-top: 5px;    // Para dar espaço à sombra no hover
 }
 
 .metricSlide {
-  width: auto !important; // Ensure slides size based on content
-  display: flex; // Use flex for alignment within slide if needed
+  width: auto !important;
+  display: flex;
+  padding: 2px 0; // Pequeno padding para que a sombra do card no hover não seja cortada
 }
 
 .metricCard {
-  // Copied from EditorWithMetrics.module.scss
-  background-color: var(--card-bg);
+  // Estilos padrão (assumindo tema escuro como base)
+  background-color: var(--bg-card-dark);
   padding: 0.75rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  border-radius: 8px; // Um pouco mais arredondado
+  border: 1px solid var(--border-color-dark);
   text-align: center;
-  min-width: 120px; // Keep min-width for consistency
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  min-width: 120px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08); // Sombra um pouco mais pronunciada
   cursor: grab;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; // Adicionar transição para hover
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
 
   &:active {
     cursor: grabbing;
+    transform: translateY(-1px); // Efeito de clique
+  }
+
+  // Adaptação para o Tema Claro
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    border-color: var(--border-color-light);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+
+    &:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
   }
 }
 
 .metricName {
-  // Copied from EditorWithMetrics.module.scss
   display: block;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.3rem;
+  font-size: 0.7rem; // Um pouco menor para mais hierarquia
+  color: var(--text-secondary-dark);
+  margin-bottom: 0.25rem; // Ajuste de margem
   text-transform: uppercase;
+  font-weight: 500; // Dar um pouco mais de peso ao nome
+
+  // Adaptação para o Tema Claro
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
 }
 
 .metricValue {
-  // Copied from EditorWithMetrics.module.scss
   display: block;
-  font-size: 1.1rem;
+  font-size: 1.15rem; // Um pouco maior para destaque
   font-weight: 600;
-  color: var(--text-primary);
-}
+  color: var(--text-main-dark); // Usar text-main para consistência no escuro
 
+  // Adaptação para o Tema Claro
+  [data-theme='light'] & {
+    color: var(--text-main-light); // Esta é a correção principal para a visibilidade no tema claro
+  }
+}

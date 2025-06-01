@@ -1,6 +1,5 @@
 // src/components/atoms/Text.module.scss
-// @import '../../assets/scss/variables'; // Pode não ser necessário se usar vars CSS
-
+@import '../../assets/scss/variables';
 // As classes de Text.tsx já aplicam estilos de Tailwind-like.
 // Este arquivo pode ser usado para estilos base do Text se necessário,
 // ou para adicionar estilos mais complexos que não se encaixam nas props.

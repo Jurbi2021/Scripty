@@ -7,7 +7,6 @@ const PersonalizationPage: React.FC = () => {
   return (
     <DashboardLayout>
       <div className={styles.page}>
-        <h1>Personalizar Scripty</h1>
         <PersonalizationPanel />
       </div>
     </DashboardLayout>

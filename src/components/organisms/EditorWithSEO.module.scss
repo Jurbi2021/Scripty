@@ -1,27 +1,28 @@
 // src/components/organisms/EditorWithSEO.module.scss
-@import "../../App.css"; //
-// Reutiliza estilos de layout do EditorWithMetrics.module.scss via editorLayoutStyles no TSX
+@import "../../App.css";
+// As classes .editorLayout, .mainContentArea, .focusModeLayoutActive são reutilizadas
+// do EditorWithMetrics.module.scss através da importação `editorLayoutStyles` no TSX.
 
 .seoAnalysisPanel {
-  flex: 1.5; // Consistente com outros painéis
+  flex: 1.5;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 1.25rem;
-  background-color: var(--bg-container-dark); //
-  border-radius: 12px; // Consistente
-  border: 1px solid var(--border-color-dark); //
-  box-shadow: 0 5px 15px rgba(0,0,0,0.07); // Consistente
+  background-color: var(--bg-container-dark);
+  border-radius: 12px;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
   box-sizing: border-box;
   height: 100%;
   overflow-y: auto;
-  scrollbar-width: thin; //
-  scrollbar-color: var(--action-highlight-dark) var(--bg-container-dark); //
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) var(--bg-container-dark);
 
-  &::-webkit-scrollbar { width: 6px; } //
-  &::-webkit-scrollbar-track { background: var(--bg-container-dark); border-radius: 3px; } //
-  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 3px; border: 1px solid var(--bg-container-dark); } //
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: var(--bg-container-dark); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 3px; border: 1px solid var(--bg-container-dark); }
 
   [data-theme='light'] & {
     background-color: var(--bg-container-light);
@@ -34,111 +35,85 @@
 }
 
 .panelTitle {
-  font-size: 1.1rem; // Consistente
+  font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-main-dark); //
+  color: var(--text-main-dark);
   margin: 0 0 0.1rem 0;
   [data-theme='light'] & { color: var(--text-main-light); }
 }
 
 .panelSubtitle {
-  font-size: 0.8rem; // Consistente
-  color: var(--text-secondary-dark); //
+  font-size: 0.8rem;
+  color: var(--text-secondary-dark);
   margin: 0 0 1rem 0;
   [data-theme='light'] & { color: var(--text-secondary-light); }
 }
 
 .feedbackContainer {
-  display: flex; //
-  flex-direction: column; //
-  gap: 0.85rem; // Consistente
-  flex-grow: 1; //
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex-grow: 1;
 }
 
 .feedbackCard {
-  background-color: var(--bg-card-dark); //
-  border-radius: 10px; // Consistente
-  padding: 0.9rem 1.1rem; // Consistente
-  border: 1px solid var(--border-color-dark); //
-  border-left-width: 4px; // Consistente
-  // box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  // transition: border-left-color 0.3s ease, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  // A transição do card em si (transform, box-shadow) será feita pelo Framer Motion
-
+  background-color: var(--bg-card-dark);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border-color-dark);
+  border-left-width: 4px;
   [data-theme='light'] & {
     background-color: var(--bg-card-light);
     border-color: var(--border-color-light);
-    // box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
-  // &:hover { // Controlado por Framer Motion
-  //   transform: translateY(-2px);
-  //   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  // }
 }
 
 .feedbackTitle {
-  font-size: 0.85rem; // Consistente
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-main-dark); //
+  color: var(--text-main-dark);
   margin: 0 0 0.4rem 0;
   [data-theme='light'] & { color: var(--text-main-light); }
 }
 
 .feedbackText {
-  font-size: 0.85rem; // Consistente
-  color: var(--text-secondary-dark); //
-  line-height: 1.5; //
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark);
+  line-height: 1.5;
   margin: 0 0 0.6rem 0;
   [data-theme='light'] & { color: var(--text-secondary-light); }
 }
 
-// Status classes (já definidas em EditorWithSEO.module.scss, mantê-las)
-.statusBom { border-left-color: var(--success-dark) !important; [data-theme='light'] & { border-left-color: var(--success-light) !important; } } //
-.statusRegular { border-left-color: #faad14 !important; } //
-.statusRuim { border-left-color: #f5222d !important; } //
+.statusBom { border-left-color: var(--success-dark) !important; [data-theme='light'] & { border-left-color: var(--success-light) !important; } }
+.statusRegular { border-left-color: #faad14 !important; }
+.statusRuim { border-left-color: #f5222d !important; }
 .statusNA { border-left-color: var(--border-color-dark) !important; [data-theme='light'] & { border-left-color: var(--border-color-light) !important; }}
 
-
-.details { // Estilos de EditorWithStyle.module.scss
+.details {
   summary {
-    cursor: pointer; //
-    font-size: 0.8rem; //
-    color: var(--action-highlight-dark); //
-    font-weight: 500; //
-    margin-top: 0.25rem; //
-    display: inline-block; //
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease; //
-    &:hover { background-color: rgba(180, 151, 255, 0.1); } //
-    &::marker { content: "+ "; font-size: 0.8em; } //
+    cursor: pointer; font-size: 0.8rem; color: var(--action-highlight-dark); font-weight: 500;
+    margin-top: 0.25rem; display: inline-block; padding: 0.2rem 0.4rem;
+    border-radius: 4px; transition: background-color 0.2s ease;
+    &:hover { background-color: rgba(180, 151, 255, 0.1); }
+    &::marker { content: "+ "; font-size: 0.8em; }
     [data-theme='light'] & {
         color: var(--action-highlight-light);
         &:hover { background-color: rgba(180, 151, 255, 0.1); }
     }
   }
-  &[open] summary::marker { content: "- "; } //
+  &[open] summary::marker { content: "- "; }
 }
 
-.wordList, .headingsList { // Combinado e ajustado de EditorWithStyle.module.scss
-  list-style: none; //
-  padding-left: 0.5rem;
-  margin: 0.5rem 0 0 0.5rem;
-  font-size: 0.8rem;
-  color: var(--text-secondary-dark); //
-  line-height: 1.5; // Ajuste
-  word-break: break-word; //
-  max-height: 120px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
-  border-top: 1px dashed var(--border-color-dark);
-  padding-top: 0.5rem;
+.wordList, .headingsList {
+  list-style: none; padding-left: 0.5rem; margin: 0.5rem 0 0 0.5rem;
+  font-size: 0.8rem; color: var(--text-secondary-dark); line-height: 1.5;
+  word-break: break-word; max-height: 120px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
+  border-top: 1px dashed var(--border-color-dark); padding-top: 0.5rem;
 
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 2px; }
-
-  li { margin-bottom: 0.3rem; } //
+  li { margin-bottom: 0.3rem; }
 
   [data-theme='light'] & {
     color: var(--text-secondary-light);
@@ -148,33 +123,29 @@
   }
 }
 
-.keywordInfo { // Estilos de EditorWithSEO.module.scss
-  display: flex; //
-  align-items: center; //
-  margin-top: 0.5rem; //
-  padding: 0.6rem 0.8rem; // Ajuste
-  background-color: rgba(var(--bg-main-rgb), 0.03); // Usar cor base com alfa
+.keywordInfo {
+  display: flex; align-items: center; margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  // background-color: rgba(var(--bg-main-rgb), 0.03); // Defina --bg-main-rgb se for usar
+  background-color: rgba(211, 215, 222, 0.03); // Fallback se --bg-main-rgb não estiver definido
   border: 1px solid var(--border-color-dark);
-  border-radius: 6px; //
+  border-radius: 6px;
   [data-theme='light'] & {
-    background-color: rgba(var(--bg-main-rgb-light), 0.03); // Precisaria definir --bg-main-rgb-light
+    // background-color: rgba(var(--bg-main-rgb-light), 0.03);
+    background-color: rgba(51, 51, 51, 0.03); // Fallback
     border-color: var(--border-color-light);
   }
 }
 
 .keywordLabel {
-  font-weight: 500; //
-  margin-right: 0.5rem; //
-  color: var(--text-main-dark); //
-  font-size: 0.8rem; // Ajuste
+  font-weight: 500; margin-right: 0.5rem; color: var(--text-main-dark);
+  font-size: 0.8rem;
   [data-theme='light'] & { color: var(--text-main-light); }
 }
 
 .keywordValue {
-  color: var(--action-highlight-dark); //
-  font-weight: 600; //
-  font-size: 0.8rem; // Ajuste
+  color: var(--action-highlight-dark); font-weight: 600; font-size: 0.8rem;
   [data-theme='light'] & { color: var(--action-highlight-light); }
 }
 
-// .emptyState já existe em EditorWithSEO.module.scss, pode ser reutilizado (ou usar o de EditorWithMetrics)
+// Reutilizar .emptyStateAdvancedMetrics do EditorWithMetrics.module.scss

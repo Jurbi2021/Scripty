@@ -1,84 +1,88 @@
 // src/components/molecules/SidebarItem.module.scss
-@use 'sass:color';
-@use '../../assets/scss/variables' as vars;
-@use '../../assets/scss/mixins' as mixins;
+// @use 'sass:color'; // Pode não ser necessário se usarmos apenas vars CSS para hover
+// @use '../../assets/scss/variables' as vars; // Comentado, usaremos vars CSS globais
+// @use '../../assets/scss/mixins' as mixins;
 
 .sidebarItem {
   display: flex;
   align-items: center;
+  // gap: 0.8rem; // O label terá margin-left
   padding: 0.8rem 1.2rem;
-  border-radius: 8px;
+  border-radius: 8px; // Raio mais comum
   cursor: pointer;
+  // transition: background-color 0.2s ease-out, transform 0.15s ease-out; // CSS transition para hover
+  // A transição principal pode ser gerenciada pelo Framer Motion no .tsx
   overflow: hidden;
-  width: calc(100% - 1.5rem); // Ajuste para considerar margens do pai (Sidebar.module.scss)
-  margin: 0.3rem 0.75rem; // Aumentar um pouco a margem vertical
+  width: calc(100% - 1.5rem); // Conforme o que usamos na Sidebar
+  margin: 0.3rem 0.75rem;
   box-sizing: border-box;
+
+  // Cor padrão do texto para item NÃO ATIVO (tema escuro)
   color: var(--text-secondary-dark);
-  transition: background-color 0.2s ease-out; // Transição para o hover do SCSS
 
-  &:hover:not(.active) { // Efeito de hover apenas para itens não ativos
-    background-color: rgba(180, 151, 255, 0.08); // Usar sua cor de ação com alfa bem baixo
-    color: var(--text-main-dark); // Texto principal no hover para melhor visibilidade
-     .icon {
+  // Efeito de hover para item NÃO ATIVO (pode ser feito com Framer Motion no TSX ou aqui)
+  &:hover:not(.active) {
+    background-color: rgba(180, 151, 255, 0.08); // var(--action-highlight-dark) com alfa
+    color: var(--text-main-dark);
+     .icon { // Garante que o ícone também mude de cor no hover
         color: var(--text-main-dark);
      }
-     .label p { // Se Text renderiza <p>
-        color: var(--text-main-dark);
-     }
+     // O Text atom do label deve herdar a cor
   }
 
-  &.active {
-    background-color: var(--action-highlight-dark);
-    color: #ffffff;
-    font-weight: 500;
-
-    .icon {
-      color: #ffffff;
-    }
-
-    .label p { // Assumindo que o Text atom renderiza um <p>
-        color: #ffffff !important;
-    }
-
-    [data-theme='light'] & {
-      background-color: var(--action-highlight-light);
-      color: var(--text-main-dark);
-
-       .icon {
-         color: var(--text-main-dark);
-       }
-       .label p {
-           color: var(--text-main-dark) !important;
-       }
-    }
-  }
-
-  &.collapsed {
-    justify-content: center;
-    padding: 0.8rem 0;
-
-    .iconContainer {
-      margin: 0;
-    }
-  }
-
+  // Adaptação para item NÃO ATIVO no Tema Claro
   [data-theme='light'] & {
     color: var(--text-secondary-light);
 
-     &:hover:not(.active) {
-        background-color: rgba(180, 151, 255, 0.1);
-        color: var(--text-main-light);
-         .icon {
-            color: var(--text-main-light);
-         }
-         .label p {
-            color: var(--text-main-light);
-         }
+    &:hover:not(.active) {
+      background-color: rgba(180, 151, 255, 0.1); // var(--action-highlight-light) com alfa
+      color: var(--text-main-light);
+       .icon {
+          color: var(--text-main-light);
+       }
+    }
+  }
+  
+  &.collapsed {
+    justify-content: center;
+    padding: 0.8rem 0; 
+    .iconContainer { // Adicionado para centralizar o ícone
+      margin: 0;
+    }
+    // .label é controlado por Framer Motion
+  }
+}
+
+.active {
+  // Estilo ATIVO para tema escuro
+  background-color: var(--action-highlight-dark); // Fundo lilás
+  color: #ffffff; // Texto branco para bom contraste com o lilás
+  font-weight: 500; // Como já estava no Sidebar.module.scss
+
+  .icon {
+    color: #ffffff; // Ícone branco
+  }
+  // O Text atom do label herdará a cor #ffffff do pai .active
+
+  // >>> ADIÇÃO PRINCIPAL AQUI: Estilo ATIVO para tema claro <<<
+  [data-theme='light'] & {
+    background-color: var(--action-highlight-light); // Pode manter o mesmo lilás ou um pouco mais saturado/escuro se preferir
+    // Para texto em cima do lilás claro, um texto escuro geralmente funciona melhor para contraste:
+    color: var(--text-main-dark); // Um cinza bem escuro (ex: #333333 ou o que for seu text-main-dark para o lilás)
+                                  // Ou, se o action-highlight-light for muito claro, pode ser #FFFFFF se o action-highlight for escuro.
+                                  // No seu caso, --action-highlight-light: #b497ff, então texto branco ou muito escuro.
+                                  // Vamos testar com branco por agora, mas um cinza escuro como #202632 (seu --bg-card-dark) pode ser bom.
+                                  // Corrigindo para melhor contraste com lilás (#b497ff):
+    color: #FFFFFF; // Texto branco sobre fundo lilás
+
+
+    .icon {
+      color: #FFFFFF; // Ícone branco sobre fundo lilás
     }
   }
 }
 
-.iconContainer {
+.iconContainer { // Adicionado para melhor controle do ícone
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,18 +90,19 @@
 }
 
 .icon {
-  font-size: 1.1rem;
-  // color: inherit; // Removido para que o hover e active controlem melhor
+  font-size: 1.1rem; // Alinhado com Sidebar.module.scss
+  // color: inherit; // Removido, pois o hover e .active agora definem explicitamente
   flex-shrink: 0;
 }
 
 .label {
+  // font-weight é definido pelo Text atom (semibold)
   white-space: nowrap;
   overflow: hidden;
-  // O Text atom interno controlará a cor e o tamanho da fonte.
+  // opacity, max-width, margin-left são controlados por Framer Motion no SidebarItem.tsx
+  // O Text atom interno é que tem a cor do texto, ele herda do .sidebarItem ou .active
   p { // Se o Text atom renderiza um <p>
-    margin: 0; // Resetar margem do Text atom
-    // A cor será definida pelo Text atom ou pelo estado .active do .sidebarItem
-    // O Framer Motion controla opacity, width, marginLeft
+    margin: 0; // Resetar margem padrão do <p> do Text atom
+    color: inherit; // Garantir que herde do pai (.sidebarItem ou .active)
   }
 }

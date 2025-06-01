@@ -7,7 +7,6 @@ const EditorSEOPage: React.FC = () => {
   return (
     <DashboardLayout>
       <div className={styles.page}>
-        <h1>Análise de SEO</h1>
         <EditorWithSEO />
       </div>
     </DashboardLayout>

@@ -2,61 +2,74 @@
 import React from 'react';
 import Sidebar from '../organisms/Sidebar';
 import Header from '../organisms/Header';
-import styles from './DashboardLayout.module.scss';
-import { useNavigate } from 'react-router-dom'; // Para navegação baseada em rotas
+import styles from './DashboardLayout.module.scss'; //
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEditor } from '../../contexts/EditorContext'; // Importar o hook do contexto
 
-// Definir o tipo View, pode ser importado de um arquivo compartilhado se usado em múltiplos lugares
 type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  // Adicionar initialView se a Sidebar precisar saber qual item destacar
-  // com base na rota atual. Isso pode ser mais complexo e envolver useLocation.
-  currentViewForSidebar?: View; // Opcional: para destacar item na Sidebar
-  headerTitle?: string; // Título para o Header
+  headerTitle?: string;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, currentViewForSidebar, headerTitle }) => {
+const getActiveViewFromPathname = (pathname: string): View => {
+  if (pathname.startsWith('/editor/style')) return 'style';
+  if (pathname.startsWith('/editor/seo')) return 'seo';
+  if (pathname.startsWith('/personalization')) return 'personalization';
+  if (pathname.startsWith('/help')) return 'help';
+  if (pathname.startsWith('/editor/metrics') || pathname === '/') return 'metrics';
+  return 'metrics';
+};
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isFocusMode } = useEditor(); // Obter o estado do Modo Foco
+
+  const currentViewForSidebar = getActiveViewFromPathname(location.pathname);
 
   const handleNavigate = (view: View) => {
-    // Mapear 'view' para rotas reais
+    // ... (lógica de navegação existente)
     switch (view) {
-      case 'metrics':
-        navigate('/editor/metrics');
-        break;
-      case 'style':
-        navigate('/editor/style');
-        break;
-      case 'seo':
-        navigate('/editor/seo');
-        break;
-      case 'personalization':
-        navigate('/personalization');
-        break;
-      case 'help':
-        navigate('/help');
-        break;
-      default:
-        navigate('/'); // Rota padrão
+      case 'metrics': navigate('/editor/metrics'); break;
+      case 'style': navigate('/editor/style'); break;
+      case 'seo': navigate('/editor/seo'); break;
+      case 'personalization': navigate('/personalization'); break;
+      case 'help': navigate('/help'); break;
+      default: navigate('/');
     }
   };
-  
+
   const handleNavigateToHelp = () => {
     handleNavigate('help');
   };
 
+  let pageSpecificHeaderTitle = headerTitle;
+  if (!pageSpecificHeaderTitle) {
+    switch (currentViewForSidebar) {
+      case 'metrics': pageSpecificHeaderTitle = "Editor Principal"; break;
+      case 'style': pageSpecificHeaderTitle = "Análise de Estilo"; break;
+      case 'seo': pageSpecificHeaderTitle = "Análise de SEO"; break;
+      case 'personalization': pageSpecificHeaderTitle = "Personalização"; break;
+      default: pageSpecificHeaderTitle = "Scripty";
+    }
+  }
+
   return (
-    <div className={styles.layout}>
-      {/* A Sidebar aqui usará a navegação baseada em rotas.
-        O 'initialView' pode ser determinado a partir da rota atual (useLocation)
-        para destacar o item correto.
-      */}
-      <Sidebar onNavigate={handleNavigate} initialView={currentViewForSidebar} />
-      <div className={styles.main}>
-        <Header 
-          title={headerTitle || "Scripty"} // Título padrão se não fornecido
+    // Adiciona uma classe condicional ao layout principal quando o Modo Foco está ativo
+    <div className={`${styles.layout} ${isFocusMode ? styles.focusModeActive : ''}`}>
+      {!isFocusMode && ( // Renderiza a Sidebar apenas se o Modo Foco NÃO estiver ativo
+        <Sidebar
+          onNavigate={handleNavigate}
+          initialView={currentViewForSidebar}
+        />
+      )}
+      <div className={styles.main}> {/* Esta área pode precisar se expandir */}
+        <Header
+          title={pageSpecificHeaderTitle}
           onHelpButtonClick={handleNavigateToHelp}
+          // Poderíamos passar isFocusMode para o Header se quisermos que ele também mude
         />
         <main className={styles.content}>{children}</main>
       </div>

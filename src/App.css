@@ -8,6 +8,9 @@
   --action-highlight-dark: #b497ff;
   --success-dark: #58d6a3;
   --border-color-dark: #303640; /* Adjusted subtle border */
+  --action-highlight-dark-01: #ffffff;
+  --destaque-dados-dark: #ffbbbb;
+  ----border-color-dark-soft: rgba(48, 54, 64, 0.5);
 
   /* Define CSS variables for Light Mode based on user palette */
   --bg-main-light: #f9f5f1;
@@ -18,6 +21,8 @@
   --action-highlight-light: #b497ff; /* Same lilac, maybe adjust saturation/lightness if needed */
   --success-light: #70d2a0;
   --border-color-light: #e0d9d1; /* Adjusted subtle border */
+  --destaque-dados-light: #eb4848;
+  --border-color-light-soft: rgba(224, 217, 209, 0.5);
 }
 
 body {

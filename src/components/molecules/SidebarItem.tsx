@@ -42,7 +42,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             exit={{ opacity: 0, width: 0, marginLeft: 0, transition: {duration: 0.15} }} // Transição de saída mais rápida
             transition={{ duration: 0.25, ease: "easeInOut" }}
           >
-            <Text size="medium" weight="semibold" color={isActive && !isCollapsed ? (document.documentElement.getAttribute('data-theme') === 'light' ? 'var(--text-main-dark)' : '#FFFFFF') : undefined}>
+            <Text size="medium" weight="semibold" color={isActive && !isCollapsed ? (document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#FFFFFF') : undefined}>
               {label}
             </Text>
           </motion.span>

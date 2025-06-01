@@ -1,5 +1,6 @@
 // src/utils/SeoAnalysis.tsx
 import { countSyllables } from "./BasicMetrics"; // Assuming countSyllables is here
+export { SeoAnalysisResult }
 
 // --- Interfaces ---
 interface LsiResult {

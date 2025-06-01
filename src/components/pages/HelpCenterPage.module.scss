@@ -1,24 +1,154 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/pages/HelpCenterPage.module.scss
+@use '../../assets/scss/variables' as vars; // Se você usa variáveis SCSS assim
+// Ou use as variáveis CSS globais diretamente: var(--text-primary-dark)
 
-.page {
+.pageContent {
   padding: 2rem;
+  max-width: 900px; // Limitar largura para melhor legibilidade de texto
+  margin: 0 auto; // Centralizar conteúdo
+  color: var(--text-main-dark);
 
-  h1 {
-    color: vars.$text-primary-dark;
-    margin-bottom: 1rem;
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
+}
+
+.headerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color-dark);
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light);
+  }
+}
+
+.mainTitle {
+  // O átomo Text já aplica estilos de H1, mas podemos adicionar cor específica se necessário
+  color: var(--text-main-dark);
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
+}
+
+.themeToggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary-dark);
+  font-size: 0.9rem;
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.introParagraph, .sectionIntro, .tipParagraph {
+  font-size: 1rem; // Ajuste conforme necessário
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: var(--text-secondary-dark);
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.tipParagraph {
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionTitle {
+  // O átomo Text já aplica H2. Cor já deve vir dele ou do tema.
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color-dark);
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light);
+  }
+}
+
+.metricList {
+  list-style: none; // Remover bullets padrão se quisermos controle total
+  padding-left: 0;
+  margin-top: 1rem;
+}
+
+.metricItem {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem; // Pequeno recuo para itens
+  border-left: 3px solid var(--action-highlight-dark); // Uma linha lateral para destacar
+  background-color: var(--bg-card-dark); // Um fundo levemente diferente para o item
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+
+  [data-theme='light'] & {
+    border-left-color: var(--action-highlight-light);
+    background-color: var(--bg-card-light);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
   }
 
   p {
-    color: vars.$text-secondary-dark;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary-dark);
+    [data-theme='light'] & {
+      color: var(--text-secondary-light);
+    }
+  }
+}
+
+.metricName {
+  // O átomo Text já aplica H3.
+  margin-bottom: 0.5rem;
+  color: var(--text-main-dark);
+   [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
+}
+
+.subList {
+  list-style: disc; // Usar bullets para sub-listas
+  padding-left: 1.5rem; // Recuo para sub-listas
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary-dark);
+
+  li {
+    margin-bottom: 0.3rem;
   }
 
   [data-theme='light'] & {
-    h1 {
-      color: vars.$text-primary-light;
-    }
+    color: var(--text-secondary-light);
+  }
+}
 
-    p {
-      color: vars.$text-secondary-light;
-    }
+.codeText {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--bg-card-dark); // Um fundo para destacar o código
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--destaque-dados-dark); // Cor de destaque para o código
+  border: 1px solid var(--border-color-dark);
+
+
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    color: var(--destaque-dados-light);
+    border: 1px solid var(--border-color-light);
   }
 }

@@ -1,27 +1,100 @@
 // src/components/templates/HelpCenterLayout.module.scss
-// @use '../../assets/scss/variables' as vars; // Comentado se usar vars CSS
+@import '../../App.css'; //
 
-.layout {
-  display: flex; //
-  flex-direction: column; //
-  min-height: 100vh; //
-  background-color: var(--bg-main-dark); // Usar variável CSS
+.helpLayout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // Ocupar toda a altura da viewport
+  width: 100vw;  // Ocupar toda a largura da viewport
+  overflow: hidden; // Evitar scrollbars no nível do layout
+  background-color: var(--bg-main-dark);
 
   [data-theme='light'] & {
     background-color: var(--bg-main-light);
   }
 }
 
-.content {
-  flex: 1; //
-  padding: 2rem; // // Aumentar padding para conteúdo textual
-  // A cor de fundo pode vir do .layout ou ser definida aqui se for diferente
-  // Ex: background: var(--bg-container-dark);
-  max-width: 900px; // Limitar largura para melhor legibilidade de texto
-  margin: 0 auto; // Centralizar conteúdo se max-width for usado
-  width: 100%; // Garantir que ocupe a largura disponível até o max-width
+.contentWrapper {
+  display: flex;
+  flex-grow: 1; // Faz esta área ocupar o espaço restante após o Header
+  overflow: hidden; // Evitar scrollbars duplas
+  position: relative; // Para contexto de empilhamento se necessário
+}
 
-  // [data-theme='light'] & {
-  //   background: var(--bg-container-light); // Exemplo
-  // }
+.tableOfContents {
+  width: 240px; // Largura similar à Sidebar
+  flex-shrink: 0;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid var(--border-color-dark);
+  overflow-y: auto; // Scroll para o sumário se for longo
+  background-color: var(--bg-container-dark); // Mesmo fundo da sidebar para consistência
+
+  [data-theme='light'] & {
+    border-right-color: var(--border-color-light);
+    background-color: var(--bg-container-light);
+  }
+
+  .tocTitle {
+    font-size: 1rem; // Ajustado
+    font-weight: 600; // Usar valores numéricos
+    color: var(--text-main-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color-dark);
+
+
+    [data-theme='light'] & {
+      color: var(--text-main-light);
+      border-bottom-color: var(--border-color-light);
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tocItem a, .tocItemLevel2 a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary-dark);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      background-color: var(--action-highlight-dark-01); // Precisa definir essa variável (ex: --action-highlight-dark com opacidade)
+                                                       // Ou, por exemplo: rgba(180, 151, 255, 0.1);
+      color: var(--action-highlight-dark);
+    }
+
+    [data-theme='light'] & {
+      color: var(--text-secondary-light);
+      &:hover {
+        background-color: var(--action-highlight-light-01); // rgba(180, 151, 255, 0.1);
+        color: var(--action-highlight-light);
+      }
+    }
+  }
+  .tocItemLevel2 a {
+    padding-left: 1.5rem; // Indentação para nível 2
+  }
+
+  // Adicione variáveis para cores de hover com opacidade em App.css se necessário
+  // Ex: --action-highlight-dark-01: rgba(180, 151, 255, 0.1);
+  //     --action-highlight-light-01: rgba(180, 151, 255, 0.1);
+}
+
+.mainContentArea {
+  flex-grow: 1;
+  overflow-y: auto; // Scroll para o conteúdo principal
+  padding: 2rem; // Padding interno para o conteúdo
+  // A cor de fundo será a do .helpLayout ou .contentWrapper
+  // A centralização do texto é feita dentro do HelpCenterPage.module.scss (.pageContent)
+
+  // Adicionar scroll-behavior: smooth aqui se a navegação por hash for usada diretamente
+  // ou controlar via JS como no exemplo do HelpCenterLayout.tsx
+  scroll-behavior: smooth; // Para rolagem suave com links de âncora
 }

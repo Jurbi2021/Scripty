@@ -112,6 +112,8 @@ export function countCharsWithSpaces(text: string): number {
     readingTime: string; // Formatted string
   }
 
+
+
   // Function to calculate all basic metrics
   export function calculateBasicMetrics(text: string): BasicMetricsData {
     return {
