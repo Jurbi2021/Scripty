@@ -1,30 +1,27 @@
 // src/components/organisms/Header.tsx
 import React from 'react';
 import styles from './Header.module.scss'; //
-import { useEditor } from '../../contexts/EditorContext'; // Corrigido e caminho verificado
-import { useTheme } from '../../contexts/ThemeContext'; // Para saber o tema atual para os botões, se necessário
-import { FaLightbulb, FaQuestionCircle, FaArrowLeft } from 'react-icons/fa' // Ícones para os botões
-import { motion } from 'framer-motion'
+import { useEditor } from '../../contexts/EditorContext'; //
+import { FaLightbulb, FaQuestionCircle, FaArrowLeft } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 interface HeaderProps {
-  title?: string; // Título opcional para o header
-  showBackButton?: boolean; // Controlar visibilidade do botão voltar
+  title?: string;
+  showBackButton?: boolean;
   onBackButtonClick?: () => void;
   onHelpButtonClick?: () => void;
+  showFocusModeButton?: boolean; // Nova prop para controlar a visibilidade do botão
 }
 
 const Header: React.FC<HeaderProps> = ({
   title,
-  showBackButton = false, //
+  showBackButton = false,
   onBackButtonClick,
   onHelpButtonClick,
+  showFocusModeButton = true, // Por padrão, o botão é visível
 }) => {
   const { isFocusMode, toggleFocusMode } = useEditor();
-  const { theme } = useTheme(); // Para estilizar ícones/botões com base no tema se necessário
-
-  // Determinar qual texto/ícone mostrar para o botão de foco
   const focusButtonText = isFocusMode ? "Desativar Foco" : "Modo Foco";
-  // const FocusIcon = isFocusMode ? FaLightbulbSlash : FaLightbulb; // Exemplo se quiser trocar ícone
 
   const buttonVariants = {
     rest: { scale: 1, opacity: 0.9 },
@@ -39,40 +36,34 @@ const Header: React.FC<HeaderProps> = ({
           <motion.button
             className={`${styles.button} ${styles.iconButton}`}
             onClick={onBackButtonClick}
-            variants={buttonVariants}
-            initial="rest"
-            whileHover="hover"
-            whileTap="tap"
+            variants={buttonVariants} initial="rest" whileHover="hover" whileTap="tap"
             aria-label="Voltar"
           >
             <FaArrowLeft />
           </motion.button>
         )}
         {title && <h1 className={styles.title}>{title}</h1>}
-        {!title && !showBackButton && <div className={styles.logoPlaceholder}></div> /* Espaço reservado para logo se não houver título nem botão voltar */}
+        {!title && !showBackButton && <div className={styles.logoPlaceholder}></div>}
       </div>
       <div className={styles.rightSection}>
-        <motion.button
-          className={`${styles.button} ${styles.focusButton} ${isFocusMode ? styles.focusActive : ''}`}
-          onClick={toggleFocusMode}
-          variants={buttonVariants}
-          initial="rest"
-          whileHover="hover"
-          whileTap="tap"
-        >
-          <FaLightbulb className={styles.buttonIcon} />
-          {focusButtonText}
-        </motion.button>
+        {/* Renderiza o botão de Modo Foco apenas se showFocusModeButton for true */}
+        {showFocusModeButton && (
+          <motion.button
+            className={`${styles.button} ${styles.focusButton} ${isFocusMode ? styles.focusActive : ''}`}
+            onClick={toggleFocusMode}
+            variants={buttonVariants} initial="rest" whileHover="hover" whileTap="tap"
+          >
+            <FaLightbulb className={styles.buttonIcon} />
+            {focusButtonText}
+          </motion.button>
+        )}
 
         {onHelpButtonClick && (
             <motion.button
-            className={`${styles.button} ${styles.iconButton}`}
-            onClick={onHelpButtonClick}
-            variants={buttonVariants}
-            initial="rest"
-            whileHover="hover"
-            whileTap="tap"
-            aria-label="Ajuda"
+              className={`${styles.button} ${styles.iconButton}`}
+              onClick={onHelpButtonClick}
+              variants={buttonVariants} initial="rest" whileHover="hover" whileTap="tap"
+              aria-label="Ajuda"
             >
                 <FaQuestionCircle />
             </motion.button>
