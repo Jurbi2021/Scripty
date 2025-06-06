@@ -1,0 +1,64 @@
+// src/components/organisms/LoginForm.module.scss
+@import '../../App.css';
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.inputGroup {
+  text-align: left;
+}
+
+.submitButton {
+  width: 100%;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+.errorMessage {
+  background-color: rgba(var(--danger-color-dark-rgb, 245, 34, 45), 0.1); // Use a var ou fallback
+  border: 1px solid var(--danger-color-dark, #f5222d);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  p { // Acessando o <p> dentro do átomo Text
+    color: var(--danger-color-dark, #f5222d) !important;
+    margin: 0;
+  }
+
+  [data-theme='light'] & {
+    background-color: rgba(var(--danger-color-light-rgb, 225, 29, 72), 0.1);
+    border-color: var(--danger-color-light, #e11d48);
+     p {
+        color: var(--danger-color-light, #e11d48) !important;
+     }
+  }
+}
+
+.footerText {
+  margin-top: 1rem;
+  text-align: center;
+  p { // Acessando o <p> dentro do átomo Text
+    color: var(--text-secondary-dark);
+    margin: 0;
+  }
+  [data-theme='light'] & {
+    p { color: var(--text-secondary-light); }
+  }
+}
+
+.link {
+  color: var(--action-highlight-dark);
+  font-weight: 500;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+  [data-theme='light'] & {
+    color: var(--action-highlight-light);
+  }
+}

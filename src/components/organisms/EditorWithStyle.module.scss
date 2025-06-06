@@ -150,12 +150,83 @@
   padding-left: 0.5rem;
 }
 
+// Adicionar ao final de EditorWithStyle.module.scss
+
+.detailsWrapper {
+  margin-top: 0.75rem; // Espaço acima dos detalhes
+  // border-top: 1px dashed var(--border-color-dark-soft, rgba(48, 54, 64, 0.3)); // Linha sutil opcional
+  // padding-top: 0.75rem; // Espaço interno opcional
+}
+
+.summaryButton {
+  background: none;
+  border: none;
+  padding: 0.3rem 0.5rem; // Padding para torná-lo clicável
+  margin: 0; // Resetar margem do botão
+  width: 100%; // Ocupar toda a largura disponível no card
+  text-align: left; // Alinhar texto à esquerda
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--action-highlight-dark);
+  font-weight: 500;
+  display: flex; // Para alinhar o texto e o chevron
+  justify-content: space-between; // Coloca o chevron no final
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(180, 151, 255, 0.1); // Mesmo hover do summary original
+  }
+
+  [data-theme='light'] & {
+    color: var(--action-highlight-light);
+    &:hover {
+      background-color: rgba(180, 151, 255, 0.1);
+    }
+  }
+}
+
+.summaryChevron {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.7em; // Chevron um pouco menor
+  // A rotação é feita pelo Framer Motion
+}
+
+// Estilos para a lista de sentenças e palavras já estão bons,
+// apenas garantir que funcionem bem dentro do motion.div animado.
+.sentenceList, .wordList {
+  // ... seus estilos existentes ...
+  // Garantir que o padding/margin não causem saltos com a animação de height.
+  // O motion.div pai com overflow:hidden cuidará do corte durante a animação de height.
+  margin-top: 0.5rem; // Adicionar um pouco de espaço após o botão de summary
+  padding-left: 0.75rem; // Pequeno recuo para o conteúdo dos detalhes
+}
+
+.noDetails {
+  font-style: italic;
+  opacity: 0.7;
+  padding: 0.5rem 0.75rem; // Adicionar padding
+  font-size: 0.8rem;
+   color: var(--text-secondary-dark);
+    [data-theme='light'] & {
+        color: var(--text-secondary-light);
+    }
+}
+
+.moreDetails {
+    font-style: italic;
+    opacity: 0.8;
+    font-size: 0.8rem;
+     color: var(--text-secondary-dark);
+    [data-theme='light'] & {
+        color: var(--text-secondary-light);
+    }
+}
+
 .levelExcelente { border-left-color: var(--success-dark) !important; [data-theme='light'] & { border-left-color: var(--success-light) !important; } }
 .levelBom { border-left-color: #a0d911 !important; } // Use variáveis CSS se tiver para estas cores
 .levelRegular { border-left-color: #faad14 !important; }
 .levelRuim { border-left-color: #f5222d !important; }
 .levelNA { border-left-color: var(--border-color-dark) !important; [data-theme='light'] & { border-left-color: var(--border-color-light) !important; }}
-
-// Reutilizar o estilo de .emptyStateAdvancedMetrics do EditorWithMetrics.module.scss
-// Se você importou como editorLayoutStyles, pode usar editorLayoutStyles.emptyStateAdvancedMetrics
-// Certifique-se que .emptyStateAdvancedMetrics está definido em EditorWithMetrics.module.scss

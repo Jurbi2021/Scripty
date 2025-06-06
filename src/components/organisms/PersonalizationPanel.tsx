@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import styles from './PersonalizationPanel.module.scss';
 import { motion } from 'framer-motion';
-import Toggle from '../atoms/Toggle'; //
-import Button from '../atoms/Button'; // Seu átomo de botão
-import Text from '../atoms/Text';   // Seu átomo de texto
-import { useEditor } from '../../contexts/EditorContext'; //
+import Toggle from '../atoms/Toggle';
+import Button from '../atoms/Button';
+import Text from '../atoms/Text';
+import { useEditor } from '../../contexts/EditorContext';
 import {
   ScriptyPreferences,
   BasicMetricKey,
@@ -13,250 +13,182 @@ import {
   StyleMetricKey,
   SeoMetricKey,
   DetailLevel,
-  defaultScriptyPreferences
-} from '../../utils/preferences';
+  AIPromptSettings, // Importar se for usar para tipar o handler explicitamente
+  defaultScriptyPreferences,
+  // Os tipos de sub-preferências podem ser úteis para os handlers se você quiser mais especificidade
+  // ToolbarPreferences, AdvancedMetricsPreferences, StyleAnalysisPreferences, SeoAnalysisPreferences
+} from '../../utils/preferences'; // Ajuste o caminho conforme necessário
 
-// Dados para os toggles (para evitar repetição no JSX)
-// Você pode buscar os nomes das métricas dos seus arquivos de utils se preferir
-const basicMetricsOptions: { key: BasicMetricKey; label: string }[] = [
-  { key: 'charsWithSpaces', label: 'Caracteres' },
-  { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
-  { key: 'words', label: 'Palavras' },
-  { key: 'sentences', label: 'Sentenças' },
-  { key: 'paragraphs', label: 'Parágrafos' },
-  { key: 'readingTime', label: 'Tempo de Leitura' },
-  { key: 'uniqueWords', label: 'Palavras Únicas' },
+// --- Definições das Opções de Métricas (conforme já definimos antes) ---
+const allBasicMetricsOptions: { key: BasicMetricKey; label: string }[] = [
+  { key: 'words', label: 'Palavras' }, { key: 'charsWithSpaces', label: 'Caracteres' },
+  { key: 'sentences', label: 'Sentenças' }, { key: 'paragraphs', label: 'Parágrafos' },
+  { key: 'readingTime', label: 'Tempo de Leitura' }, { key: 'uniqueWords', label: 'Palavras Únicas' },
   { key: 'avgWordsPerSentence', label: 'Média Palavras/Sentença' },
-  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' },
+  { key: 'avgCharsPerWord', label: 'Média Caracteres/Palavra' }, { key: 'charsNoSpaces', label: 'Caracteres (s/ espaço)' },
 ];
-
-const readabilityIndicesOptions: { key: ReadabilityIndexKey; label: string }[] = [
-  { key: 'jurbiX', label: 'JurbiX' },
-  { key: 'fleschKincaidReadingEase', label: 'Flesch-Kincaid' },
-  { key: 'gunningFog', label: 'Gunning Fog' },
-  { key: 'smogIndex', label: 'SMOG' },
-  { key: 'colemanLiauIndex', label: 'Coleman-Liau' },
+const allReadabilityIndicesOptions: { key: ReadabilityIndexKey; label: string }[] = [
+  { key: 'jurbiX', label: 'JurbiX' }, { key: 'fleschKincaidReadingEase', label: 'Flesch-Kincaid' },
+  { key: 'gunningFog', label: 'Gunning Fog' }, { key: 'smogIndex', label: 'SMOG' },
+  { key: 'colemanLiauIndex', label: 'Coleman-Liau' }, { key: 'gulpeaseIndex', label: 'Gulpease' }
 ];
-
-const styleMetricsOptions: { key: StyleMetricKey; label: string; hasDetails?: boolean }[] = [
-  { key: 'passiveVoice', label: 'Voz Passiva', hasDetails: true },
-  { key: 'adverbs', label: 'Advérbios' },
+const allStyleMetricsOptions: { key: StyleMetricKey; label: string; hasDetails?: boolean }[] = [
+  { key: 'passiveVoice', label: 'Voz Passiva', hasDetails: true }, { key: 'adverbs', label: 'Advérbios' },
   { key: 'complexSentences', label: 'Frases Complexas', hasDetails: true },
-  { key: 'discourseConnectors', label: 'Conectores Discursivos' },
-  { key: 'lexicalDiversity', label: 'Diversidade Léxica' },
+  { key: 'discourseConnectors', label: 'Conectores Discursivos' }, { key: 'lexicalDiversity', label: 'Diversidade Léxica' },
 ];
-
-const seoMetricsOptions: { key: SeoMetricKey; label: string }[] = [
-  { key: 'mainKeyword', label: 'Palavra-Chave Principal' },
-  { key: 'lsiResult', label: 'Densidade LSI' },
-  { key: 'seoReadability', label: 'Legibilidade para SEO' },
-  { key: 'seoTextLength', label: 'Comprimento do Texto (SEO)' },
+const allSeoMetricsOptions: { key: SeoMetricKey; label: string }[] = [
+  { key: 'mainKeyword', label: 'Palavra-Chave Principal' }, { key: 'lsiResult', label: 'Densidade LSI' },
+  { key: 'seoReadability', label: 'Legibilidade para SEO' }, { key: 'seoTextLength', label: 'Comprimento do Texto (SEO)' },
   { key: 'headingResult', label: 'Estrutura Textual' },
 ];
-
+// --- Fim das Definições ---
 
 const PersonalizationPanel: React.FC = () => {
   const { preferences, updatePreferences, resetPreferences } = useEditor();
-  // Estado local para gerenciar as mudanças antes de salvar, se preferir um "save" explícito
   const [localPrefs, setLocalPrefs] = useState<ScriptyPreferences>(preferences);
-    // Sincronizar localPrefs se as preferences globais mudarem (ex: reset externo)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
   useEffect(() => {
     setLocalPrefs(preferences);
   }, [preferences]);
 
-const handleToolbarMetricVisibilityToggle = (metricKey: BasicMetricKey) => {
+  // Suas funções de handle (handleToggle, handleArrayToggle, etc.) permanecem as mesmas
+ const handleToolbarMetricVisibilityToggle = (metricKey: BasicMetricKey) => {
     setLocalPrefs(prev => {
-      const newVisibleMetrics = [...prev.toolbar.visibleMetrics];
-      const itemIndex = newVisibleMetrics.indexOf(metricKey);
-
-      if (itemIndex > -1) {
-        newVisibleMetrics.splice(itemIndex, 1); // Remove se já existe (desativa)
-      } else {
-        // Adiciona, respeitando a ordem de allBasicMetricsOptions para novos itens,
-        // ou simplesmente no final se a ordem inicial não for crítica aqui.
-        // Para manter uma ordem previsível ao adicionar, poderíamos adicionar no final.
-        newVisibleMetrics.push(metricKey);
-      }
-      return {
-        ...prev,
-        toolbar: {
-          ...prev.toolbar,
-          visibleMetrics: newVisibleMetrics,
-        },
-      };
+      const currentVisible = prev.toolbar.visibleMetrics;
+      const newVisibleMetrics = currentVisible.includes(metricKey)
+        ? currentVisible.filter(m => m !== metricKey)
+        : [...currentVisible, metricKey];
+      return { ...prev, toolbar: { ...prev.toolbar, visibleMetrics: newVisibleMetrics } };
     });
   };
-
-  // Função para mover uma métrica na lista de métricas visíveis da toolbar
   const handleMoveToolbarMetric = (metricKey: BasicMetricKey, direction: 'up' | 'down') => {
     setLocalPrefs(prev => {
       const currentVisibleMetrics = [...prev.toolbar.visibleMetrics];
       const index = currentVisibleMetrics.indexOf(metricKey);
-
-      if (index === -1) return prev; // Métrica não está visível, não faz nada
-
+      if (index === -1) return prev;
       if (direction === 'up' && index > 0) {
-        // Troca com o elemento anterior
         [currentVisibleMetrics[index - 1], currentVisibleMetrics[index]] = [currentVisibleMetrics[index], currentVisibleMetrics[index - 1]];
       } else if (direction === 'down' && index < currentVisibleMetrics.length - 1) {
-        // Troca com o elemento seguinte
         [currentVisibleMetrics[index + 1], currentVisibleMetrics[index]] = [currentVisibleMetrics[index], currentVisibleMetrics[index + 1]];
       }
-
-      return {
-        ...prev,
-        toolbar: {
-          ...prev.toolbar,
-          visibleMetrics: currentVisibleMetrics,
-        },
-      };
+      return { ...prev, toolbar: { ...prev.toolbar, visibleMetrics: currentVisibleMetrics } };
     });
   };
 
+  // --- Handlers Genéricos e Específicos ---
+  const handleSimpleToggle = <C extends keyof Omit<ScriptyPreferences, 'toolbar' | 'styleAnalysis' | 'aiPromptSettings' | 'advancedMetrics'>, K extends keyof ScriptyPreferences[C]>(category: C, key: K) => {
+    // Este handler genérico precisa ser ajustado para lidar com a estrutura de cada preferência.
+    // Ou criar handlers específicos para cada categoria como abaixo.
+  };
 
-  const handleToggle = (category: keyof ScriptyPreferences, key: string, subKey?: string) => {
+  const handleAdvancedMetricToggle = (key: keyof Omit<ScriptyPreferences['advancedMetrics'], 'visibleReadabilityIndices'>) => {
+    setLocalPrefs(prev => ({
+      ...prev,
+      advancedMetrics: { ...prev.advancedMetrics, [key]: !prev.advancedMetrics[key] }
+    }));
+  };
+
+  const handleReadabilityIndexToggle = (indexKey: ReadabilityIndexKey) => {
     setLocalPrefs(prev => {
-      const newPrefs = JSON.parse(JSON.stringify(prev)); // Deep copy para evitar mutação
-      if (subKey) {
-        // @ts-ignore // Lidar com tipos dinâmicos aqui pode ser complexo
-        newPrefs[category][key][subKey] = !newPrefs[category][key][subKey];
-      } else if (category === 'toolbar' && key === 'visibleMetrics') {
-        // Tratamento especial para array de visibleMetrics na toolbar
-        const metricKey = subKey as BasicMetricKey; // subKey aqui seria a métrica
-        const currentVisible = newPrefs.toolbar.visibleMetrics as BasicMetricKey[];
-        if (currentVisible.includes(metricKey)) {
-          newPrefs.toolbar.visibleMetrics = currentVisible.filter(m => m !== metricKey);
-        } else {
-          newPrefs.toolbar.visibleMetrics = [...currentVisible, metricKey];
-        }
-      } else if (category === 'advancedMetrics' && key === 'visibleReadabilityIndices') {
-        const indexKey = subKey as ReadabilityIndexKey;
-        const currentVisible = newPrefs.advancedMetrics.visibleReadabilityIndices as ReadabilityIndexKey[];
-        if (currentVisible.includes(indexKey)) {
-          newPrefs.advancedMetrics.visibleReadabilityIndices = currentVisible.filter(m => m !== indexKey);
-        } else {
-          newPrefs.advancedMetrics.visibleReadabilityIndices = [...currentVisible, indexKey];
-        }
-      }
-      else {
-         // @ts-ignore
-        newPrefs[category][key] = !newPrefs[category][key];
-      }
-      return newPrefs;
+      const currentVisible = prev.advancedMetrics.visibleReadabilityIndices;
+      const newVisible = currentVisible.includes(indexKey)
+        ? currentVisible.filter(k => k !== indexKey)
+        : [...currentVisible, indexKey];
+      return { ...prev, advancedMetrics: { ...prev.advancedMetrics, visibleReadabilityIndices: newVisible } };
     });
   };
 
-  const handleDetailLevelChange = (styleKey: StyleMetricKey, level: DetailLevel) => {
-    setLocalPrefs(prev => {
-      const newPrefs = JSON.parse(JSON.stringify(prev));
-      if (newPrefs.styleAnalysis[styleKey]) {
-        newPrefs.styleAnalysis[styleKey]!.detailLevel = level;
-      }
-      return newPrefs;
-    });
+  const handleStyleCardToggle = (styleKey: StyleMetricKey) => {
+    setLocalPrefs(prev => ({
+      ...prev,
+      styleAnalysis: { ...prev.styleAnalysis, [styleKey]: { ...prev.styleAnalysis[styleKey], showCard: !prev.styleAnalysis[styleKey].showCard } }
+    }));
   };
 
-  // Função para lidar com o toggle de métricas que são arrays (como toolbar.visibleMetrics)
-  const handleArrayToggle = (
-    category: 'toolbar' | 'advancedMetrics',
-    listKey: 'visibleMetrics' | 'visibleReadabilityIndices',
-    itemKey: BasicMetricKey | ReadabilityIndexKey
-  ) => {
-    setLocalPrefs(prev => {
-      const newPrefs = JSON.parse(JSON.stringify(prev)); // Deep copy
-      const currentList = newPrefs[category][listKey] as Array<BasicMetricKey | ReadabilityIndexKey>;
-      const itemIndex = currentList.indexOf(itemKey);
-
-      if (itemIndex > -1) {
-        currentList.splice(itemIndex, 1); // Remove
-      } else {
-        currentList.push(itemKey); // Adiciona
-      }
-      newPrefs[category][listKey] = currentList;
-      return newPrefs;
-    });
+  const handleStyleDetailLevelChange = (styleKey: StyleMetricKey, level: DetailLevel) => {
+    setLocalPrefs(prev => ({
+      ...prev,
+      styleAnalysis: { ...prev.styleAnalysis, [styleKey]: { ...prev.styleAnalysis[styleKey], detailLevel: level } }
+    }));
   };
 
+  const handleSeoCardToggle = (seoKey: SeoMetricKey) => {
+    setLocalPrefs(prev => ({
+      ...prev,
+      seoAnalysis: { ...prev.seoAnalysis, [seoKey]: { ...prev.seoAnalysis[seoKey], showCard: !prev.seoAnalysis[seoKey].showCard } }
+    }));
+  };
 
+  // --- NOVO HANDLER para o toggle de generateComprehensivePrompt ---
+  const handleToggleComprehensivePrompt = () => {
+    setLocalPrefs(prev => ({
+      ...prev,
+      aiPromptSettings: {
+        ...prev.aiPromptSettings,
+        generateComprehensivePrompt: !prev.aiPromptSettings.generateComprehensivePrompt,
+      },
+    }));
+  };
+  
   const handleSavePreferences = () => {
-    // Para uma atualização profunda, pode ser necessário fazer um merge mais cuidadoso
-    // ou garantir que updatePreferences lide com a estrutura aninhada.
-    // A implementação atual de updatePreferences no EditorContext já tenta um merge aninhado simples.
+    setSaveStatus('saving');
     updatePreferences(localPrefs);
-    // Adicionar feedback ao usuário (ex: toast, mensagem)
+    setTimeout(() => {
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 1500); 
+    }, 700);
   };
 
   const handleResetPreferences = () => {
-    setLocalPrefs(defaultScriptyPreferences);
-    resetPreferences(); // Isso vai resetar no contexto e localStorage
-  }
-
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.4, ease: "easeOut" }
-    })
+    resetPreferences(); // O useEffect sincronizará localPrefs
   };
+
+  const sectionVariants = { /* ... (suas variantes, se houver) ... */ };
 
   return (
     <div className={styles.personalizationContainer}>
       <motion.div
-        className={styles.settingsSection} // Renomeado para metricsCustomizationSection ou similar
-        custom={0}
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
+        className={styles.settingsSection}
+        custom={0} variants={sectionVariants} initial="hidden" animate="visible"
       >
-        <Text as="h2" className={styles.sectionTitle}>Personalizar Métricas Visíveis</Text>
+        <Text as="h2" className={styles.sectionTitle}>Personalizar Exibição de Métricas</Text>
 
         {/* Toolbar de Métricas Básicas */}
         <div className={styles.preferenceCategory}>
           <Text as="h3" className={styles.categoryTitle}>Barra de Métricas Básicas (Toolbar)</Text>
-          {basicMetricsOptions.map(opt => (
-            <div key={opt.key} className={styles.toggleItem}>
-              <Text size="medium">{opt.label}</Text>
-              <Toggle
-                isOn={localPrefs.toolbar.visibleMetrics.includes(opt.key)}
-                onToggle={() => handleArrayToggle('toolbar', 'visibleMetrics', opt.key)}
-                ariaLabel={`Mostrar/ocultar ${opt.label} na toolbar`}
-              />
-            </div>
-          ))}
+          <Text as="p" className={styles.categoryDescription}>
+            Selecione quais métricas básicas deseja ver na barra de ferramentas e defina sua ordem.
+          </Text>
+          <div className={styles.visibilityList}>
+            <Text as="h4" className={styles.subCategoryTitle}>Ativar/Desativar Métricas na Toolbar:</Text>
+            {allBasicMetricsOptions.map(opt => (
+              <div key={`toggle-${opt.key}`} className={styles.toggleItem}>
+                <Text size="medium">{opt.label}</Text>
+                <Toggle
+                  isOn={localPrefs.toolbar.visibleMetrics.includes(opt.key)}
+                  onToggle={() => handleToolbarMetricVisibilityToggle(opt.key)}
+                  ariaLabel={`Mostrar/ocultar ${opt.label} na toolbar`}
+                />
+              </div>
+            ))}
+          </div>
+          {/* A reordenação foi adiada para v2, então a seção de reorderList não está aqui por agora */}
         </div>
 
         {/* Painel de Métricas Avançadas */}
         <div className={styles.preferenceCategory}>
           <Text as="h3" className={styles.categoryTitle}>Painel de Métricas Avançadas</Text>
-          <div className={styles.toggleItem}>
-            <Text size="medium">Card de Comprimento do Texto</Text>
-            <Toggle isOn={localPrefs.advancedMetrics.showLengthCard} onToggle={() => handleToggle('advancedMetrics', 'showLengthCard')} />
-          </div>
-          <div className={styles.toggleItem}>
-            <Text size="medium">Card de Redundância</Text>
-            <Toggle isOn={localPrefs.advancedMetrics.showRedundancyCard} onToggle={() => handleToggle('advancedMetrics', 'showRedundancyCard')} />
-          </div>
-          <div className={styles.toggleItem}>
-            <Text size="medium">Card de Análise de Sentimento</Text>
-            <Toggle isOn={localPrefs.advancedMetrics.showSentimentCard} onToggle={() => handleToggle('advancedMetrics', 'showSentimentCard')} />
-          </div>
-          <div className={styles.toggleItem}>
-            <Text size="medium">Carrossel de Índices de Legibilidade</Text>
-            <Toggle isOn={localPrefs.advancedMetrics.showReadabilityCarousel} onToggle={() => handleToggle('advancedMetrics', 'showReadabilityCarousel')} />
-          </div>
+          <div className={styles.toggleItem}><Text size="medium">Card de Comprimento do Texto</Text><Toggle isOn={localPrefs.advancedMetrics.showLengthCard} onToggle={() => handleAdvancedMetricToggle('showLengthCard')} /></div>
+          <div className={styles.toggleItem}><Text size="medium">Card de Redundância</Text><Toggle isOn={localPrefs.advancedMetrics.showRedundancyCard} onToggle={() => handleAdvancedMetricToggle('showRedundancyCard')} /></div>
+          <div className={styles.toggleItem}><Text size="medium">Card de Análise de Sentimento</Text><Toggle isOn={localPrefs.advancedMetrics.showSentimentCard} onToggle={() => handleAdvancedMetricToggle('showSentimentCard')} /></div>
+          <div className={styles.toggleItem}><Text size="medium">Carrossel de Índices de Legibilidade</Text><Toggle isOn={localPrefs.advancedMetrics.showReadabilityCarousel} onToggle={() => handleAdvancedMetricToggle('showReadabilityCarousel')} /></div>
           {localPrefs.advancedMetrics.showReadabilityCarousel && (
             <div className={styles.subCategory}>
-              <Text as="h4" className={styles.subCategoryTitle}>Índices de Legibilidade Visíveis no Carrossel:</Text>
-              {readabilityIndicesOptions.map(opt => (
-                <div key={opt.key} className={styles.toggleItemCompact}>
-                  <Text size="small">{opt.label}</Text>
-                  <Toggle
-                    isOn={localPrefs.advancedMetrics.visibleReadabilityIndices.includes(opt.key)}
-                    onToggle={() => handleArrayToggle('advancedMetrics', 'visibleReadabilityIndices', opt.key)}
-                    ariaLabel={`Mostrar/ocultar ${opt.label} no carrossel de legibilidade`}
-                  />
-                </div>
+              <Text as="h4" className={styles.subCategoryTitle}>Índices Visíveis no Carrossel:</Text>
+              {allReadabilityIndicesOptions.map(opt => (
+                <div key={opt.key} className={styles.toggleItemCompact}><Text size="small">{opt.label}</Text><Toggle isOn={localPrefs.advancedMetrics.visibleReadabilityIndices.includes(opt.key)} onToggle={() => handleReadabilityIndexToggle(opt.key)} /></div>
               ))}
             </div>
           )}
@@ -265,25 +197,13 @@ const handleToolbarMetricVisibilityToggle = (metricKey: BasicMetricKey) => {
         {/* Painel de Análise de Estilo */}
         <div className={styles.preferenceCategory}>
           <Text as="h3" className={styles.categoryTitle}>Painel de Análise de Estilo</Text>
-          {styleMetricsOptions.map(opt => (
+          {allStyleMetricsOptions.map(opt => (
             <div key={opt.key} className={styles.toggleCard}>
-              <div className={styles.toggleItem}>
-                <Text size="medium">{opt.label}</Text>
-                <Toggle
-                  isOn={localPrefs.styleAnalysis[opt.key]?.showCard ?? false}
-                  // @ts-ignore
-                  onToggle={() => setLocalPrefs(prev => ({...prev, styleAnalysis: {...prev.styleAnalysis, [opt.key]: {...prev.styleAnalysis[opt.key], showCard: !prev.styleAnalysis[opt.key]?.showCard }}}))}
-                  ariaLabel={`Mostrar/ocultar card de ${opt.label}`}
-                />
-              </div>
+              <div className={styles.toggleItem}><Text size="medium">{opt.label}</Text><Toggle isOn={localPrefs.styleAnalysis[opt.key]?.showCard ?? false} onToggle={() => handleStyleCardToggle(opt.key)} /></div>
               {(localPrefs.styleAnalysis[opt.key]?.showCard && opt.hasDetails) && (
                 <div className={styles.detailPreference}>
                   <Text size="small">Nível de Detalhe:</Text>
-                  <select
-                    value={localPrefs.styleAnalysis[opt.key]?.detailLevel}
-                    onChange={(e) => handleDetailLevelChange(opt.key, e.target.value as DetailLevel)}
-                    className={styles.selectDropdown}
-                  >
+                  <select value={localPrefs.styleAnalysis[opt.key]?.detailLevel} onChange={(e) => handleStyleDetailLevelChange(opt.key, e.target.value as DetailLevel)} className={styles.selectDropdown} aria-label={`Nível de detalhe para ${opt.label}`}>
                     <option value="details_collapsed">Mostrar Detalhes (Recolhido)</option>
                     <option value="details_expanded">Mostrar Detalhes (Expandido)</option>
                     <option value="summary">Apenas Resumo</option>
@@ -297,33 +217,33 @@ const handleToolbarMetricVisibilityToggle = (metricKey: BasicMetricKey) => {
         {/* Painel de Análise de SEO */}
         <div className={styles.preferenceCategory}>
           <Text as="h3" className={styles.categoryTitle}>Painel de Análise de SEO</Text>
-          {seoMetricsOptions.map(opt => (
-            <div key={opt.key} className={styles.toggleItem}>
-              <Text size="medium">{opt.label}</Text>
-              <Toggle
-                isOn={localPrefs.seoAnalysis[opt.key as keyof SeoAnalysisPreferences]?.showCard ?? false}
-                 // @ts-ignore
-                onToggle={() => setLocalPrefs(prev => ({...prev, seoAnalysis: {...prev.seoAnalysis, [opt.key]: {...prev.seoAnalysis[opt.key], showCard: !prev.seoAnalysis[opt.key]?.showCard }}}))}
-                ariaLabel={`Mostrar/ocultar card de ${opt.label}`}
-              />
-            </div>
+          {allSeoMetricsOptions.map(opt => (
+            <div key={opt.key} className={styles.toggleItem}><Text size="medium">{opt.label}</Text><Toggle isOn={localPrefs.seoAnalysis[opt.key as keyof SeoAnalysisPreferences]?.showCard ?? false} onToggle={() => handleSeoCardToggle(opt.key as SeoMetricKey)} /></div>
           ))}
         </div>
 
+        {/* --- NOVA SEÇÃO PARA CONFIGURAÇÕES DO PROMPT DE IA --- */}
+        <div className={styles.preferenceCategory}>
+          <Text as="h3" className={styles.categoryTitle}>Configurações do Prompt de IA</Text>
+          <div className={styles.toggleItem}>
+            <Text size="medium">Gerar prompt abrangente (incluir feedbacks de todas as análises)</Text>
+            <Toggle
+              isOn={localPrefs.aiPromptSettings.generateComprehensivePrompt}
+              onToggle={handleToggleComprehensivePrompt}
+              ariaLabel="Ativar ou desativar prompt de IA abrangente"
+            />
+          </div>
+          <Text as="p" size="small" className={styles.categoryDescription} style={{marginTop: '0.5rem'}}>
+            Se desativado, o prompt de IA será focado apenas nos feedbacks da tela de análise ativa.
+          </Text>
+        </div>
+        {/* --- FIM DA NOVA SEÇÃO --- */}
+
         <div className={styles.actionButtons}>
-            <Button onClick={handleSavePreferences} variant="primary" className={styles.confirmButton}>
-                Salvar Preferências
-            </Button>
-            <Button onClick={handleResetPreferences} variant="secondary" className={styles.resetButton}>
-                Restaurar Padrões
-            </Button>
+            <Button onClick={handleSavePreferences} variant="primary" className={styles.confirmButton}>Salvar Preferências</Button>
+            <Button onClick={handleResetPreferences} variant="secondary" className={styles.resetButton}>Restaurar Padrões</Button>
         </div>
       </motion.div>
-
-      {/* A seção de Tema do Scripty original pode ser removida se o foco não é em cores
-          ou mantida se você planeja adicionar personalização de tema no futuro.
-          Por enquanto, vou omiti-la conforme sua indicação de focar em métricas.
-      */}
     </div>
   );
 };

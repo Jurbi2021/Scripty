@@ -3,7 +3,6 @@ import React from 'react';
 import Header from '../organisms/Header';
 import styles from './HelpCenterLayout.module.scss'; //
 import { useNavigate } from 'react-router-dom';
-import { TableOfContentsItem } from './HelpCenterLayout'; // Supondo que você ainda precise disso
 
 interface HelpCenterLayoutProps {
   children: React.ReactNode;

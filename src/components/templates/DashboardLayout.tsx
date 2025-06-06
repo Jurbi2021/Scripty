@@ -12,6 +12,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   headerTitle?: string;
 }
+const isEditorPage = location.pathname.startsWith('/editor/') || location.pathname === '/';
 
 const getActiveViewFromPathname = (pathname: string): View => {
   if (pathname.startsWith('/editor/style')) return 'style';
@@ -74,6 +75,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
           title={pageSpecificHeaderTitle}
           onHelpButtonClick={handleNavigateToHelp}
           showFocusModeButton={isFocusModeRelevantPage} // Passa a prop condicionalmente
+          showAIPromptButton={isEditorPage} // <--- Esta linha é crucial
         />
         <main className={styles.content}>{children}</main>
       </div>

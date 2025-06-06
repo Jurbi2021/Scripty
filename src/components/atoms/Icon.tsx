@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaPen, FaCode, FaSearch, FaCog, FaQuestionCircle } from 'react-icons/fa';
+import { FaEdit, FaCode, FaSearch, FaCog, FaQuestionCircle, FaSignOutAlt, FaChevronRight, FaUser, FaPenFancy, FaChevronLeft } from 'react-icons/fa';
 import styles from './Icon.module.scss';
 import { BsArrowBarLeft, BsArrowRight } from 'react-icons/bs';
 
@@ -11,12 +11,20 @@ interface IconProps {
 }
 
 const iconMap: { [key: string]: React.ElementType } = {
-  editor: FaPen,
-  style: FaCode,
+  // Chaves para as views da sidebar
+  metrics: FaEdit, // Usando FaPen em vez de FaEdit para consistência com o que você tinha no Icon.tsx
+  style: FaPenFancy,   // Você usou FaPenFancy na Sidebar, vamos manter essa. Se preferir FaCode, troque aqui.
   seo: FaSearch,
-  personalize: FaCog,
+  personalization: FaCog,
+  
+  // Chaves para o footer da sidebar
   help: FaQuestionCircle,
-  arrow: BsArrowRight,
+  logout: FaSignOutAlt,
+  user: FaUser, // Adicionado um ícone de usuário genérico que pode ser útil
+  
+  // Outros ícones
+  arrowLeft: FaChevronLeft, // Renomeado para clareza
+  arrowRight: FaChevronRight, // Renomeado para clareza
 };
 
 const Icon: React.FC<IconProps> = ({ name, size = 24, color = 'inherit', className = '' }) => {

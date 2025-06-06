@@ -1,7 +1,7 @@
 // src/components/organisms/EditorWithMetrics.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './EditorWithMetrics.module.scss';
-import editorLayoutStyles from './EditorWithMetrics.module.scss'; // Reutiliza o mesmo para .editorLayout e .mainContentArea
+import editorLayoutStyles from './EditorWithMetrics.module.scss';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Mousewheel, Pagination, Navigation } from 'swiper/modules';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,14 +22,14 @@ import {
 import {
   calculateAdvancedMetrics,
   AdvancedMetricsData,
-  ReadabilityIndices, // Usado para tipar advancedMetrics.readability[key]
+  ReadabilityIndices,
   getEmptyAdvancedMetrics,
   SentimentScore
 } from '../../utils/AdvancedMetrics';
-import lexicoData from '../../utils/lexico.json'; //
+import lexicoData from '../../utils/lexico.json';
 
 import { useEditor } from '../../contexts/EditorContext';
-import { ReadabilityIndexKey } from '../../utils/preferences'; // Ajuste o caminho
+import { ReadabilityIndexKey } from '../../utils/preferences';
 
 interface Lexico {
   positive: string[];
@@ -49,23 +49,28 @@ const allReadabilityIndicesOptions: { key: ReadabilityIndexKey; label: string }[
     { key: 'gunningFog', label: 'Gunning Fog' },
     { key: 'smogIndex', label: 'SMOG' },
     { key: 'colemanLiauIndex', label: 'Coleman-Liau' },
-    // { key: 'gulpeaseIndex', label: 'Gulpease' }, // Adicione se for usar
 ];
 
 const EditorWithMetrics: React.FC = () => {
-  const [text, setText] = useState<string>('');
   const [basicMetrics, setBasicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
-  const [advancedMetrics, setAdvancedMetrics] = useState<AdvancedMetricsData>(getEmptyAdvancedMetrics());
-  
-  const { preferences, isFocusMode } = useEditor();
+  const { 
+  preferences, 
+  isFocusMode, 
+  text,                 // <<< ADICIONADO para ler do contexto
+  setText,              // <<< ADICIONADO para atualizar o contexto
+  advancedMetrics,      
+  setAdvancedMetricsData 
+  } = useEditor();
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setBasicMetrics(calculateBasicMetrics(text));
-      setAdvancedMetrics(calculateAdvancedMetrics(text, lexico));
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [text]);
+  const handler = setTimeout(() => {
+    const newBasicMetrics = calculateBasicMetrics(text); // 'text' deve ser o global
+    const newAdvancedMetrics = calculateAdvancedMetrics(text, lexico); // 'text' deve ser o global
+    setBasicMetrics(newBasicMetrics); // setBasicMetrics ainda é local, ok
+    setAdvancedMetricsData(newAdvancedMetrics); // Chama o setter do CONTEXTO
+  }, 300);
+  return () => clearTimeout(handler);
+}, [text, lexico, setAdvancedMetricsData]);
 
   const formatSentiment = (sentiment: SentimentScore): string => {
     const score = sentiment.compound;
@@ -75,7 +80,7 @@ const EditorWithMetrics: React.FC = () => {
     return `${emoji} ${sentiment.sentiment.charAt(0).toUpperCase() + sentiment.sentiment.slice(1)} (${score.toFixed(2)})`;
   };
 
-  const getLevelClass = (level: string | undefined): string => { // Aceita undefined
+  const getLevelClass = (level: string | undefined): string => {
     switch (level?.toLowerCase()) {
       case 'muito fácil': return styles.levelMuitoFacil;
       case 'fácil': return styles.levelFacil;
@@ -89,9 +94,10 @@ const EditorWithMetrics: React.FC = () => {
     }
   };
 
-  const cardVariants = {
+  // Variantes para os cards principais dentro do grid
+  const gridItemCardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.98 },
-    visible: (i: number) => ({
+    visible: (i: number) => ({ // Aceita o índice para delay escalonado
       opacity: 1,
       y: 0,
       scale: 1,
@@ -100,8 +106,53 @@ const EditorWithMetrics: React.FC = () => {
         duration: 0.4,
         ease: "easeOut"
       }
-    })
+    }),
+    // Animação de saída para cada card individual se o container pai (grid) não tiver uma exit própria
+    // ou se quisermos que os cards sumam de forma escalonada também.
+    // Se o grid container tiver um exit, esta pode não ser necessária.
+    exit: { 
+      opacity: 0, 
+      scale: 0.95, 
+      y: 10, 
+      transition: { duration: 0.2, ease: "easeIn" } 
+    } 
   };
+  
+  // Variantes para o conteúdo dos cards de legibilidade no Swiper
+  const readabilityCardContentVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      }
+    },
+    // Adicionando exit aqui também para consistência se o slide mudar
+    exit: { opacity: 0, y: -10, transition: { duration: 0.15 } }
+  };
+
+  // Variantes para a animação de mudança de valores numéricos
+  const valueChangeVariants = {
+    initial: { opacity: 0.3, y: -8 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  };
+
+  // Variantes para as mensagens de estado vazio
+  const emptyStateVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.2, ease: "easeIn" } }
+  };
+
+  // Variantes para o container do grid de métricas
+  const gridContainerVariants = {
+    initial: { opacity: 0 }, // Pode ser mais sutil, pois os filhos animam
+    animate: { opacity: 1, transition: { duration: 0.1 } }, // Entrada rápida
+    exit: { opacity: 0, transition: { duration: 0.2, ease: "easeIn" } } // Saída coordenada
+  };
+
 
   const readabilityIndicesToDisplay = allReadabilityIndicesOptions.filter(option =>
     preferences.advancedMetrics.visibleReadabilityIndices.includes(option.key)
@@ -138,61 +189,111 @@ const EditorWithMetrics: React.FC = () => {
         </div>
 
         <TextArea
-          className={editorLayoutStyles.editorAreaAdapter}
-          placeholder="Comece a escrever seu texto aqui..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={15}
+         className={editorLayoutStyles.editorAreaAdapter}
+         placeholder="Comece a escrever seu texto aqui..."
+          value={text} // <<< Usa o 'text' do contexto
+         onChange={(e) => setText(e.target.value)} // <<< Chama o 'setText' do contexto
+         rows={15}
         />
       </div>
 
-      {!isFocusMode && ( // O painel avançado só é renderizado se NÃO estiver em Modo Foco
+      {!isFocusMode && advancedMetrics && ( 
         <motion.div
           className={styles.advancedMetricsPanel}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-          // Adicionar key para AnimatePresence funcionar corretamente se o painel some/aparece
-          key="advancedMetricsPanel"
         >
           <h3 className={styles.advancedPanelTitle}>Métricas Avançadas</h3>
           <p className={styles.advancedSubtitle}>Analise a legibilidade do seu texto de forma mais profunda.</p>
 
-          <AnimatePresence>
+          <AnimatePresence mode="wait"> 
             {(text.length > 0 && shouldShowAnyAdvancedCard) ? (
               <motion.div
+                key="metrics-grid-container" 
                 className={styles.advancedGridContainer}
-                initial="hidden"
-                animate="visible" // Os cards internos terão sua própria animação com 'custom'
+                variants={gridContainerVariants} // Usar variantes para o container do grid
+                initial="initial"
+                animate="animate"
+                exit="exit" 
               >
                 {preferences.advancedMetrics.showLengthCard && (
-                  <motion.div className={`${styles.advancedGridItem} ${styles.advancedCard}`} custom={0} variants={cardVariants} initial="hidden" animate="visible">
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={0} 
+                    variants={gridItemCardVariants}
+                    initial="hidden" 
+                    animate="visible"
+                    // exit="exit" // Se o gridItemCardVariants tiver a prop exit
+                  >
                     <span className={styles.advancedCardTitle}>Comprimento do Texto</span>
                     <div className={styles.advancedCardContent}>
-                      <p className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.textLengthWords < 300 ? 'ruim' : advancedMetrics.textLengthWords <= 2000 ? 'bom' : 'ruim')}`}>
+                      <motion.p
+                        key={`length-feedback-${advancedMetrics.feedbackComprimento}`} 
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.textLengthWords < 300 ? 'ruim' : advancedMetrics.textLengthWords <= 2000 ? 'bom' : 'ruim')}`}>
                         {advancedMetrics.feedbackComprimento || 'Digite para feedback.'}
-                      </p>
+                      </motion.p>
                     </div>
                   </motion.div>
                 )}
 
                 {preferences.advancedMetrics.showRedundancyCard && (
-                  <motion.div className={`${styles.advancedGridItem} ${styles.advancedCard}`} custom={1} variants={cardVariants} initial="hidden" animate="visible">
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={1} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    // exit="exit"
+                  >
                     <span className={styles.advancedCardTitle}>Redundância</span>
                     <div className={styles.advancedCardContent}>
-                      <p>Índice: <span className={styles.metricHighlight}>{advancedMetrics.redundancy.index.toFixed(1)}%</span></p>
-                      <p className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.redundancy.level)}`}>
-                        {advancedMetrics.redundancy.feedback || 'Digite para feedback.'}
+                      <p>
+                        Índice:{" "}
+                        <motion.span
+                          key={`redundancy-value-${advancedMetrics.redundancy.index}`} 
+                          variants={valueChangeVariants}
+                          initial="initial"
+                          animate="animate"
+                          className={styles.metricHighlight}
+                        >
+                          {advancedMetrics.redundancy.index.toFixed(1)}%
+                        </motion.span>
                       </p>
+                      <motion.p
+                        key={`redundancy-feedback-${advancedMetrics.redundancy.level}`}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.redundancy.level)}`}>
+                        {advancedMetrics.redundancy.feedback || 'Digite para feedback.'}
+                      </motion.p>
                     </div>
                   </motion.div>
                 )}
 
                 {preferences.advancedMetrics.showSentimentCard && (
-                  <motion.div className={`${styles.advancedGridItem} ${styles.advancedCard}`} custom={2} variants={cardVariants} initial="hidden" animate="visible">
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={2} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    // exit="exit"
+                  >
                     <span className={styles.advancedCardTitle}>Análise de Sentimento</span>
                     <div className={styles.advancedCardContent}>
-                      <p className={styles.metricHighlightLarge}>{formatSentiment(advancedMetrics.sentiment)}</p>
+                       <motion.p
+                        key={`sentiment-value-${advancedMetrics.sentiment.compound}`}
+                        variants={valueChangeVariants}
+                        initial="initial"
+                        animate="animate"
+                        className={styles.metricHighlightLarge}>
+                          {formatSentiment(advancedMetrics.sentiment)}
+                        </motion.p>
                     </div>
                   </motion.div>
                 )}
@@ -200,8 +301,11 @@ const EditorWithMetrics: React.FC = () => {
                 {(preferences.advancedMetrics.showReadabilityCarousel && readabilityIndicesToDisplay.length > 0) && (
                   <motion.div
                     className={`${styles.advancedGridItem} ${styles.readabilityCarouselContainer}`}
-                    custom={3}
-                    variants={cardVariants} initial="hidden" animate="visible"
+                    custom={3} 
+                    variants={gridItemCardVariants} 
+                    initial="hidden"
+                    animate="visible"
+                    // exit="exit"
                   >
                     <h4>Índices de Legibilidade</h4>
                     <Swiper
@@ -209,7 +313,7 @@ const EditorWithMetrics: React.FC = () => {
                       spaceBetween={10}
                       slidesPerView={1}
                       pagination={{ clickable: true, dynamicBullets: true, el: `.${styles.customPagination}` }}
-                      mousewheel={true}
+                      mousewheel={{ forceToAxis: true }}
                       navigation
                       className={styles.readabilitySwiper}
                     >
@@ -217,14 +321,43 @@ const EditorWithMetrics: React.FC = () => {
                         const result = advancedMetrics.readability[key as keyof ReadabilityIndices];
                         return (
                           <SwiperSlide key={key} className={styles.readabilitySlide}>
-                            <div className={styles.readabilityCard}>
+                            <motion.div
+                              className={styles.readabilityCard}
+                              key={`readability-card-${key}-${result?.score}`} 
+                              variants={readabilityCardContentVariants} 
+                              initial="hidden"
+                              animate="visible" 
+                              exit="exit" // Para animar a saída do conteúdo do slide
+                            >
                               <span className={styles.readabilityName}>{label}</span>
-                              <span className={`${styles.readabilityValue} ${getLevelClass(result?.level)}`}>
+                              <motion.span
+                                key={`score-value-${key}-${result?.score}`}
+                                variants={valueChangeVariants}
+                                initial="initial"
+                                animate="animate"
+                                className={`${styles.readabilityValue} ${getLevelClass(result?.level)}`}
+                              >
                                 {result?.score?.toFixed(1) ?? 'N/A'}
-                              </span>
-                              <span className={`${styles.readabilityLevel} ${getLevelClass(result?.level)}`}>{result?.level ?? 'Indisponível'}</span>
-                              <span className={styles.readabilityFeedback}>{result?.feedback || 'Sem dados para este índice.'}</span>
-                            </div>
+                              </motion.span>
+                              <motion.span 
+                                key={`level-text-${key}-${result?.level}`}
+                                initial={{ opacity: 0.5 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className={`${styles.readabilityLevel} ${getLevelClass(result?.level)}`}
+                              >
+                                {result?.level ?? 'Indisponível'}
+                              </motion.span>
+                              <motion.span 
+                                key={`feedback-text-${key}-${result?.feedback}`}
+                                initial={{ opacity: 0.5 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3, delay: 0.1 }} 
+                                className={styles.readabilityFeedback}
+                              >
+                                {result?.feedback || 'Sem dados para este índice.'}
+                              </motion.span>
+                            </motion.div>
                           </SwiperSlide>
                         );
                       })}
@@ -235,12 +368,26 @@ const EditorWithMetrics: React.FC = () => {
               </motion.div>
             ) : (
               text.length > 0 && !shouldShowAnyAdvancedCard ? (
-                   <motion.div key="empty-metrics-config" className={styles.emptyStateAdvancedMetrics} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                   <motion.div 
+                      key="empty-metrics-config" 
+                      className={styles.emptyStateAdvancedMetrics} 
+                      variants={emptyStateVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit" 
+                    >
                       <FaLightbulb />
                       <p>Nenhuma métrica avançada selecionada para exibição. Ajuste na página de personalização.</p>
                   </motion.div>
               ) : text.length === 0 ? (
-                  <motion.div key="empty-metrics-text" className={styles.emptyStateAdvancedMetrics} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                   <motion.div 
+                      key="empty-metrics-text" 
+                      className={styles.emptyStateAdvancedMetrics} 
+                      variants={emptyStateVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit" 
+                    >
                       <FaLightbulb />
                       <p>Suas métricas avançadas aparecerão aqui assim que você começar a digitar.</p>
                   </motion.div>

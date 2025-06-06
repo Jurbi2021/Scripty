@@ -110,9 +110,12 @@
 // Agora são controlados pela molécula SidebarItem.tsx e seu SCSS.
 
 .footer {
-  padding: 0.5rem 0; // Ajustar padding, os itens internos (SidebarItem) já têm margem/padding
-  border-top: 1px solid var(--border-color-dark); //
-  flex-shrink: 0; //
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border-color-dark);
+  flex-shrink: 0;
+  display: flex;       // <<< Adicionar
+  flex-direction: column; // <<< Adicionar
+  gap: 0.2rem;          // <<< Adicionar (espaçamento entre itens do footer)
 
   [data-theme='light'] & {
     border-top: 1px solid var(--border-color-light);
@@ -175,5 +178,49 @@
     //   background-color: rgba(0,0,0,0.03);
     //   color: var(--text-main-light);
     // }
+  }
+}
+
+// --- NOVOS ESTILOS PARA A SEÇÃO DO USUÁRIO ---
+
+.userSection {
+  order: 1; // Coloca a seção do usuário no topo do footer
+  border-bottom: 1px solid var(--border-color-dark);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light);
+  }
+}
+
+.logoutItem { // Estilo opcional para o item de logout
+  // Exemplo: se quiser que ele tenha uma cor de "perigo"
+  &:hover:not(.active) {
+    background-color: rgba(var(--danger-color-dark-rgb, 245, 34, 45), 0.1) !important;
+    color: var(--danger-color-dark, #f5222d) !important;
+    
+    .icon, .label p {
+       color: var(--danger-color-dark, #f5222d) !important;
+    }
+  }
+}
+
+.userEmail {
+  text-align: center;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; // Pequeno
+  color: var(--text-secondary-dark);
+  // Estilo para truncar email se for muito longo
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+  
+  p { // Para o átomo Text
+    margin: 0;
   }
 }

@@ -1,51 +1,65 @@
 // src/components/atoms/Toggle.module.scss
-@use '../../assets/scss/variables' as vars; //
+@use '../../assets/scss/variables' as vars;
 
 .toggle {
-  width: 44px; // Levemente maior para um clique mais fácil
-  height: 24px; //
-  background-color: var(--border-color-dark); // Cor base mais sutil para estado 'off'
-  border-radius: 999px; //
-  display: flex; //
-  align-items: center; //
-  padding: 3px; //
-  cursor: pointer; //
-  position: relative; //
-  transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1); // Easing mais suave
-  border: none; // Garantir que não haja borda padrão de botão
+  width: 44px;
+  height: 24px;
+  background-color: var(--border-color-dark);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 3px; // Padding interno para o thumb
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border: none;
+  box-sizing: border-box; // Adicionado para consistência
 
-  &.on { // Classe para estado ativo
-    background-color: var(--action-highlight-dark); // Usar a cor de ação principal
+  // Ajustar o posicionamento do thumb usando justify-content no pai flex
+  // Isso funciona bem com a prop 'layout' do Framer Motion no thumb
+  justify-content: flex-start; // Estado 'off' por padrão
+
+  &.on {
+    background-color: var(--action-highlight-dark);
+    justify-content: flex-end; // Move o thumb para a direita no estado 'on'
 
     .toggleThumb {
-      transform: translateX(20px); // Ajustar conforme o novo width (44px - 24px (thumb) - 2*padding?)
-      background-color: vars.$white; // Thumb branco no estado ativo
+      // A cor do thumb no estado 'on' é controlada aqui para ambos os temas
+      background-color: var(--white, #ffffff); // Thumb branco no estado ativo
     }
 
     [data-theme='light'] & {
-        background-color: var(--action-highlight-light);
-         .toggleThumb {
-            background-color: vars.$white; // Manter branco ou um tom muito claro de --bg-main-light
-        }
+      background-color: var(--action-highlight-light);
+      // .toggleThumb já será branco por padrão
     }
   }
 
-  // Classe para estado inativo (adicionada para clareza, mas o padrão já é 'off')
   &.off {
+    // O estado 'off' já é o padrão (flex-start)
     [data-theme='light'] & {
       background-color: var(--border-color-light);
+       .toggleThumb {
+         background-color: var(--text-secondary-light); // Thumb mais escuro no 'off' do tema claro
+       }
     }
   }
 
-  .toggleThumb {
-    width: 18px; //
-    height: 18px; //
-    background-color: vars.$white; //
-    border-radius: 50%; //
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease; // Easing mais suave
-
-    [data-theme='light'] & {
-        background-color: var(--text-secondary-light); // No tema claro, thumb pode ser mais escuro no estado 'off'
-    }
+  // Novo estilo para o estado desabilitado
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5; // Reduz a opacidade para indicar desabilitação
+    // Não aplicar hover ou tap states quando desabilitado (Framer Motion já cuida disso no TSX)
   }
+}
+
+.toggleThumb {
+  width: 18px;
+  height: 18px;
+  background-color: var(--white, #ffffff); // Cor padrão do thumb (para tema escuro 'off')
+  border-radius: 50%;
+  // Remover a transição de 'transform' daqui, Framer Motion cuidará disso.
+  // Manter a transição de 'background-color' se quiser que a cor do thumb mude suavemente.
+  transition: background-color 0.3s ease;
+  display: block; // Adicionado para garantir que seja tratado como bloco
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2); // Sombra sutil no thumb para profundidade
 }

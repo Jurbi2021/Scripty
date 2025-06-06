@@ -2,11 +2,12 @@
 @import "../../App.css"; //
 
 .personalizationContainer {
-  display: flex;
+  display: flex; // Alterado para flex para centralizar o settingsSection se ele não ocupar tudo
+  justify-content: center; // Centraliza o .settingsSection se houver espaço
   gap: 1.5rem;
-  padding: 1.5rem;
+  padding: 1.5rem; // Padding no container geral
   height: 100%;
-  overflow-y: auto;
+  overflow-y: auto; // Scroll no container principal se o conteúdo for maior
   scrollbar-width: thin;
   scrollbar-color: var(--action-highlight-dark) transparent;
 
@@ -20,16 +21,17 @@
   }
 }
 
-.settingsSection { // Esta é a div principal que contém todas as categorias
-  flex: 1;
+.settingsSection { 
+  width: 100%; // Ocupa a largura do personalizationContainer
+  max-width: 800px; // Limita a largura máxima para melhor legibilidade em telas grandes
   background-color: var(--bg-container-dark);
   border-radius: 12px;
-  padding: 1.5rem 2rem; // Mais padding lateral
+  padding: 1.5rem 2rem; 
   border: 1px solid var(--border-color-dark);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; // Espaço entre as categorias de preferência
+  gap: 1rem; // Reduzido o gap entre as categorias para um visual mais compacto
 
   [data-theme='light'] & {
     background-color: var(--bg-container-light);
@@ -37,9 +39,9 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   }
 
-  .sectionTitle { // Título principal da página de personalização
+  .sectionTitle { 
     margin: 0 0 1rem 0;
-    font-size: 1.25rem;
+    font-size: 1.25rem; // Mantido
     font-weight: 600;
     color: var(--text-main-dark);
     border-bottom: 1px solid var(--border-color-dark);
@@ -51,34 +53,37 @@
   }
 }
 
-.preferenceCategory {
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border-color-dark); // Separador entre categorias
 
-  &:last-child {
+.preferenceCategory {
+  padding: 1rem 0; // Ajustado padding
+  border-bottom: 1px solid var(--border-color-dark-soft, rgba(48, 54, 64, 0.5)); // Borda mais suave
+
+  &:last-of-type { // Remover borda da última categoria
     border-bottom: none;
+    padding-bottom: 0; // Remover padding inferior do último
   }
 
   [data-theme='light'] & {
-    border-bottom-color: var(--border-color-light);
+    border-bottom-color: var(--border-color-light-soft, rgba(224, 217, 209, 0.5));
   }
 }
 
 .categoryTitle {
   font-size: 1.1rem;
-  font-weight: 600; //semibold
+  font-weight: 600;
   color: var(--text-main-dark);
-  margin-bottom: 1rem;
+  margin-bottom: 1rem; // Mantido
 
   [data-theme='light'] & {
     color: var(--text-main-light);
   }
 }
-
 .subCategory {
-  margin-top: 0.75rem;
+  // O margin-top e margin-bottom agora são controlados pela animação (subCategoryVariants)
+  // margin-top: 0.75rem; // Removido
   padding-left: 1rem;
   border-left: 2px solid var(--border-color-dark);
+  // margin-bottom: 0.5rem; // Removido
 
   [data-theme='light'] & {
     border-left-color: var(--border-color-light);
@@ -87,9 +92,9 @@
 
 .subCategoryTitle {
   font-size: 0.9rem;
-  font-weight: 500; // normal
+  font-weight: 500; 
   color: var(--text-secondary-dark);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem; // Aumentar um pouco a margem
 
   [data-theme='light'] & {
     color: var(--text-secondary-light);
@@ -101,39 +106,29 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.6rem 0;
-  // border-bottom: 1px solid var(--border-color-dark); // Linha sutil entre toggles
-
-  // &:last-child {
-  //   border-bottom: none;
-  // }
-
-  p { // Se o Text atom renderizar <p>
+  
+  p { 
     margin: 0;
     color: var(--text-secondary-dark);
      [data-theme='light'] & {
         color: var(--text-secondary-light);
      }
   }
-
-  [data-theme='light'] & {
-    // border-bottom-color: var(--border-color-light);
-  }
 }
 
 .toggleItemCompact {
   padding: 0.4rem 0;
-  // Para os sub-itens, como os índices de legibilidade
    p {
     font-size: 0.9rem;
   }
 }
 
-.toggleCard { // Para itens que podem ter configurações de detalhe
+.toggleCard { 
   flex-direction: column;
   align-items: stretch;
   background-color: var(--bg-card-dark);
   padding: 0.8rem 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem; // Aumentado para mais respiro
   border-radius: 8px;
   border: 1px solid var(--border-color-dark);
 
@@ -142,29 +137,79 @@
     border-color: var(--border-color-light);
   }
 
-  .toggleItem { // O item de toggle dentro do card não precisa de borda inferior
+  .toggleItem { 
     border-bottom: none;
     padding-bottom: 0.4rem;
   }
 }
 
 .detailPreference {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px dashed var(--border-color-dark);
+  // margin-top e padding-top são controlados pela animação (detailPreferenceVariants)
+  // border-top: 1px dashed var(--border-color-dark); // Borda no SCSS, mas o padding/margin são animados
+  border-top: 1px dashed var(--border-color-dark-soft, rgba(48, 54, 64, 0.3)); // Usar cor mais suave
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 0.9rem;
+  overflow: hidden; // Para a animação de height
 
   [data-theme='light'] & {
-    border-top-color: var(--border-color-light);
+    border-top-color: var(--border-color-light-soft, rgba(224, 217, 209, 0.3));
   }
 
   p {
     font-size: 0.9rem;
   }
 }
+
+.selectDropdown {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color-dark);
+  background-color: var(--bg-main-dark); 
+  color: var(--text-main-dark);
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 180px; // Para dar um tamanho mínimo
+
+  &:focus {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 2px var(--action-highlight-dark-01, rgba(180, 151, 255, 0.2)); // Adicionar um anel de foco
+  }
+
+  [data-theme='light'] & {
+    border-color: var(--border-color-light);
+    background-color: var(--bg-main-light);
+    color: var(--text-main-light);
+    &:focus {
+      border-color: var(--action-highlight-light);
+      box-shadow: 0 0 0 2px var(--action-highlight-light-01, rgba(180, 151, 255, 0.2));
+    }
+  }
+}
+
+
+.actionButtons {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color-dark); // Linha mais sólida aqui
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end; // Alinhar botões à direita
+
+  [data-theme='light'] & {
+    border-top-color: var(--border-color-light);
+  }
+
+  // Os botões já são estilizados pelo átomo Button.tsx
+  .confirmButton {
+    // Se precisar de override
+  }
+  .resetButton {
+    // Se precisar de override
+  }
+}
+
 
 .selectDropdown {
   padding: 0.4rem 0.6rem;
@@ -189,36 +234,13 @@
   }
 }
 
-
-.actionButtons {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color-dark);
-  display: flex;
-  gap: 1rem;
-
-  [data-theme='light'] & {
-    border-top-color: var(--border-color-light);
-  }
-
-  .confirmButton { // Estilos do Button atom já devem ser aplicados
-    // padding: 0.7rem 1.5rem;
-  }
-
-  .resetButton { // Estilos do Button atom já devem ser aplicados
-    // background-color: transparent;
-    // color: var(--text-secondary-dark);
-    // border: 1px solid var(--border-color-dark);
-  }
-
-  .categoryDescription {
+.categoryDescription { // Se voltar a usar
   font-size: 0.9rem;
   color: var(--text-secondary-dark);
   margin-bottom: 1rem;
   [data-theme='light'] & {
     color: var(--text-secondary-light);
   }
-}
 
 .reorderList, .visibilityList {
   margin-top: 1rem;

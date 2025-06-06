@@ -1,64 +1,115 @@
 // src/components/organisms/Sidebar.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './Sidebar.module.scss';
-import { FaChevronLeft, FaChevronRight, FaEdit, FaPenFancy, FaSearch, FaCog, FaQuestionCircle, FaSun, FaMoon } from 'react-icons/fa';
-import { SidebarItem } from '../molecules/SidebarItem'; // Verifique se o caminho está correto para sua molécula
-import { useTheme } from '../../contexts/ThemeContext'; // Verifique se o caminho está correto
+// Adicionar o ícone de logout
+import { FaChevronLeft, FaChevronRight, FaEdit, FaPenFancy, FaSearch, FaCog, FaQuestionCircle, FaSun, FaMoon, FaSignOutAlt } from 'react-icons/fa'; 
+import { SidebarItem } from '../molecules/SidebarItem';
+import { useTheme } from '../../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help'; //
+// --- Novas Importações para Autenticação ---
+import { useEditor } from '../../contexts/EditorContext';
+import { useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../services/firebase';
+import Text from '../atoms/Text'; // Para exibir o email
+// -----------------------------------------
+
+// --- NOVO HOOK CUSTOMIZADO (pode ser colocado neste arquivo ou em um arquivo de hooks separado) ---
+const useWindowSize = () => {
+  const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+  useEffect(() => {
+    const handleResize = () => {
+      setSize([window.innerWidth, window.innerHeight]);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return size;
+};
+
+type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
 
 interface SidebarProps {
-  onNavigate: (view: View) => void; //
-  initialView?: View; //
+  onNavigate: (view: View) => void;
+  initialView?: View;
 }
 
-const menuItems: { view: View; icon: React.ElementType; label: string }[] = [ //
-  { view: 'metrics', icon: FaEdit, label: 'Editor de Texto' }, //
-  { view: 'style', icon: FaPenFancy, label: 'Análise de Estilo' }, //
-  { view: 'seo', icon: FaSearch, label: 'Análise de SEO' }, //
-  { view: 'personalization', icon: FaCog, label: 'Personalizar' }, //
+
+
+const menuItems: { view: View; label: string }[] = [
+  { view: 'metrics', label: 'Editor de Texto' },
+  { view: 'style', label: 'Análise de Estilo' },
+  { view: 'seo', label: 'Análise de SEO' },
+  { view: 'personalization', label: 'Personalizar' },
+  { view: 'help', label: 'Central de Ajuda' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }) => {
-  const [isExpanded, setIsExpanded] = useState(true); //
-  const [activeView, setActiveView] = useState<View>(initialView); //
+  const [width] = useWindowSize(); // Obtém a largura da tela
+  const [isExpanded, setIsExpanded] = useState(width > 992);
+  useEffect(() => {
+    if (width <= 992) {
+      setIsExpanded(false);
+    } else {
+      setIsExpanded(true);
+    }
+  }, [width]);
+  const [activeView, setActiveView] = useState<View>(initialView);
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
+  
+
+  // --- Novos Hooks para Autenticação ---
+  const { currentUser } = useEditor();
+  const navigate = useNavigate();
+  // ------------------------------------
 
   useEffect(() => {
     setActiveView(initialView);
   }, [initialView]);
 
-  const handleToggleExpand = () => {
-    setIsExpanded(!isExpanded); //
+  // --- Nova Função de Logout ---
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // Após o logout, o onAuthStateChanged no context cuidará de atualizar currentUser,
+      // e o ProtectedRoute cuidará do redirecionamento.
+      // Mas podemos redirecionar proativamente aqui para uma experiência mais rápida.
+      navigate('/login');
+      console.log("Logout bem-sucedido a partir da Sidebar!");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      // Aqui você poderia usar um toast de erro se quisesse
+    }
   };
+  // -----------------------------
 
-  const handleThemeToggle = () => {
-    toggleTheme();
-  };
-
+  const handleToggleExpand = () => setIsExpanded(!isExpanded);
+  const handleThemeToggle = () => toggleTheme();
   const handleItemClick = (view: View) => {
-    setActiveView(view); //
-    onNavigate(view); //
+    setActiveView(view);
+    onNavigate(view);
   };
 
   const sidebarVariants = {
     expanded: { width: 240, transition: { duration: 0.3, ease: "easeInOut" } },
     collapsed: { width: 70, transition: { duration: 0.3, ease: "easeInOut" } }
   };
-
-  const iconButtonVariants = {
-      rest: { scale: 1, color: isDarkMode ? 'var(--text-secondary-dark)' : 'var(--text-secondary-light)' },
-      hover: { scale: 1.1, color: 'var(--action-highlight-dark)', transition: { duration: 0.2 } },
-      tap: { scale: 0.95 }
+  
+  // Suas variantes de animação existentes
+  const currentActionButtonColor = isDarkMode ? 'var(--action-highlight-dark)' : 'var(--action-highlight-light)';
+  const dynamicIconButtonVariants = {
+    rest: { scale: 1, color: isDarkMode ? 'var(--text-secondary-dark)' : 'var(--text-secondary-light)' },
+    hover: { scale: 1.1, color: currentActionButtonColor, transition: { duration: 0.2 } },
+    tap: { scale: 0.95 }
   };
 
   return (
     <motion.aside
       className={`${styles.sidebar} ${isExpanded ? styles.expanded : styles.collapsed}`}
       variants={sidebarVariants}
-      initial={false} // Não animar na montagem inicial
+      initial={false}
       animate={isExpanded ? "expanded" : "collapsed"}
     >
       <div className={styles.logoSection}>
@@ -69,7 +120,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20, transition: {duration: 0.15} }}
-              transition={{ duration: 0.25, delay: 0.1 }}
+              // Delay um pouco menor para o logo aparecer um pouco antes dos itens, ou sincronizado
+              transition={{ duration: 0.25, delay: 0.05, ease: "circOut" }} // Ajuste no ease e delay
             >
               Scripty
             </motion.span>
@@ -79,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
             onClick={handleToggleExpand}
             className={styles.toggleButton}
             aria-label={isExpanded ? 'Recolher sidebar' : 'Expandir sidebar'}
-            variants={iconButtonVariants}
+            variants={dynamicIconButtonVariants} // Usar a variante dinâmica
             initial="rest"
             whileHover="hover"
             whileTap="tap"
@@ -91,16 +143,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
       <nav className={styles.menu}>
         <ul>
           {menuItems.map((item) => (
-            // Usar a molécula SidebarItem aqui, passando as props necessárias
-            // Se você não criou SidebarItem como uma molécula separada, mantenha o código original
-            // e aplique as sugestões de animação/estilo diretamente no <li> e <button>
-            <li key={item.view}> {/* O motion.div da SidebarItem já tem a key */}
+            <li key={item.view}>
                  <SidebarItem
-                    icon={item.view} // Ajustar se o nome do ícone na SidebarItem for diferente
-                    label={item.label}
-                    isActive={activeView === item.view}
-                    isCollapsed={!isExpanded}
-                    onClick={() => handleItemClick(item.view)}
+                    icon={item.view} label={item.label} isActive={activeView === item.view}
+                    isCollapsed={!isExpanded} onClick={() => handleItemClick(item.view)}
                  />
             </li>
           ))}
@@ -108,14 +154,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
       </nav>
 
       <div className={styles.footer}>
-        {/* Envolver os itens do footer em motion.div se quiser animá-los com AnimatePresence */}
-        {/* quando a sidebar expande/recolhe. Similar ao SidebarItem. */}
         <SidebarItem
-            icon="help"
-            label="Central de Ajuda"
-            isActive={activeView === 'help'}
-            isCollapsed={!isExpanded}
-            onClick={() => handleItemClick('help')}
+            icon="help" label="Central de Ajuda" isActive={activeView === 'help'}
+            isCollapsed={!isExpanded} onClick={() => handleItemClick('help')}
         />
 
         <div className={`${styles.themeToggle} ${!isExpanded ? styles.themeToggleCollapsed : ''}`}>
@@ -123,8 +164,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
             {isExpanded && (
               <motion.span
                 className={styles.label}
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: {duration: 0.1} }}
-                transition={{ duration: 0.2, delay: 0.1}}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: {duration: 0.1} }}
+                // Sincronizar com a animação do label dos SidebarItems
+                transition={{ duration: 0.2, delay: isExpanded ? 0.15 : 0, ease: "circOut" }} // Ajuste no delay e ease
               >
                 {isDarkMode ? 'Modo Escuro' : 'Modo Claro'}
               </motion.span>
@@ -134,14 +178,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
             onClick={handleThemeToggle}
             className={styles.toggleThemeButton}
             aria-label="Mudar tema"
-            variants={iconButtonVariants}
+            variants={dynamicIconButtonVariants} // Usar a variante dinâmica
             initial="rest"
             whileHover="hover"
             whileTap="tap"
-            animate={{ rotate: isDarkMode ? 0 : 180 }} // Animação de rotação
-            transition={{ duration: 0.3 }}
+            animate={{ rotate: isDarkMode ? 0 : 180 }}
+            transition={{ duration: 0.3, ease: "anticipate" }} // Ease "anticipate" pode ser interessante aqui
           >
-            {/* Animar a troca de ícone */}
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={isDarkMode ? 'moon' : 'sun'}
@@ -155,6 +198,33 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
             </AnimatePresence>
           </motion.button>
         </div>
+
+        {/* --- NOVA SEÇÃO DE USUÁRIO (aparece apenas se logado) --- */}
+        {currentUser && (
+          <div className={styles.userSection}>
+             <SidebarItem
+                icon="logout" // <<< Você precisará adicionar 'logout' ao seu átomo Icon.tsx
+                label="Sair"
+                isCollapsed={!isExpanded}
+                onClick={handleLogout}
+                className={styles.logoutItem} // Classe opcional para estilização
+             />
+             <AnimatePresence>
+              {isExpanded && (
+                <motion.div
+                  className={styles.userEmail}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto', transition: { delay: 0.15 } }}
+                  exit={{ opacity: 0, height: 0, transition: { duration: 0.1 } }}
+                >
+                  <Text size="small" weight="normal">{currentUser.email}</Text>
+                </motion.div>
+              )}
+             </AnimatePresence>
+          </div>
+        )}
+        {/* --- FIM DA SEÇÃO DE USUÁRIO --- */}
+
       </div>
     </motion.aside>
   );

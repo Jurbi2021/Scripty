@@ -1,5 +1,7 @@
 // src/components/organisms/EditorWithMetrics.module.scss
+@use "../../assets//scss/variables" as vars;
 @import "../../App.css"; //
+
 
 .editorLayout {
   display: flex;
@@ -14,6 +16,12 @@
       flex: 1 1 100%; // Faz a área principal ocupar todo o espaço
       max-width: 100%;
     }
+
+    @media (max-width: vars.$breakpoint-tablet) {
+    flex-direction: column; // Muda a direção do flex para empilhar os itens verticalmente
+    overflow-y: auto;       // Permite o scroll vertical da página inteira
+    height: auto;           // A altura se ajusta ao conteúdo
+  }
     // O advancedMetricsPanel será removido do DOM via JS, então não precisa de display: none aqui
   }
 }
@@ -96,6 +104,11 @@
     color: var(--text-secondary-dark);
     margin: 0 0 1rem 0;
     [data-theme='light'] & { color: var(--text-secondary-light); }
+  }
+
+  @media (max-width: vars.$breakpoint-tablet) {
+    flex: none; // Remove a propriedade flex para que o painel tenha altura automática
+    height: auto; // A altura se ajusta ao conteúdo
   }
 }
 
