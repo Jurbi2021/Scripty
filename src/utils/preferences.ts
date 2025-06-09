@@ -24,11 +24,6 @@ export interface AIPromptSettings { // <<< ADICIONAR ESTA INTERFACE
   generateComprehensivePrompt: boolean;
 }
 
-// Tipo base para uma preferência de card
-interface CardPreference {
-  showCard: boolean;
-}
-
 export interface StyleAnalysisPreferences {
   passiveVoice: { showCard: boolean; detailLevel: DetailLevel };
   adverbs: { showCard: boolean; detailLevel: DetailLevel };

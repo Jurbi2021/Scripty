@@ -204,7 +204,7 @@ const calculateJurbiX = (
     readabilityIndices: Omit<ReadabilityIndices, "jurbiX"> // Pass other calculated indices
 ): ReadabilityIndexResult => {
 
-    const { words: totalWords, charsWithSpaces: totalCaracteres, sentences: totalSentences, paragraphs: totalParagrafos, uniqueWords: palavrasUnicas } = basicMetrics;
+    const { words: totalWords, charsWithSpaces: totalCaracteres, paragraphs: totalParagrafos, uniqueWords: palavrasUnicas } = basicMetrics;
     const { fleschKincaidReadingEase, gunningFog, smogIndex, colemanLiauIndex, gulpeaseIndex } = readabilityIndices;
 
     if (totalWords === 0 || totalParagrafos === 0) {
@@ -412,7 +412,7 @@ export const calculateAdvancedMetrics = (text: string, lexico: Lexico): Advanced
   const cleanedText = text.trim();
   const basicMetrics = calculateBasicMetrics(cleanedText);
 
-  const { words: totalWords, sentences: totalSentences, charsWithSpaces: totalChars, charsNoSpaces, paragraphs, uniqueWords } = basicMetrics;
+  const { words: totalWords, sentences: totalSentences, charsWithSpaces: totalChars, charsNoSpaces } = basicMetrics;
 
   const wordsArray = cleanedText.split(/\s+/).filter(word => word.length > 0);
   const totalLetters = charsNoSpaces;
