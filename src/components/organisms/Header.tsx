@@ -1,5 +1,5 @@
 // src/components/organisms/Header.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './Header.module.scss';
 import { useEditor } from '../../contexts/EditorContext';
 import { FaLightbulb, FaQuestionCircle, FaArrowLeft, FaMagic } from 'react-icons/fa';
@@ -7,20 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom'; // <<< IMPORTAÇÃO CORRETA
 import { generateAIPrompt } from '../../utils/generateAIPrompt'; // Assegure-se que este arquivo existe/será criado
 
-// --- Definição do Componente Toast ---
-// (Movido para src/components/atoms/Toast.tsx conforme nossa refatoração)
-// Importe-o se estiver em um arquivo separado:
-// import Toast, { ToastProps } from '../atoms/Toast'; 
-
-// Se ainda estiver definido localmente para teste (lembre-se que o ideal é o átomo separado):
 interface ToastProps {
   message: string;
-  show: boolean;
   onDismiss: () => void;
   type?: 'success' | 'error';
 }
 
-const Toast: React.FC<ToastProps> = ({ message, show, onDismiss, type = 'success' }) => {
+const Toast: React.FC<ToastProps> = ({ message, onDismiss, type = 'success' }) => {
 
   return (
     <motion.div 
@@ -229,7 +222,7 @@ const Header: React.FC<HeaderProps> = ({
             </div>
       
       <AnimatePresence>
-        {showToast && <Toast message={toastMessage} show={showToast} onDismiss={() => setShowToast(false)} type={toastType} />}
+        {showToast && <Toast message={toastMessage} onDismiss={() => setShowToast(false)} type={toastType} />}
       </AnimatePresence>
     </header>
   );

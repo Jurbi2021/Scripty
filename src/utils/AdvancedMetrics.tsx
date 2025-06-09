@@ -1,6 +1,6 @@
 // src/utils/AdvancedMetrics.tsx
 
-import { countWords, countSentences, countSyllables, BasicMetricsData, calculateBasicMetrics } from "./BasicMetrics";
+import { countSyllables, BasicMetricsData, calculateBasicMetrics } from "./BasicMetrics";
 
 // --- Interfaces ---
 
@@ -396,9 +396,9 @@ const analyzeSentiment = (text: string, lexico: Lexico): SentimentScore => {
 const getTextLengthFeedback = (totalWords: number): string => {
     if (totalWords === 0) return "";
     // Using ranges from HelpModal for SEO length
-    if (totalWords < 300) return "Texto muito curto para SEO, adicione mais conteúdo.";
-    if (totalWords <= 2000) return "Comprimento adequado para SEO.";
-    return "Texto muito longo para SEO, considere dividir.";
+    if (totalWords < 300) return "O comprimento do texto é ideal para redes sociais ou posts curtos";
+    if (totalWords <= 2000) return "Ótimo comprimento para um artigo ou blog post.";
+    return "Texto longo, ideal para conteúdos detalhados, mas cuidado com a concisão.";
     // Original ranges:
     // if (totalWords < 500) return "Seu texto é muito curto. Considere adicionar mais conteúdo para engajar melhor o leitor.";
     // if (totalWords < 1200) return "O comprimento do texto é ideal para redes sociais ou posts curtos.";

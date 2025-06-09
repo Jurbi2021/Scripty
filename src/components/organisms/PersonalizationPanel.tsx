@@ -46,7 +46,6 @@ const allSeoMetricsOptions: { key: SeoMetricKey; label: string }[] = [
 const PersonalizationPanel: React.FC = () => {
   const { preferences, updatePreferences, resetPreferences } = useEditor();
   const [localPrefs, setLocalPrefs] = useState<ScriptyPreferences>(preferences);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => {
     setLocalPrefs(preferences);
@@ -62,25 +61,8 @@ const PersonalizationPanel: React.FC = () => {
       return { ...prev, toolbar: { ...prev.toolbar, visibleMetrics: newVisibleMetrics } };
     });
   };
-  const handleMoveToolbarMetric = (metricKey: BasicMetricKey, direction: 'up' | 'down') => {
-    setLocalPrefs(prev => {
-      const currentVisibleMetrics = [...prev.toolbar.visibleMetrics];
-      const index = currentVisibleMetrics.indexOf(metricKey);
-      if (index === -1) return prev;
-      if (direction === 'up' && index > 0) {
-        [currentVisibleMetrics[index - 1], currentVisibleMetrics[index]] = [currentVisibleMetrics[index], currentVisibleMetrics[index - 1]];
-      } else if (direction === 'down' && index < currentVisibleMetrics.length - 1) {
-        [currentVisibleMetrics[index + 1], currentVisibleMetrics[index]] = [currentVisibleMetrics[index], currentVisibleMetrics[index + 1]];
-      }
-      return { ...prev, toolbar: { ...prev.toolbar, visibleMetrics: currentVisibleMetrics } };
-    });
-  };
 
   // --- Handlers Genéricos e Específicos ---
-  const handleSimpleToggle = <C extends keyof Omit<ScriptyPreferences, 'toolbar' | 'styleAnalysis' | 'aiPromptSettings' | 'advancedMetrics'>, K extends keyof ScriptyPreferences[C]>(category: C, key: K) => {
-    // Este handler genérico precisa ser ajustado para lidar com a estrutura de cada preferência.
-    // Ou criar handlers específicos para cada categoria como abaixo.
-  };
 
   const handleAdvancedMetricToggle = (key: keyof Omit<ScriptyPreferences['advancedMetrics'], 'visibleReadabilityIndices'>) => {
     setLocalPrefs(prev => ({
@@ -132,11 +114,9 @@ const PersonalizationPanel: React.FC = () => {
   };
   
   const handleSavePreferences = () => {
-    setSaveStatus('saving');
     updatePreferences(localPrefs);
     setTimeout(() => {
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus('idle'), 1500); 
+      setTimeout(() => 1500); 
     }, 700);
   };
 

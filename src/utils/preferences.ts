@@ -3,7 +3,7 @@
 export type BasicMetricKey = 'words' | 'charsWithSpaces' | 'sentences' | 'paragraphs' | 'readingTime' | 'uniqueWords' | 'avgWordsPerSentence' | 'avgCharsPerWord' | 'charsNoSpaces';
 export type ReadabilityIndexKey = 'jurbiX' | 'gunningFog' | 'fleschKincaidReadingEase' | 'smogIndex' | 'colemanLiauIndex' | 'gulpeaseIndex' ;
 export type StyleMetricKey = 'passiveVoice' | 'adverbs' | 'complexSentences' | 'discourseConnectors' | 'lexicalDiversity';
-export type SeoMetricKey = 'mainKeyword' | 'keywordDensity' | 'lsiResult' | 'seoReadability' | 'seoTextLength' | 'headingResult'; // Ajustar chaves conforme SeoAnalysisResult
+export type SeoMetricKey = 'mainKeyword' | 'lsiResult' | 'seoReadability' | 'seoTextLength' | 'headingResult'; // Ajustar chaves conforme SeoAnalysisResult
 
 export type DetailLevel = 'summary' | 'details_expanded' | 'details_collapsed';
 
@@ -28,10 +28,6 @@ export interface AIPromptSettings { // <<< ADICIONAR ESTA INTERFACE
 interface CardPreference {
   showCard: boolean;
 }
-// Tipo que estende o base com nível de detalhe
-interface CardPreferenceWithDetail extends CardPreference {
-  detailLevel: DetailLevel;
-}
 
 export interface StyleAnalysisPreferences {
   passiveVoice: { showCard: boolean; detailLevel: DetailLevel };
@@ -48,7 +44,6 @@ export interface SeoAnalysisPreferences {
   seoReadability: { showCard: boolean };
   seoTextLength: { showCard: boolean };
   headingResult: { showCard: boolean };
-  // A chave 'keywordDensity' não é um card, é parte do mainKeyword, então não precisa estar aqui
 }
 
 export interface ScriptyPreferences {

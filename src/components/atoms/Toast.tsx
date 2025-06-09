@@ -1,17 +1,17 @@
-// src/components/atoms/Toast.tsx
-import React from 'react'; // Removido useEffect que não era necessário
+// src/components/atoms/Toast.tsx - Corrigido
+import React from 'react'; // remover useEffect daqui
 import { motion } from 'framer-motion';
 import styles from './Toast.module.scss';
 
 export interface ToastProps {
   message: string;
-  show: boolean;
+  // A prop 'show' não é mais necessária aqui, pois é controlada pelo AnimatePresence no Header
   onDismiss: () => void;
   type?: 'success' | 'error';
 }
 
-const Toast: React.FC<ToastProps> = ({ message, show, onDismiss, type = 'success' }) => {
-
+const Toast: React.FC<ToastProps> = ({ message, onDismiss, type = 'success' }) => {
+  
   return (
     <motion.div 
       className={`${styles.toast} ${type === 'error' ? styles.toastError : styles.toastSuccess}`}

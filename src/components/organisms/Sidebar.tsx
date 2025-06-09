@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Sidebar.module.scss';
 // Adicionar o ícone de logout
-import { FaChevronLeft, FaChevronRight, FaEdit, FaPenFancy, FaSearch, FaCog, FaQuestionCircle, FaSun, FaMoon, FaSignOutAlt } from 'react-icons/fa'; 
+import { FaChevronLeft, FaChevronRight, FaSun, FaMoon } from 'react-icons/fa'; 
 import { SidebarItem } from '../molecules/SidebarItem';
 import { useTheme } from '../../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';

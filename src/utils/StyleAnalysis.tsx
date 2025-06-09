@@ -68,9 +68,6 @@ const PASSIVE_INDICATORS: string[] = [
   'fomos', 'tenha sido', 'tenha', 'tenho', 'tinha', 'tive', 'tivemos', 'sendo',
   'sido', 'estando', 'estado', 'ficando', 'ficado'
 ];
-const PASSIVE_PREPOSITIONS: string[] = [
-  'por', 'pelo', 'pela', 'pelos', 'pelas', 'de', 'do', 'da', 'dos', 'das'
-];
 const PARTICIPLES: string[] = [
   'feito', 'feita', 'feitos', 'feitas', 'visto', 'vista', 'vistos', 'vistas',
   'escrito', 'escrita', 'escritos', 'escritas', 'dito', 'dita', 'ditos', 'ditas',
@@ -127,12 +124,12 @@ export const analyzePassiveVoice = (sentences: string[]): PassiveVoiceResult => 
 
   sentences.forEach((sentence, index) => {
     const words = sentence.toLowerCase().split(/\s+/).filter(word => word.length > 0);
-    let foundPassive = false;
+    //let foundPassive = false;
     for (let i = 0; i < words.length - 1; i++) {
       if (PASSIVE_INDICATORS.includes(words[i]) && (PARTICIPLES.includes(words[i + 1]) || (words[i+1]?.endsWith('ado') || words[i+1]?.endsWith('ido')))) {
         passiveCount++;
         passiveSentences.push({ index: index + 1, sentence: sentence.trim() });
-        foundPassive = true;
+        //foundPassive = true;
         break;
       }
     }

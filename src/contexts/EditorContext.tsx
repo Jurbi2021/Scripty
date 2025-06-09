@@ -1,5 +1,5 @@
 // src/contexts/EditorContext.tsx
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 // Importar os tipos e valores padrão
 import { ScriptyPreferences, defaultScriptyPreferences } from '../utils/preferences'; 
 
