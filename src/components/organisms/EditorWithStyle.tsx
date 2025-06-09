@@ -15,13 +15,12 @@ import {
 import {
   performStyleAnalysis,
   StyleAnalysisData,
-  getEmptyStyleAnalysis,
   SentenceInfo,
   ComplexSentenceInfo
 } from '../../utils/StyleAnalysis';
 
 import { useEditor } from '../../contexts/EditorContext';
-import { StyleMetricKey, DetailLevel } from '../../utils/preferences';
+import { StyleMetricKey } from '../../utils/preferences';
 
 const EditorWithStyle: React.FC = () => {
   const [basicMetrics, setBasicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
@@ -197,10 +196,10 @@ const EditorWithStyle: React.FC = () => {
                 exit="exit"
               >
                 {analysisItemsToDisplay.map((item, index) => {
-                  const currentMetricPref = preferences.styleAnalysis[item.key as StyleMetricKey];
+                   const currentMetricPref = preferences.styleAnalysis[item.key as StyleMetricKey];
                   const detailLevel = currentMetricPref && metricsWithDetailsConfig.includes(item.key as StyleMetricKey)
-                                      ? currentMetricPref.detailLevel
-                                      : undefined;
+                      ? currentMetricPref.detailLevel
+                      : undefined;
                   
                   // Determina se o <details> deve começar aberto com base nas preferências
                   const initiallyOpen = detailLevel === 'details_expanded';
@@ -209,34 +208,40 @@ const EditorWithStyle: React.FC = () => {
                   // Uma abordagem mais simples é usar a prop 'open' do details diretamente se não precisar de animação customizada no toggle.
 
                   return (
-                    <motion.div
-                      key={item.key}
-                      className={`${styles.feedbackCard} ${getLevelClass(item.data?.level)}`}
-                      custom={index} 
-                      variants={feedbackCardVariants}
-                      initial="hidden"
-                      animate="visible"
-                      // exit="exit" // A saída será controlada pelo feedbackItemsContainerVariants
+                  <motion.div
+                    key={item.key}
+                    className={`${styles.feedbackCard} ${getLevelClass(item.data?.level)}`}
+                    custom={index} 
+                    variants={feedbackCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <h4 className={styles.feedbackTitle}>{item.title}</h4>
+                    <motion.p
+                      key={item.data?.feedback} 
+                      className={styles.feedbackText}
+                      variants={feedbackTextChangeVariants}
+                      initial="initial"
+                      animate="animate"
                     >
-                      <h4 className={styles.feedbackTitle}>{item.title}</h4>
-                      <motion.p
-                        key={item.data?.feedback} 
-                        className={styles.feedbackText}
-                        variants={feedbackTextChangeVariants}
-                        initial="initial"
-                        animate="animate"
-                      >
-                        {item.data?.feedback}
-                      </motion.p>
+                      {item.data?.feedback}
+                    </motion.p>
                       
-                      {item.detailsContent && item.data?.count > 0 && (metricsWithDetailsConfig.includes(item.key as StyleMetricKey)) && (
+                      {/* CORREÇÃO 1: Adicionado o type guard "'count' in item.data".
+                        A verificação agora só tenta aceder a .count se a propriedade existir.
+                      */}
+                      {item.detailsContent && 'count' in item.data && item.data.count > 0 && (metricsWithDetailsConfig.includes(item.key as StyleMetricKey)) && (
                         <div className={styles.detailsWrapper}>
                           <motion.button 
-                            onClick={() => toggleDetails(item.key)} 
-                            className={styles.summaryButton}
-                            aria-expanded={openDetails[item.key] ?? initiallyOpen}
-                          >
-                            Ver {item.detailType === 'adverbs' || item.detailType === 'connectors' ? 'lista' : 'frases'} ({item.data.count})
+                          onClick={() => toggleDetails(item.key)} 
+                          className={styles.summaryButton}
+                          aria-expanded={openDetails[item.key] ?? initiallyOpen}
+                        >
+                          {/* Acessar 'item.data.index' para LexicalDiversity, e 'count' para os outros */}
+                          Ver {item.detailType === 'adverbs' || item.detailType === 'connectors' ? 'lista' : 'frases'} 
+                          (
+                           {'count' in item.data ? item.data.count : 'índice'}
+                          )
                             <motion.span className={styles.summaryChevron} animate={{ rotate: (openDetails[item.key] ?? initiallyOpen) ? 180 : 0 }}>&#9660;</motion.span>
                           </motion.button>
                           <AnimatePresence initial={false}>
@@ -255,7 +260,14 @@ const EditorWithStyle: React.FC = () => {
                                       className={styles.wordList}
                                       initial={{ opacity: 0 }} animate={{ opacity: 1}} transition={{duration: 0.3}}
                                     >
-                                      {(item.detailsContent as string[]).slice(0,15).join(', ')}{(item.detailsContent.length > 15 ? '...' : '')}
+                                      {
+                                  (() => {
+                                    const adverbsList = item.detailsContent as string[];
+                                    if (adverbsList.length === 0) return null;
+                                    const truncatedList = adverbsList.slice(0, 15).join(', ');
+                                    const moreItems = adverbsList.length > 15 ? '...' : '';
+                                    return truncatedList + moreItems;
+                                  })() }
                                     </motion.p> 
                                     :
                                     renderSentences(item.detailsContent as SentenceInfo[] | ComplexSentenceInfo[], item.detailType!)

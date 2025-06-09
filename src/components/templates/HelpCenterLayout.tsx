@@ -4,6 +4,12 @@ import Header from '../organisms/Header';
 import styles from './HelpCenterLayout.module.scss'; //
 import { useNavigate } from 'react-router-dom';
 
+export interface TableOfContentsItem { // <<< ADICIONAR 'export' AQUI
+  id: string;
+  title: string;
+  level?: number;
+}
+
 interface HelpCenterLayoutProps {
   children: React.ReactNode;
   tableOfContents?: TableOfContentsItem[];

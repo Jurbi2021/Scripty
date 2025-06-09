@@ -14,7 +14,6 @@ import {
 } from '../../utils/BasicMetrics';
 import {
   analyzeSeo,
-  SeoAnalysisResult // Corrigido: não precisa ser um default import se for named export
 } from '../../utils/SeoAnalysis'; // Corrigido: sem chaves se SeoAnalysisResult for default export
 
 import { useEditor } from '../../contexts/EditorContext';
@@ -178,7 +177,10 @@ useEffect(() => {
                           aria-expanded={openDetails[card.detailsKey || card.key] ?? false}
                         >
                           {/* Para LSI e Headings, pode ter múltiplos 'details' items (listas), então pegamos o primeiro summaryLabel como exemplo */}
-                          {card.details[0]?.summaryLabel || 'Ver detalhes'}
+                          { (card.details && card.details[0] && 'summaryLabel' in card.details[0]) 
+                              ? card.details[0].summaryLabel 
+                              : 'Ver detalhes'
+                          }
                           <motion.span className={styles.summaryChevron} animate={{ rotate: (openDetails[card.detailsKey || card.key] ?? false) ? 180 : 0 }}>&#9660;</motion.span>
                         </motion.button>
                         <AnimatePresence initial={false}>

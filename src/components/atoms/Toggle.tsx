@@ -1,7 +1,7 @@
 // src/components/atoms/Toggle.tsx
 import React from 'react';
 import styles from './Toggle.module.scss';
-import { motion, AnimatePresence } from 'framer-motion'; // Adicionar AnimatePresence se quisermos animar algo mais, mas para o thumb o layout é suficiente
+import { motion } from 'framer-motion'; // Adicionar AnimatePresence se quisermos animar algo mais, mas para o thumb o layout é suficiente
 
 interface ToggleProps {
   isOn: boolean;

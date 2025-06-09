@@ -7,10 +7,6 @@ import { BasicMetricsData } from '../../utils/BasicMetrics'; // Adicionar BasicM
 import { useEditor } from '../../contexts/EditorContext'; // Importar o hook do contexto
 import {BasicMetricKey} from '../../utils/preferences'
 
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/free-mode';
-
 // A ordem e labels das métricas básicas que podem ser exibidas
 const allBasicMetricsOptions: { key: BasicMetricKey; label: string }[] = [
   { key: 'charsWithSpaces', label: 'Caracteres' },

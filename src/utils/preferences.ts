@@ -1,7 +1,7 @@
 // src/utils/preferences.ts
 
 export type BasicMetricKey = 'words' | 'charsWithSpaces' | 'sentences' | 'paragraphs' | 'readingTime' | 'uniqueWords' | 'avgWordsPerSentence' | 'avgCharsPerWord' | 'charsNoSpaces';
-export type ReadabilityIndexKey = 'jurbiX' | 'gunningFog' | 'fleschKincaidReadingEase' | 'smogIndex' | 'colemanLiauIndex'/* | 'gulpeaseIndex' */;
+export type ReadabilityIndexKey = 'jurbiX' | 'gunningFog' | 'fleschKincaidReadingEase' | 'smogIndex' | 'colemanLiauIndex' | 'gulpeaseIndex' ;
 export type StyleMetricKey = 'passiveVoice' | 'adverbs' | 'complexSentences' | 'discourseConnectors' | 'lexicalDiversity';
 export type SeoMetricKey = 'mainKeyword' | 'keywordDensity' | 'lsiResult' | 'seoReadability' | 'seoTextLength' | 'headingResult'; // Ajustar chaves conforme SeoAnalysisResult
 
@@ -20,31 +20,35 @@ export interface AdvancedMetricsPreferences {
   visibleReadabilityIndices: ReadabilityIndexKey[];
 }
 
+export interface AIPromptSettings { // <<< ADICIONAR ESTA INTERFACE
+  generateComprehensivePrompt: boolean;
+}
+
+// Tipo base para uma preferência de card
+interface CardPreference {
+  showCard: boolean;
+}
+// Tipo que estende o base com nível de detalhe
+interface CardPreferenceWithDetail extends CardPreference {
+  detailLevel: DetailLevel;
+}
+
 export interface StyleAnalysisPreferences {
-  // Um objeto onde a chave é a métrica de estilo e o valor define visibilidade e nível de detalhe
-  [key in StyleMetricKey]?: {
-    showCard: boolean;
-    detailLevel: DetailLevel; // Aplicável para passiveVoice, complexSentences
-  };
-  // Exemplo explícito para melhor clareza no código:
   passiveVoice: { showCard: boolean; detailLevel: DetailLevel };
-  adverbs: { showCard: boolean; /* detailLevel não aplicável ou sempre 'summary' */ };
+  adverbs: { showCard: boolean; detailLevel: DetailLevel };
   complexSentences: { showCard: boolean; detailLevel: DetailLevel };
-  discourseConnectors: { showCard: boolean; };
-  lexicalDiversity: { showCard: boolean; };
+  discourseConnectors: { showCard: boolean; detailLevel: DetailLevel };
+  lexicalDiversity: { showCard: boolean; detailLevel: DetailLevel };
 }
 
 export interface SeoAnalysisPreferences {
-  [key in SeoMetricKey]?: { // Usar chaves de SeoAnalysisResult se necessário
-    showCard: boolean;
-  };
-  // Exemplo explícito:
-  mainKeyword: { showCard: boolean }; // Feedback sobre a keyword
-  lsiResult: { showCard: boolean };   // Card LSI
-  seoReadability : { showCard: boolean };
+  // Definir explicitamente cada chave
+  mainKeyword: { showCard: boolean };
+  lsiResult: { showCard: boolean };
+  seoReadability: { showCard: boolean };
   seoTextLength: { showCard: boolean };
   headingResult: { showCard: boolean };
-  // A keywordDensity está ligada ao mainKeyword, não é um card separado
+  // A chave 'keywordDensity' não é um card, é parte do mainKeyword, então não precisa estar aqui
 }
 
 export interface ScriptyPreferences {
@@ -52,6 +56,7 @@ export interface ScriptyPreferences {
   advancedMetrics: AdvancedMetricsPreferences;
   styleAnalysis: StyleAnalysisPreferences;
   seoAnalysis: SeoAnalysisPreferences;
+  aiPromptSettings: AIPromptSettings; // <<< ADICIONAR AQUI
 }
 
 // Valores padrão para as preferências
@@ -69,10 +74,10 @@ export const defaultScriptyPreferences: ScriptyPreferences = {
   },
   styleAnalysis: {
     passiveVoice: { showCard: true, detailLevel: 'details_collapsed' },
-    adverbs: { showCard: true },
+    adverbs: { showCard: true, detailLevel: 'summary' }, // Adicionar detailLevel padrão
     complexSentences: { showCard: true, detailLevel: 'details_collapsed' },
-    discourseConnectors: { showCard: true },
-    lexicalDiversity: { showCard: true },
+    discourseConnectors: { showCard: true, detailLevel: 'summary' }, // Adicionar detailLevel padrão
+    lexicalDiversity: { showCard: true, detailLevel: 'summary' }, // Adicionar detailLevel padrão
   },
   seoAnalysis: {
     mainKeyword: { showCard: true },
@@ -81,4 +86,7 @@ export const defaultScriptyPreferences: ScriptyPreferences = {
     seoTextLength: { showCard: true },
     headingResult: { showCard: true },
   },
+  aiPromptSettings: { // <<< ADICIONAR AQUI
+    generateComprehensivePrompt: true,
+  }
 };

@@ -13,8 +13,7 @@ import {
   StyleMetricKey,
   SeoMetricKey,
   DetailLevel,
-  AIPromptSettings, // Importar se for usar para tipar o handler explicitamente
-  defaultScriptyPreferences,
+  SeoAnalysisPreferences,
   // Os tipos de sub-preferências podem ser úteis para os handlers se você quiser mais especificidade
   // ToolbarPreferences, AdvancedMetricsPreferences, StyleAnalysisPreferences, SeoAnalysisPreferences
 } from '../../utils/preferences'; // Ajuste o caminho conforme necessário

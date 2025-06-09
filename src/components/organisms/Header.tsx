@@ -21,15 +21,6 @@ interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ message, show, onDismiss, type = 'success' }) => {
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (show) {
-      // O timeout para esconder o toast já é gerido pela função displayToast no Header.
-    }
-    return () => clearTimeout(timer);
-  }, [show, onDismiss]);
-
-  if (!show) return null;
 
   return (
     <motion.div 
@@ -111,9 +102,7 @@ const Header: React.FC<HeaderProps> = ({
     setToastMessage(message);
     setToastType(type);
     setShowToast(true);
-    const timerId = setTimeout(() => {
-      setShowToast(false);
-    }, duration);
+    setTimeout(() => { setShowToast(false); }, duration);
     // A limpeza do timer pode ser gerenciada aqui, ou no useEffect do Toast se ele tiver um auto-dismiss interno.
     // Para este exemplo, o displayToast controla o fechamento.
   };
@@ -217,7 +206,7 @@ const Header: React.FC<HeaderProps> = ({
           >
             <FaLightbulb className={styles.buttonIcon} />
             <div className={styles.focusButtonTextContainer}>
-              <AnimatePresence mode="out-in" initial={false}>
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.span key={focusButtonText} variants={focusTextVariants}
                              initial="initial" animate="animate" exit="exit"
                              className={styles.focusButtonTextSpan}

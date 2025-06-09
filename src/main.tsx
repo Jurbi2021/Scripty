@@ -6,6 +6,11 @@ import App from './App.tsx'; //
 import { ThemeProvider } from './contexts/ThemeContext'; // Importar ThemeProvider
 import { EditorProvider } from './contexts/EditorContext'; // Importar EditorProvider
 
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>

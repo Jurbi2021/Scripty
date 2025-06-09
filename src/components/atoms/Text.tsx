@@ -1,41 +1,54 @@
 // src/components/atoms/Text.tsx
-import React, { ReactNode } from 'react'; //
+import React, { ReactNode, CSSProperties } from 'react'; // Adicionar CSSProperties
 
 interface TextProps {
   children: ReactNode;
   size?: 'small' | 'medium' | 'large';
   weight?: 'normal' | 'bold' | 'semibold';
-  color?: string; // Permite cor customizada, mas prefira variáveis CSS
+  color?: string;
   className?: string;
-  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'; // Adicionar 'as' prop
+  // <<< MUDANÇA AQUI: Adicionadas as novas tags permitidas >>>
+  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'dt' | 'dd';
+  style?: CSSProperties; // <<< ADICIONADA A PROP 'style'
+  htmlFor?: string; // Para usar com as="label"
 }
 
 const sizeClasses = {
-  small: 'text-sm', //
-  medium: 'text-base', //
-  large: 'text-lg', //
+  small: 'text-sm',
+  medium: 'text-base',
+  large: 'text-lg',
 };
 
 const weightClasses = {
-  normal: 'font-normal', //
-  semibold: 'font-semibold', //
-  bold: 'font-bold', //
+  normal: 'font-normal',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
 };
 
 const Text: React.FC<TextProps> = ({
   children,
   size = 'medium',
   weight = 'normal',
-  color, // Removido 'inherit' como default para forçar decisão ou usar CSS var
+  color,
   className = '',
-  as: Component = 'p', // Default para 'p', mas permite outras tags
+  as: Component = 'p',
+  style, // <<< ADICIONADO
+  htmlFor // <<< ADICIONADO
 }) => {
-  const style = color ? { color } : {};
+  const inlineStyle = color ? { ...style, color } : style;
+  
+  // Adiciona a prop 'htmlFor' apenas se o componente for um 'label'
+  const componentProps: { [key: string]: any } = {
+    className: `${sizeClasses[size]} ${weightClasses[weight]} ${className}`,
+    style: inlineStyle,
+  };
+
+  if (Component === 'label' && htmlFor) {
+    componentProps.htmlFor = htmlFor;
+  }
+
   return (
-    <Component
-      className={`${sizeClasses[size]} ${weightClasses[weight]} ${className}`}
-      style={style}
-    >
+    <Component {...componentProps}>
       {children}
     </Component>
   );

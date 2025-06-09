@@ -3,17 +3,14 @@ import React, { useState, useEffect } from 'react';
 import styles from './EditorWithMetrics.module.scss';
 import editorLayoutStyles from './EditorWithMetrics.module.scss';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Mousewheel, Pagination, Navigation } from 'swiper/modules';
+import {  Mousewheel, Pagination, Navigation } from 'swiper/modules';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaLightbulb } from 'react-icons/fa';
 
 import TextArea from '../atoms/TextArea';
 import MetricsToolbar from '../molecules/MetricsToolbar';
 
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+
 
 import {
   calculateBasicMetrics,
@@ -21,9 +18,7 @@ import {
 } from '../../utils/BasicMetrics';
 import {
   calculateAdvancedMetrics,
-  AdvancedMetricsData,
   ReadabilityIndices,
-  getEmptyAdvancedMetrics,
   SentimentScore
 } from '../../utils/AdvancedMetrics';
 import lexicoData from '../../utils/lexico.json';

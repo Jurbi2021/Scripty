@@ -1,8 +1,10 @@
 // src/utils/generateAIPrompt.ts
 
-import { AdvancedMetricsData, ReadabilityIndexKey, ReadabilityIndices } from './AdvancedMetrics'; // Adicionado ReadabilityIndices
-import { StyleAnalysisData, StyleMetricKey } from './StyleAnalysis';
-import { SeoAnalysisResult } from './SeoAnalysis';
+import { AdvancedMetricsData, ReadabilityIndices } from './AdvancedMetrics'; // Adicionado ReadabilityIndices
+// Corrigir importações
+import type { StyleAnalysisData } from './StyleAnalysis'; 
+import type { SeoAnalysisResult } from './SeoAnalysis';
+import { ReadabilityIndexKey, StyleMetricKey } from './preferences'; // Importar do arquivo de preferências
 
 interface FeedbackItem {
   source: string;
