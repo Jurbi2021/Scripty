@@ -187,7 +187,7 @@ const Header: React.FC<HeaderProps> = ({
             title="Gerar Prompt para Refinamento com IA"
           >
             <FaMagic className={styles.buttonIcon} />
-            {/* Se quiser texto: <span className={styles.buttonText}>Gerar Prompt IA</span> */}
+            <span className={styles.buttonText}>Gerar Prompt IA</span>
           </motion.button>
         )}
 

@@ -1,10 +1,11 @@
 // src/components/templates/DashboardLayout.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // <<< MUDANÇA AQUI: Adicionado useState e useEffect
 import Sidebar from '../organisms/Sidebar';
 import Header from '../organisms/Header';
-import styles from './DashboardLayout.module.scss'; //
+import styles from './DashboardLayout.module.scss';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEditor } from '../../contexts/EditorContext';
+import WelcomeModal from '../organisms/WelcomeModal'; // Importar o modal de boas-vindas
 
 type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
 
@@ -12,21 +13,38 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   headerTitle?: string;
 }
-const isEditorPage = location.pathname.startsWith('/editor/') || location.pathname === '/';
 
 const getActiveViewFromPathname = (pathname: string): View => {
   if (pathname.startsWith('/editor/style')) return 'style';
   if (pathname.startsWith('/editor/seo')) return 'seo';
   if (pathname.startsWith('/personalization')) return 'personalization';
-  // A rota /help usa HelpCenterLayout, então não será tratada aqui para o DashboardLayout
+  if (pathname.startsWith('/help')) return 'help';
   if (pathname.startsWith('/editor/metrics') || pathname === '/') return 'metrics';
   return 'metrics'; // Fallback
 };
+
+const WELCOME_MODAL_SEEN_KEY = 'scriptyWelcomeModalSeen';
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isFocusMode } = useEditor();
+
+  // --- LÓGICA PARA O MODAL DE BOAS-VINDAS ---
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+
+  useEffect(() => {
+    const hasSeenModal = localStorage.getItem(WELCOME_MODAL_SEEN_KEY);
+    if (!hasSeenModal) {
+      setIsWelcomeModalOpen(true);
+    }
+  }, []); // Roda apenas uma vez na montagem
+
+  const handleCloseWelcomeModal = () => {
+    setIsWelcomeModalOpen(false);
+    localStorage.setItem(WELCOME_MODAL_SEEN_KEY, 'true');
+  };
+  // ------------------------------------------
 
   const currentViewForSidebar = getActiveViewFromPathname(location.pathname);
 
@@ -36,7 +54,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
       case 'style': navigate('/editor/style'); break;
       case 'seo': navigate('/editor/seo'); break;
       case 'personalization': navigate('/personalization'); break;
-      case 'help': navigate('/help'); break; // Sidebar ainda pode ter o link de Ajuda
+      case 'help': navigate('/help'); break;
       default: navigate('/');
     }
   };
@@ -56,15 +74,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
     }
   }
 
-  // Determina se a página atual é uma onde o Modo Foco é relevante e seu botão deve ser mostrado
-  const isFocusModeRelevantPage = 
-    location.pathname.startsWith('/editor/') || location.pathname === '/';
+  const isEditorPage = location.pathname.startsWith('/editor/') || location.pathname === '/';
 
   return (
-    // A classe focusModeActive só é aplicada se for uma página relevante para o modo foco
-    <div className={`${styles.layout} ${isFocusMode && isFocusModeRelevantPage ? styles.focusModeActive : ''}`}>
-      {/* A Sidebar é oculta se o modo foco estiver ativo E for uma página relevante para o modo foco */}
-      {!(isFocusMode && isFocusModeRelevantPage) && (
+    <div className={`${styles.layout} ${isFocusMode && isEditorPage ? styles.focusModeActive : ''}`}>
+      {!(isFocusMode && isEditorPage) && (
         <Sidebar
           onNavigate={handleNavigate}
           initialView={currentViewForSidebar}
@@ -74,11 +88,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
         <Header
           title={pageSpecificHeaderTitle}
           onHelpButtonClick={handleNavigateToHelp}
-          showFocusModeButton={isFocusModeRelevantPage} // Passa a prop condicionalmente
-          showAIPromptButton={isEditorPage} // <--- Esta linha é crucial
+          showFocusModeButton={isEditorPage}
+          showAIPromptButton={isEditorPage}
         />
         <main className={styles.content}>{children}</main>
       </div>
+
+      <WelcomeModal isOpen={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} />
     </div>
   );
 };

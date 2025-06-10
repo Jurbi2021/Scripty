@@ -12,6 +12,9 @@ import { SeoAnalysisResult } from '../utils/SeoAnalysis';
 import { auth } from '../services/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 
+import { loadPreferences, savePreferences } from '../services/preferencesService';
+
+
 interface EditorContextProps {
   // Autenticação
   currentUser: User | null;
@@ -44,49 +47,40 @@ interface EditorContextProps {
 
 const EditorContext = createContext<EditorContextProps | undefined>(undefined);
 
-const LOCAL_STORAGE_PREFERENCES_KEY = 'scriptyPreferences';
-
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // Estados
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [text, setText] = useState('');
-  const [preferences, setPreferences] = useState<ScriptyPreferences>(() => {
-    const storedPrefs = localStorage.getItem(LOCAL_STORAGE_PREFERENCES_KEY);
-    // Lógica robusta para carregar as preferências, mesclando com os padrões
-    let loadedPrefs = defaultScriptyPreferences;
-    if (storedPrefs) {
-      try {
-        const parsedStoredPrefs = JSON.parse(storedPrefs);
-        loadedPrefs = {
-          ...defaultScriptyPreferences,
-          ...parsedStoredPrefs,
-          toolbar: { ...defaultScriptyPreferences.toolbar, ...(parsedStoredPrefs.toolbar || {}) },
-          advancedMetrics: { ...defaultScriptyPreferences.advancedMetrics, ...(parsedStoredPrefs.advancedMetrics || {}) },
-          styleAnalysis: { ...defaultScriptyPreferences.styleAnalysis, ...(parsedStoredPrefs.styleAnalysis || {}) },
-          seoAnalysis: { ...defaultScriptyPreferences.seoAnalysis, ...(parsedStoredPrefs.seoAnalysis || {}) },
-          aiPromptSettings: { ...defaultScriptyPreferences.aiPromptSettings, ...(parsedStoredPrefs.aiPromptSettings || {}) },
-        };
-      } catch (error) {
-        console.error("Erro ao parsear preferências do localStorage, usando padrões:", error);
-      }
-    }
-    return loadedPrefs;
-  });
+  const [preferences, setPreferences] = useState<ScriptyPreferences>(defaultScriptyPreferences);
 
   const [advancedMetrics, setAdvancedMetrics] = useState<AdvancedMetricsData>(getEmptyAdvancedMetrics());
   const [styleAnalysis, setStyleAnalysis] = useState<StyleAnalysisData>(getEmptyStyleAnalysis());
   const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysisResult | null>(null); 
 
   // Efeito para persistir preferências no localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_PREFERENCES_KEY, JSON.stringify(preferences));
-    } catch (error) {
-      console.error("Erro ao salvar preferências no localStorage:", error);
-    }
-  }, [preferences]);
+
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => { // A função de callback agora é async
+      if (user) {
+        // Usuário fez login
+        console.log("Usuário logado:", user.email);
+        setCurrentUser(user);
+        // Carregar as preferências do Firestore para este usuário
+        const userPreferences = await loadPreferences(user.uid);
+        setPreferences(userPreferences);
+      } else {
+        // Usuário fez logout
+        console.log("Nenhum usuário logado.");
+        setCurrentUser(null);
+        // Resetar as preferências para o padrão quando deslogar
+        setPreferences(defaultScriptyPreferences);
+      }
+      setAuthLoading(false);
+    });
+    return unsubscribe;
+  }, []); // Array de dependências vazio, roda apenas uma vez
 
   // Efeito para observar o estado de autenticação do Firebase
   useEffect(() => {
@@ -98,6 +92,25 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     return unsubscribe; // Limpeza ao desmontar
   }, []);
 
+   useEffect(() => {
+    // Só tenta salvar se houver um usuário logado
+    if (!currentUser || authLoading) {
+      return;
+    }
+
+    // Usar um debounce (atraso) para evitar salvar no banco de dados a cada pequena mudança.
+    // Ele só salvará 1.5 segundos após a última alteração nas preferências.
+    const debounceSave = setTimeout(() => {
+      console.log("Debounce finalizado. Salvando preferências no Firestore...");
+      savePreferences(currentUser.uid, preferences);
+    }, 1500); // 1.5 segundos
+
+    // Função de limpeza: se 'preferences' mudar novamente antes do timeout, cancela o save anterior.
+    return () => clearTimeout(debounceSave);
+
+  }, [preferences, currentUser, authLoading]); // Observa mudanças nestas variáveis
+
+  
   // Funções
   const toggleFocusMode = () => setIsFocusMode((prev) => !prev);
   
@@ -112,8 +125,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       return updatedState;
     });
   };
-
-  const resetPreferences = () => setPreferences(defaultScriptyPreferences);
+  const resetPreferences = () => {
+    // Agora, resetar significa voltar para os padrões, o que acionará o save no Firestore.
+    setPreferences(defaultScriptyPreferences);
+  };
 
   const setAdvancedMetricsData = (data: AdvancedMetricsData) => setAdvancedMetrics(data);
   const setStyleAnalysisData = (data: StyleAnalysisData) => setStyleAnalysis(data);
@@ -125,31 +140,17 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <EditorContext.Provider value={{
-      currentUser,
-      authLoading,
-      isFocusMode,
-      toggleFocusMode,
-      text,
-      setText,
-      preferences,
-      updatePreferences,
-      resetPreferences,
-      advancedMetrics,
-      styleAnalysis,
-      seoAnalysis,
-      setAdvancedMetricsData,
-      setStyleAnalysisData,
-      setSeoAnalysisData,
-      resetAdvancedMetricsData,
-      resetStyleAnalysisData,
-      resetSeoAnalysisData
+      currentUser, authLoading, isFocusMode, toggleFocusMode, text, setText, preferences,
+      updatePreferences, resetPreferences, advancedMetrics, styleAnalysis, seoAnalysis,
+      setAdvancedMetricsData, setStyleAnalysisData, setSeoAnalysisData,
+      resetAdvancedMetricsData, resetStyleAnalysisData, resetSeoAnalysisData
     }}>
       {children}
     </EditorContext.Provider>
   );
 };
 
-export const useEditor = (): EditorContextProps => {
+  export const useEditor = (): EditorContextProps => {
   const context = useContext(EditorContext);
   if (!context) {
     throw new Error('useEditor deve ser usado dentro de um EditorProvider');

@@ -1,12 +1,11 @@
 // src/services/firebase.ts
 
-import { initializeApp, FirebaseApp } from 'firebase/app';
-// Adicionar a importação para getAuth e o tipo Auth
+import { initializeApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from 'firebase/auth'; 
-// A importação de getAnalytics é opcional para a autenticação. Removida para simplificar por agora.
-// import { getAnalytics } from "firebase/analytics"; 
+// <<< PASSO 1: Importar as funções do Firestore >>>
+import { getFirestore, Firestore } from 'firebase/firestore';
 
-// Suas configurações do Firebase (MANTENHA AS SUAS CREDENCIAIS REAIS AQUI)
+// Suas configurações do Firebase (MANTENHA AS SUAS CREDENCIAIS REAIS)
 const firebaseConfig = {
   apiKey: "AIzaSyAh4KXf2stl8YjKCy6glZENv3WMpdfbSlg",
   authDomain: "scripty-9a7df.firebaseapp.com",
@@ -23,8 +22,11 @@ const app: FirebaseApp = initializeApp(firebaseConfig);
 // Obter a instância de Autenticação
 const auth: Auth = getAuth(app);
 
+// <<< PASSO 2: Obter a instância do Firestore >>>
+const db: Firestore = getFirestore(app);
+
 // Se você não for usar o Analytics agora, pode remover estas linhas:
 // const analytics = getAnalytics(app);
 
-// Exportar as instâncias que você usará na sua aplicação
-export { app, auth }; // Exportamos 'auth' que será usado para login, registo, etc.
+// <<< PASSO 3: Exportar a instância 'db' juntamente com as outras >>>
+export { app, auth, db };
