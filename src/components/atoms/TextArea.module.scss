@@ -1,0 +1,46 @@
+// src/components/atoms/TextArea.module.scss
+@use '../../assets/scss/variables' as vars;
+
+.textArea {
+  width: 100%;
+  padding: 1.75rem; // Aumentar padding para mais respiro
+  font-size: 1rem; // ou 1.1rem para melhor leitura de texto longo
+  line-height: 1.75; // Aumentar para melhor legibilidade
+  color: var(--text-main-dark);
+  background-color: var(--bg-container-dark);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 8px;
+  resize: none; // Ou 'vertical' se preferir
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit; // Mantém a fonte Inter
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 3px rgba(180, 151, 255, 0.25); // Sombra no foco mais suave
+    // background-color: var(--bg-card-dark); // Opcional: Leve mudança de fundo no foco
+  }
+
+  &::placeholder {
+    color: var(--text-secondary-dark);
+    opacity: 0.6; // Ajustar opacidade conforme necessário
+  }
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+    background-color: var(--bg-container-light);
+    border: 1px solid var(--border-color-light);
+
+    &:focus {
+      border-color: var(--action-highlight-light);
+      box-shadow: 0 0 0 3px rgba(180, 151, 255, 0.25); // Manter a cor de ação para consistência
+      // background-color: var(--bg-card-light);
+    }
+
+    &::placeholder {
+      color: var(--text-secondary-light);
+      opacity: 0.6;
+    }
+  }
+}

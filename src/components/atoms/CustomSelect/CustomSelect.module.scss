@@ -1,0 +1,147 @@
+// src/components/atoms/CustomSelect.module.scss
+.selectTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+  background-color: transparent;
+  border: 1px solid var(--border-color-dark);
+  color: var(--text-secondary-dark);
+  cursor: pointer;
+  min-width: 150px; // Largura mínima
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &[data-placeholder] {
+    color: var(--text-secondary-dark);
+    opacity: 0.7;
+  }
+
+  &:hover {
+    border-color: var(--action-highlight-dark);
+  }
+  
+  // O Radix adiciona o atributo data-state="open"
+  &[data-state='open'] {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 3px rgba(180, 151, 255, 0.25);
+  }
+
+  [data-theme='light'] & {
+    border-color: var(--border-color-light);
+    color: var(--text-secondary-light);
+    &:hover { border-color: var(--action-highlight-light); }
+    &[data-state='open'] { border-color: var(--action-highlight-light); }
+  }
+}
+
+.selectIcon {
+  color: var(--text-secondary-dark);
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.selectContent {
+  background-color: var(--bg-card-dark); // <<< FUNDO COM O TEMA
+  border-radius: 8px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+  width: var(--radix-select-trigger-width); // Faz o conteúdo ter a mesma largura do botão
+
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    border-color: var(--border-color-light);
+  }
+}
+
+.selectViewport {
+  // Container para os itens, pode ter scroll
+  max-height: 200px;
+}
+
+.selectItem {
+  font-size: 0.9rem;
+  color: var(--text-main-dark);
+  border-radius: 6px;
+  display: flex; // Mantém o flex
+  align-items: center;
+  height: 2.5rem; // Um pouco mais de altura para respiro
+  padding: 0 0.75rem; // Padding horizontal geral
+  position: relative; // Necessário para o posicionamento do indicador
+  user-select: none;
+  cursor: pointer;
+
+  &[data-highlighted] {
+    outline: none;
+    background-color: var(--action-highlight-dark);
+    color: var(--bg-main-dark);
+  }
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+    &[data-highlighted] {
+      background-color: var(--action-highlight-light);
+      color: var(--bg-main-light);
+    }
+  }
+}
+
+.selectItemIndicator {
+  // Ícone de "check" para o item selecionado
+  position: absolute;
+  left: 0.75rem; // Posiciona à esquerda, dentro do padding
+  width: 20px; // Largura para o ícone
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.itemContentWrapper {
+  // Novo container para o ícone e o texto
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; // Espaço entre o ícone e o texto
+  width: 100%;
+  // Adiciona padding à esquerda para não ficar em cima do indicador de check
+  padding-left: 1.75rem; 
+}
+
+.optionIcon {
+  // Ícone do perfil (FaBlog, etc.)
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary-dark);
+  font-size: 1rem;
+  flex-shrink: 0; // Evita que o ícone seja esmagado
+
+  // Quando o item está em hover/foco, o ícone herda a cor do texto
+  .selectItem[data-highlighted] & {
+    color: inherit; 
+  }
+  
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.selectScrollButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  background-color: var(--bg-card-dark);
+  color: var(--text-secondary-dark);
+  cursor: default;
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    color: var(--text-secondary-light);
+  }
+}

@@ -1,82 +1,108 @@
-@use 'sass:color';
-@use '../../assets/scss/variables' as vars;
-@use '../../assets/scss/mixins' as mixins;
+// src/components/molecules/SidebarItem.module.scss
+// @use 'sass:color'; // Pode não ser necessário se usarmos apenas vars CSS para hover
+// @use '../../assets/scss/variables' as vars; // Comentado, usaremos vars CSS globais
+// @use '../../assets/scss/mixins' as mixins;
 
 .sidebarItem {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  // gap: 0.8rem; // O label terá margin-left
   padding: 0.8rem 1.2rem;
-  border-radius: 0.8rem;
+  border-radius: 8px; // Raio mais comum
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, padding 0.4s ease;
+  // transition: background-color 0.2s ease-out, transform 0.15s ease-out; // CSS transition para hover
+  // A transição principal pode ser gerenciada pelo Framer Motion no .tsx
   overflow: hidden;
+  width: calc(100% - 1.5rem); // Conforme o que usamos na Sidebar
+  margin: 0.3rem 0.75rem;
+  box-sizing: border-box;
 
-  // Tema padrão (escuro)
-  color: vars.$text-primary-dark;
+  // Cor padrão do texto para item NÃO ATIVO (tema escuro)
+  color: var(--text-secondary-dark);
 
-  &:hover {
-    background-color: color.adjust(vars.$action-color, $lightness: 20%);
-    transform: translateX(4px);
+  // Efeito de hover para item NÃO ATIVO (pode ser feito com Framer Motion no TSX ou aqui)
+  &:hover:not(.active) {
+    background-color: rgba(180, 151, 255, 0.08); // var(--action-highlight-dark) com alfa
+    color: var(--text-main-dark);
+     .icon { // Garante que o ícone também mude de cor no hover
+        color: var(--text-main-dark);
+     }
+     // O Text atom do label deve herdar a cor
   }
 
-  // Ajustes para tema claro
+  // Adaptação para item NÃO ATIVO no Tema Claro
   [data-theme='light'] & {
-    color: vars.$text-primary-light;
+    color: var(--text-secondary-light);
+
+    &:hover:not(.active) {
+      background-color: rgba(180, 151, 255, 0.1); // var(--action-highlight-light) com alfa
+      color: var(--text-main-light);
+       .icon {
+          color: var(--text-main-light);
+       }
+    }
   }
   
   &.collapsed {
     justify-content: center;
-    padding: 0.8rem 0; // Remove padding lateral
-    
-    .icon {
-      margin: 0 auto; // Centraliza o ícone
+    padding: 0.8rem 0; 
+    .iconContainer { // Adicionado para centralizar o ícone
+      margin: 0;
     }
-    
-    .label {
-      opacity: 0;
-      max-width: 0;
-      margin-left: 0;
-      margin-right: 0;
-    }
+    // .label é controlado por Framer Motion
   }
 }
 
 .active {
-  background-color: vars.$action-color;
-  // Tema padrão (escuro)
-  color: vars.$text-primary-dark;
+  // Estilo ATIVO para tema escuro
+  background-color: var(--action-highlight-dark); // Fundo lilás
+  color: #ffffff; // Texto branco para bom contraste com o lilás
+  font-weight: 500; // Como já estava no Sidebar.module.scss
 
   .icon {
-    color: vars.$text-primary-dark;
+    color: #ffffff; // Ícone branco
   }
+  // O Text atom do label herdará a cor #ffffff do pai .active
 
-  // Ajustes para tema claro
+  // >>> ADIÇÃO PRINCIPAL AQUI: Estilo ATIVO para tema claro <<<
   [data-theme='light'] & {
-    color: vars.$text-primary-light;
+    background-color: var(--action-highlight-light); // Pode manter o mesmo lilás ou um pouco mais saturado/escuro se preferir
+    // Para texto em cima do lilás claro, um texto escuro geralmente funciona melhor para contraste:
+    color: var(--text-main-dark); // Um cinza bem escuro (ex: #333333 ou o que for seu text-main-dark para o lilás)
+                                  // Ou, se o action-highlight-light for muito claro, pode ser #FFFFFF se o action-highlight for escuro.
+                                  // No seu caso, --action-highlight-light: #b497ff, então texto branco ou muito escuro.
+                                  // Vamos testar com branco por agora, mas um cinza escuro como #202632 (seu --bg-card-dark) pode ser bom.
+                                  // Corrigindo para melhor contraste com lilás (#b497ff):
+    color: #FFFFFF; // Texto branco sobre fundo lilás
+
 
     .icon {
-      color: vars.$text-primary-light;
+      color: #FFFFFF; // Ícone branco sobre fundo lilás
     }
   }
 }
 
-.icon {
-  font-size: 1.8rem;
-  color: inherit;
+.iconContainer { // Adicionado para melhor controle do ícone
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  transition: margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon {
+  font-size: 1.1rem; // Alinhado com Sidebar.module.scss
+  // color: inherit; // Removido, pois o hover e .active agora definem explicitamente
+  flex-shrink: 0;
 }
 
 .label {
-  font-weight: 500;
+  // font-weight é definido pelo Text atom (semibold)
   white-space: nowrap;
-  opacity: 1;
-  max-width: 200px;
   overflow: hidden;
-  transition: 
-    opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s,
-    max-width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-    margin-left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-    margin-right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  // opacity, max-width, margin-left são controlados por Framer Motion no SidebarItem.tsx
+  // O Text atom interno é que tem a cor do texto, ele herda do .sidebarItem ou .active
+  p { // Se o Text atom renderiza um <p>
+    margin: 0; // Resetar margem padrão do <p> do Text atom
+    color: inherit; // Garantir que herde do pai (.sidebarItem ou .active)
+  }
 }

@@ -1,32 +1,42 @@
+// src/components/atoms/Text.module.scss
 @import '../../assets/scss/variables';
+// As classes de Text.tsx já aplicam estilos de Tailwind-like.
+// Este arquivo pode ser usado para estilos base do Text se necessário,
+// ou para adicionar estilos mais complexos que não se encaixam nas props.
 
-.text {
-  color: inherit;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.5;
-  margin: 0;
-}
+// Exemplo: garantir que a cor padrão seja a primária do tema
+// .text { // Se você adicionar uma classe base ao Text.tsx
+//   color: var(--text-main-dark); // Padrão para tema escuro
+//   font-family: 'Inter', sans-serif;
+//   line-height: 1.6; // Ajustar line-height globalmente se necessário
+//   margin: 0;
 
+//   [data-theme='light'] & {
+//     color: var(--text-main-light);
+//   }
+// }
+
+// As classes utilitárias de Text.tsx devem continuar funcionando:
 .text-sm {
-  font-size: 0.875rem;
+  font-size: 0.875rem; // 14px
 }
 
 .text-base {
-  font-size: 1rem;
+  font-size: 1rem; // 16px
 }
 
 .text-lg {
-  font-size: 1.25rem;
+  font-size: 1.125rem; // 18px (era 1.25rem, ajustado para ser sutilmente maior)
 }
 
 .font-normal {
-  font-weight: 400;
+  font-weight: 400; //
 }
 
 .font-semibold {
-  font-weight: 600;
+  font-weight: 500; // Ajustado para 500 para um semibold mais leve, 600 é mais 'bold'
 }
 
 .font-bold {
-  font-weight: 700;
+  font-weight: 700; //
 }

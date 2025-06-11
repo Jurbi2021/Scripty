@@ -1,27 +1,335 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/organisms/PersonalizationPanel.module.scss
+@import "../../App.css"; //
 
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  background: vars.$card-dark;
-  border-radius: 8px;
+.personalizationContainer {
+  display: flex; // Alterado para flex para centralizar o settingsSection se ele não ocupar tudo
+  justify-content: center; // Centraliza o .settingsSection se houver espaço
+  gap: 1.5rem;
+  padding: 1.5rem; // Padding no container geral
+  height: 100%;
+  overflow-y: auto; // Scroll no container principal se o conteúdo for maior
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) transparent;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
 
   [data-theme='light'] & {
-    background: vars.$card-light;
+    scrollbar-color: var(--action-highlight-light) transparent;
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); }
   }
 }
 
-.option {
+.settingsSection { 
+  width: 100%; // Ocupa a largura do personalizationContainer
+  max-width: 800px; // Limita a largura máxima para melhor legibilidade em telas grandes
+  background-color: var(--bg-container-dark);
+  border-radius: 12px;
+  padding: 1.5rem 2rem; 
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; // Reduzido o gap entre as categorias para um visual mais compacto
+
+  [data-theme='light'] & {
+    background-color: var(--bg-container-light);
+    border-color: var(--border-color-light);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .sectionTitle { 
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem; // Mantido
+    font-weight: 600;
+    color: var(--text-main-dark);
+    border-bottom: 1px solid var(--border-color-dark);
+    padding-bottom: 0.75rem;
+    [data-theme='light'] & {
+        color: var(--text-main-light);
+        border-bottom-color: var(--border-color-light);
+    }
+  }
+}
+
+
+.preferenceCategory {
+  padding: 1rem 0; // Ajustado padding
+  border-bottom: 1px solid var(--border-color-dark-soft, rgba(48, 54, 64, 0.5)); // Borda mais suave
+
+  &:last-of-type { // Remover borda da última categoria
+    border-bottom: none;
+    padding-bottom: 0; // Remover padding inferior do último
+  }
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light-soft, rgba(224, 217, 209, 0.5));
+  }
+}
+
+.categoryTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main-dark);
+  margin-bottom: 1rem; // Mantido
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
+}
+.subCategory {
+  // O margin-top e margin-bottom agora são controlados pela animação (subCategoryVariants)
+  // margin-top: 0.75rem; // Removido
+  padding-left: 1rem;
+  border-left: 2px solid var(--border-color-dark);
+  // margin-bottom: 0.5rem; // Removido
+
+  [data-theme='light'] & {
+    border-left-color: var(--border-color-light);
+  }
+}
+
+.subCategoryTitle {
+  font-size: 0.9rem;
+  font-weight: 500; 
+  color: var(--text-secondary-dark);
+  margin-bottom: 0.75rem; // Aumentar um pouco a margem
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.toggleItem, .toggleItemCompact, .toggleCard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
+  
+  p { 
+    margin: 0;
+    color: var(--text-secondary-dark);
+     [data-theme='light'] & {
+        color: var(--text-secondary-light);
+     }
+  }
 }
 
-.actions {
+.toggleItemCompact {
+  padding: 0.4rem 0;
+   p {
+    font-size: 0.9rem;
+  }
+}
+
+.toggleCard { 
+  flex-direction: column;
+  align-items: stretch;
+  background-color: var(--bg-card-dark);
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.75rem; // Aumentado para mais respiro
+  border-radius: 8px;
+  border: 1px solid var(--border-color-dark);
+
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    border-color: var(--border-color-light);
+  }
+
+  .toggleItem { 
+    border-bottom: none;
+    padding-bottom: 0.4rem;
+  }
+}
+
+.detailPreference {
+  // margin-top e padding-top são controlados pela animação (detailPreferenceVariants)
+  // border-top: 1px dashed var(--border-color-dark); // Borda no SCSS, mas o padding/margin são animados
+  border-top: 1px dashed var(--border-color-dark-soft, rgba(48, 54, 64, 0.3)); // Usar cor mais suave
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  overflow: hidden; // Para a animação de height
+
+  [data-theme='light'] & {
+    border-top-color: var(--border-color-light-soft, rgba(224, 217, 209, 0.3));
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+.selectDropdown {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color-dark);
+  background-color: var(--bg-main-dark); 
+  color: var(--text-main-dark);
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 180px; // Para dar um tamanho mínimo
+
+  &:focus {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 2px var(--action-highlight-dark-01, rgba(180, 151, 255, 0.2)); // Adicionar um anel de foco
+  }
+
+  [data-theme='light'] & {
+    border-color: var(--border-color-light);
+    background-color: var(--bg-main-light);
+    color: var(--text-main-light);
+    &:focus {
+      border-color: var(--action-highlight-light);
+      box-shadow: 0 0 0 2px var(--action-highlight-light-01, rgba(180, 151, 255, 0.2));
+    }
+  }
+}
+
+
+.actionButtons {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color-dark); // Linha mais sólida aqui
   display: flex;
   gap: 1rem;
+  justify-content: flex-end; // Alinhar botões à direita
+
+  [data-theme='light'] & {
+    border-top-color: var(--border-color-light);
+  }
+
+  // Os botões já são estilizados pelo átomo Button.tsx
+  .confirmButton {
+    // Se precisar de override
+  }
+  .resetButton {
+    // Se precisar de override
+  }
+}
+
+
+.selectDropdown {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color-dark);
+  background-color: var(--bg-main-dark); // Ou --bg-container-dark
+  color: var(--text-main-dark);
+  font-size: 0.85rem;
+  outline: none;
+
+  &:focus {
+    border-color: var(--action-highlight-dark);
+  }
+
+  [data-theme='light'] & {
+    border-color: var(--border-color-light);
+    background-color: var(--bg-main-light);
+    color: var(--text-main-light);
+    &:focus {
+      border-color: var(--action-highlight-light);
+    }
+  }
+}
+
+.categoryDescription { // Se voltar a usar
+  font-size: 0.9rem;
+  color: var(--text-secondary-dark);
+  margin-bottom: 1rem;
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+
+.reorderList, .visibilityList {
   margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color-dark);
+
+  [data-theme='light'] & {
+    border-top-color: var(--border-color-light);
+  }
+}
+
+.reorderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--border-color-dark-soft); // Uma borda mais suave para itens da lista
+                                                        // Defina --border-color-dark-soft, ex: rgba(var(--border-color-dark-rgb), 0.5)
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .metricLabel {
+    color: var(--text-main-dark);
+    font-size: 0.95rem;
+    [data-theme='light'] & {
+      color: var(--text-main-light);
+    }
+  }
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light-soft);
+  }
+}
+
+.moveButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.moveButton {
+  // Usar estilos do seu átomo Button, mas talvez com padding menor ou variante 'icon' se tiver
+  padding: 0.3rem 0.6rem !important; // Forçar se o átomo Button tiver padding grande
+  font-size: 1rem !important;
+  line-height: 1;
+  min-width: auto; // Para botões pequenos
+  background-color: var(--bg-card-dark) !important;
+  color: var(--text-secondary-dark) !important;
+  border: 1px solid var(--border-color-dark) !important;
+
+  &:hover:not(:disabled) {
+    background-color: var(--action-highlight-dark-01) !important;
+    color: var(--action-highlight-dark) !important;
+    border-color: var(--action-highlight-dark) !important;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light) !important;
+    color: var(--text-secondary-light) !important;
+    border: 1px solid var(--border-color-light) !important;
+
+     &:hover:not(:disabled) {
+        background-color: var(--action-highlight-light-01) !important;
+        color: var(--action-highlight-light) !important;
+        border-color: var(--action-highlight-light) !important;
+    }
+  }
+}
+
+.emptyListMessage {
+  padding: 0.5rem;
+  text-align: center;
+  color: var(--text-secondary-dark);
+  font-style: italic;
+  font-size: 0.85rem;
+   [data-theme='light'] & {
+      color: var(--text-secondary-light);
+   }
+}
+
+// Defina --border-color-dark-soft e --border-color-light-soft em App.css ou _variables.scss
+// Ex:
+// :root {
+//   --border-color-dark-soft: rgba(48, 54, 64, 0.5); /* Exemplo: 50% opacidade de --border-color-dark */
+//   --border-color-light-soft: rgba(224, 217, 209, 0.5); /* Exemplo: 50% opacidade de --border-color-light */
+// }
 }

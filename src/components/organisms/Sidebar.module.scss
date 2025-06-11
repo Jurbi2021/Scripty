@@ -1,47 +1,226 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/organisms/Sidebar.module.scss
+@import "../../App.css"; //
 
 .sidebar {
-  background: vars.$sidebar-dark;
-  height: 100vh;
-  width: 250px;
-  padding: 0;
-  transition: width 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6); // Transição suave personalizada
+  background-color: var(--bg-container-dark); // Unificar com Header, ou usar --bg-sidebar-dark se preferir diferenciação
+  color: var(--text-secondary-dark); //
+  height: 100vh; //
+  display: flex; //
+  flex-direction: column; //
+  // width será controlado por Framer Motion
+  // transition: width 0.3s ease;
+  border-right: 1px solid var(--border-color-dark); //
+  flex-shrink: 0; //
+  box-sizing: border-box; //
+  overflow: hidden; //
 
-  &.collapsed {
-    width: 90px;
-    :global([class*="SidebarItem_sidebarItem"]) {
-      justify-content: center;
-      padding: 0.8rem;
-      
-      :global([class*="SidebarItem_label"]) {
-        opacity: 0;
-        max-width: 0;
-        margin-left: 0;
-        margin-right: 0;
-      }
-      
-      :global([class*="SidebarItem_icon"]) {
-        margin: 0 auto; // Centraliza o ícone
-      }
-    }
-  }
   [data-theme='light'] & {
-    background: vars.$sidebar-light;
+    background-color: var(--bg-container-light);
+    color: var(--text-secondary-light);
+    border-right: 1px solid var(--border-color-light);
+  }
+}
+
+// .expanded e .collapsed não são mais estritamente necessários se Framer Motion controla a width
+// .expanded { width: 240px; }
+// .collapsed { width: 70px; }
+
+.logoSection {
+  display: flex; //
+  align-items: center; //
+  justify-content: space-between; //
+  padding: 1.25rem 1rem; //
+  height: 65px; // Sincronizar com altura do Header
+  box-sizing: border-box; //
+  flex-shrink: 0; //
+  border-bottom: 1px solid var(--border-color-dark); // Adicionar separador
+
+  [data-theme='light'] & {
+    border-bottom: 1px solid var(--border-color-light);
+  }
+}
+
+.logoText {
+  font-size: 1.6rem; // Um pouco maior
+  font-weight: 700; // Mais bold
+  color: var(--text-main-dark); //
+  white-space: nowrap; //
+  // opacity e transition controlados por Framer Motion
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
   }
 }
 
 .toggleButton {
-  margin: 1rem;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  .sidebar.collapsed & {
-    transform: rotate(180deg); // Se você estiver usando um ícone de seta
+  background: none; //
+  border: none; //
+  color: var(--text-secondary-dark); //
+  font-size: 1.1rem; //
+  cursor: pointer; //
+  padding: 0.5rem; //
+  border-radius: 6px; // Mais arredondado
+  display: flex; //
+  align-items: center; //
+  justify-content: center; //
+  // transições controladas por Framer Motion (whileHover)
+
+  // &:hover { // Controlado por Framer Motion
+  //   background-color: rgba(255, 255, 255, 0.05);
+  //   color: var(--text-main-dark);
+  // }
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    // &:hover {
+    //   background-color: rgba(0, 0, 0, 0.03);
+    //   color: var(--text-main-light);
+    // }
   }
 }
+
 .menu {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem;
+  flex-grow: 1; //
+  overflow-y: auto; //
+  overflow-x: hidden; //
+  padding-top: 0.5rem; // Reduzir padding-top
+  scrollbar-width: thin; // Para Firefox
+  scrollbar-color: var(--border-color-dark) transparent; // Cor do scrollbar
+
+  &::-webkit-scrollbar { // Para Chrome/Safari/Edge
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border-color-dark);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ul {
+    list-style: none; //
+    padding: 0; //
+    margin: 0; //
+  }
+
+  // Estilos para li e button agora são controlados pela molécula SidebarItem.module.scss
+}
+
+// .icon, .label, .collapsed .icon, .collapsed .label, .collapsed .menu li button
+// Agora são controlados pela molécula SidebarItem.tsx e seu SCSS.
+
+.footer {
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border-color-dark);
+  flex-shrink: 0;
+  display: flex;       // <<< Adicionar
+  flex-direction: column; // <<< Adicionar
+  gap: 0.2rem;          // <<< Adicionar (espaçamento entre itens do footer)
+
+  [data-theme='light'] & {
+    border-top: 1px solid var(--border-color-light);
+  }
+}
+
+// .menuItem e .collapsed .menuItem button são agora SidebarItem
+
+.themeToggle {
+  display: flex; //
+  align-items: center; //
+  justify-content: space-between;
+  padding: 0.8rem 1.5rem; // Alinhar com padding de itens de menu (SidebarItem)
+  margin: 0.2rem 0.75rem; // Alinhar com margem de itens de menu
+  box-sizing: border-box;
+  white-space: nowrap; //
+  height: 45px; // Altura similar a um SidebarItem
+
+  // .label controlado por Framer Motion
+  .label {
+    font-size: 0.9rem; //
+    color: var(--text-secondary-dark); //
+    margin-right: 1rem; //
+    // opacity e transição controlados por Framer Motion
+    [data-theme='light'] & {
+      color: var(--text-secondary-light);
+    }
+  }
+
+  // Estilo para quando o sidebar está colapsado
+  &.themeToggleCollapsed {
+    justify-content: center;
+    padding: 0.8rem 0;
+    .label {
+      display: none;
+    }
+  }
+}
+
+.toggleThemeButton {
+  background: none; //
+  border: none; //
+  color: var(--text-secondary-dark); //
+  font-size: 1.1rem; //
+  cursor: pointer; //
+  padding: 0.5rem; //
+  border-radius: 6px; // Mais arredondado
+  display: flex; //
+  align-items: center; //
+  justify-content: center; //
+  // transições controladas por Framer Motion
+
+  // &:hover { // Controlado por Framer Motion
+  //   background-color: rgba(255, 255, 255, 0.05);
+  //   color: var(--text-main-dark);
+  // }
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    // &:hover {
+    //   background-color: rgba(0,0,0,0.03);
+    //   color: var(--text-main-light);
+    // }
+  }
+}
+
+// --- NOVOS ESTILOS PARA A SEÇÃO DO USUÁRIO ---
+
+.userSection {
+  order: 1; // Coloca a seção do usuário no topo do footer
+  border-bottom: 1px solid var(--border-color-dark);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  [data-theme='light'] & {
+    border-bottom-color: var(--border-color-light);
+  }
+}
+
+.logoutItem { // Estilo opcional para o item de logout
+  // Exemplo: se quiser que ele tenha uma cor de "perigo"
+  &:hover:not(.active) {
+    background-color: rgba(var(--danger-color-dark-rgb, 245, 34, 45), 0.1) !important;
+    color: var(--danger-color-dark, #f5222d) !important;
+    
+    .icon, .label p {
+       color: var(--danger-color-dark, #f5222d) !important;
+    }
+  }
+}
+
+.userEmail {
+  text-align: center;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.75rem; // Pequeno
+  color: var(--text-secondary-dark);
+  // Estilo para truncar email se for muito longo
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+  
+  p { // Para o átomo Text
+    margin: 0;
+  }
 }

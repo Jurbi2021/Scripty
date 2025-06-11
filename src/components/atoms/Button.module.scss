@@ -1,46 +1,77 @@
+// src/components/atoms/Button.module.scss
 @use 'sass:color';
-@use '../../assets/scss/variables' as vars;
+@use '../../assets/scss/variables' as vars; //
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.4rem;
   border-radius: 8px;
-  background-color: vars.$action-color;
-  color: vars.$white;
   font-weight: 600;
   font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  border: none;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out; // Adicionada transição para color e border-color
+  border: 1px solid transparent; // Borda transparente por padrão para primary
   cursor: pointer;
+  text-decoration: none; // Garantir que não haja sublinhado se usado como link
+  outline: none; // Vamos controlar o foco com box-shadow
 
-  &:hover {
-    background-color: color.adjust(vars.$action-color, $lightness: 5%);
-    transform: scale(1.02);
-  }
-
-  &:active {
-    transform: scale(0.98);
+  // Estilo de foco para acessibilidade - pode ser também via Framer Motion se preferir
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--bg-main-dark), 0 0 0 4px var(--action-color); // Exemplo de anel de foco
+    // No tema claro, você pode querer ajustar a cor do primeiro anel
+    [data-theme='light'] & {
+      box-shadow: 0 0 0 2px var(--bg-main-light), 0 0 0 4px var(--action-color);
+    }
   }
 
   &:disabled {
-    background-color: vars.$gray-medium;
+    background-color: var(--text-secondary-dark); // Usar uma cor mais neutra do tema para desabilitado
+    color: var(--bg-card-dark);
+    border-color: var(--text-secondary-dark);
     cursor: not-allowed;
+    opacity: 0.6;
+    // Importante: remover animações Framer Motion no estado disabled no TSX
+    [data-theme='light'] & {
+        background-color: var(--text-secondary-light);
+        color: var(--bg-card-light);
+        border-color: var(--text-secondary-light);
+    }
   }
 
   &.primary {
-    background-color: vars.$action-color;
-    color: vars.$white;
+    background-color: var(--action-color);
+    color: var(--white, #ffffff); // Usar var(--white) se definido, ou fallback
+    border-color: var(--action-color); // Borda da mesma cor para consistência
+
+    // Hover e Tap são controlados pelo Framer Motion no TSX
+    // Apenas um leve escurecimento/clareamento no CSS como fallback ou para temas sem JS
+    &:hover:not(:disabled) {
+      background-color: #{color.adjust(vars.$action-color, $lightness: -5%)};
+      border-color: #{color.adjust(vars.$action-color, $lightness: -5%)};
+    }
   }
 
   &.secondary {
-    background-color: vars.$gray-medium;
-    color: vars.$white;
+    background-color: transparent; // Fundo transparente para um look mais "ghost"
+    color: var(--action-color);     // Texto na cor de ação
+    border: 1px solid var(--action-color);
 
-    // Ajustes para tema claro (se necessário)
+    &:hover:not(:disabled) {
+      background-color: #{color.adjust(vars.$action-color, $alpha: -0.9)}; // Fundo com leve tom da cor de ação
+      color: var(--action-color); // Manter cor do texto
+      border-color: var(--action-color); // Manter cor da borda
+    }
+
     [data-theme='light'] & {
-      color: vars.$white;
+      // Para o tema claro, o botão secundário pode ter o texto na cor de ação
+      // e a borda também. O fundo pode ser transparente.
+      color: var(--action-color);
+      border-color: var(--action-color);
+
+      &:hover:not(:disabled) {
+        background-color: #{color.adjust(vars.$action-color, $alpha: -0.85)}; // Leve tom de ação no fundo
+      }
     }
   }
 }

@@ -1,7 +1,6 @@
 import React from 'react';
-import { FaPen, FaCode, FaSearch, FaCog, FaQuestionCircle } from 'react-icons/fa';
+import { FaEdit, FaSearch, FaCog, FaQuestionCircle, FaSignOutAlt, FaChevronRight, FaUser, FaPenFancy, FaChevronLeft } from 'react-icons/fa';
 import styles from './Icon.module.scss';
-import { BsArrowBarLeft, BsArrowRight } from 'react-icons/bs';
 
 interface IconProps {
   name: string;
@@ -10,13 +9,22 @@ interface IconProps {
   className?: string;
 }
 
+// Este mapa é a nossa "única fonte de verdade" para os ícones
 const iconMap: { [key: string]: React.ElementType } = {
-  editor: FaPen,
-  style: FaCode,
+  // Chaves para as views da sidebar
+  metrics: FaEdit,
+  style: FaPenFancy,   // Usando FaPenFancy como discutido
   seo: FaSearch,
-  personalize: FaCog,
+  personalization: FaCog,
+  
+  // Chaves para o footer da sidebar
   help: FaQuestionCircle,
-  arrow: BsArrowRight,
+  logout: FaSignOutAlt,
+  user: FaUser,
+  
+  // Chaves para outros ícones
+  arrowLeft: FaChevronLeft,
+  arrowRight: FaChevronRight,
 };
 
 const Icon: React.FC<IconProps> = ({ name, size = 24, color = 'inherit', className = '' }) => {

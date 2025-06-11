@@ -1,15 +1,9 @@
 // src/App.tsx
-import React from 'react';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { EditorProvider } from './contexts/EditorContext';
-import Routes from './routes';
+import './App.css'; //
+import AppRoutes from './routes'; // Importa o AppRoutes modificado
 
-const App: React.FC = () => (
-  <ThemeProvider>
-    <EditorProvider>
-      <Routes />
-    </EditorProvider>
-  </ThemeProvider>
-);
+function App() {
+  return <AppRoutes />;
+}
 
 export default App;

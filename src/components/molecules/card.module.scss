@@ -1,13 +1,49 @@
-@import '../../assets/scss/variables';
+// src/components/molecules/card.module.scss
+@use '../../assets/scss/variables' as vars;
 
 .card {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card-dark);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05), 0 10px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color-dark);
+  // Remover a transição e transform: translateY daqui se Framer Motion controlar o hover
+  // transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; 
+  overflow: hidden;
+
+  // O &:hover pode ser removido ou simplificado se Framer Motion controlar tudo
+  // &:hover {
+  //   transform: translateY(-2px); // Removido se Framer Motion faz
+  //   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06), 0 15px 25px rgba(0, 0, 0, 0.06); // Removido se Framer Motion faz
+  // }
+
+  [data-theme='light'] & {
+    background: var(--bg-card-light);
+    border: 1px solid var(--border-color-light);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 10px 20px rgba(0, 0, 0, 0.04);
+
+    //  &:hover { // Removido se Framer Motion faz
+    //    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05), 0 15px 25px rgba(0, 0, 0, 0.05);
+    //  }
+  }
+}
+
+.title {
+  color: var(--text-main-dark);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
 }
 
 .content {
-  margin-top: 0.5rem;
-  color: var(--text-secondary);
+  color: var(--text-secondary-dark);
+  font-size: 0.95rem;
+  line-height: 1.6;
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
 }

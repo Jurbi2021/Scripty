@@ -1,23 +1,71 @@
-@import '../../assets/scss/variables';
+// src/components/atoms/Input.module.scss
+@import '../../App.css';
 
-.input {
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--text-secondary);
-  border-radius: 8px;
-  background: var(--card-bg);
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+.inputContainer {
+  position: relative;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem; // 14px
+  font-weight: 500;
+  color: var(--text-secondary-dark);
+  text-align: left;
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.fieldWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary-dark);
   font-size: 1rem;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  pointer-events: none; // Para que o clique vá para o input
 
-  &:focus {
-    border-color: var(--action);
-    outline: none;
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.inputField {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-main-dark); // Um fundo um pouco mais escuro que o do painel
+  border: 1px solid var(--border-color-dark); // <<< BORDA VISÍVEL
+  color: var(--text-main-dark);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  // Ajusta o padding esquerdo se houver um ícone
+  &.withIcon {
+    padding-left: 3rem;
   }
 
-  &:disabled {
-    background: $gray-medium;
-    cursor: not-allowed;
-    opacity: 0.6;
+  &:focus {
+    border-color: var(--action-highlight-dark);
+    box-shadow: 0 0 0 3px rgba(var(--action-highlight-rgb, 180, 151, 255), 0.25); // Defina --action-highlight-rgb
+  }
+
+  [data-theme='light'] & {
+    background-color: var(--bg-main-light);
+    border-color: var(--border-color-light);
+    color: var(--text-main-light);
+    &:focus {
+      border-color: var(--action-highlight-light);
+    }
   }
 }

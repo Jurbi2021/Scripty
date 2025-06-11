@@ -1,33 +1,63 @@
+// src/components/molecules/MetricsSummary.module.scss
 @use '../../assets/scss/variables' as vars;
 
 .metricsSummary {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); // Tornar responsivo
+  gap: 1.25rem;
   width: 100%;
-  height: 100%;
-  overflow-y: auto; // Permite rolagem se houver muitas métricas
 }
 
 .metric {
-  background: vars.$card-dark;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border-left: 4px solid vars.$action-color;
-  color: vars.$text-primary-dark;
-  
+  background: var(--bg-card-dark);
+  padding: 1.25rem;
+  border-radius: 10px; // Alinhar com outros cards
+  border: 1px solid var(--border-color-dark);
+  color: var(--text-primary-dark);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  display: flex; // Adicionado para melhor controle do conteúdo interno
+  flex-direction: column; // Adicionado
+  justify-content: center; // Adicionado
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.07);
+  }
+
   [data-theme='light'] & {
-    background: vars.$card-light;
-    color: vars.$text-primary-light;
+    background: var(--bg-card-light);
+    color: var(--text-primary-light);
+    border-color: var(--border-color-light);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+     &:hover {
+        box-shadow: 0 5px 12px rgba(0,0,0,0.06);
+    }
   }
 }
 
-.name {
-  margin-bottom: 0.6rem;
-  font-size: 1.1rem;
+.name { // dl > dt
+  color: var(--text-secondary-dark);
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4; // Adicionado para consistência
+  // O Text atom controla o font-weight="semibold"
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
 }
 
-.value {
-  color: vars.$action-color;
-  font-size: 1.2rem;
+.value { // dl > dd
+  color: var(--text-main-dark);
+  font-size: 1.5rem; // Um pouco maior para destaque
+  font-weight: 600; // Semibold ou bold (Text atom controla)
+  line-height: 1.2;
+  margin: 0; // Resetar margem do Text atom se ele adicionar <p>
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+  }
 }

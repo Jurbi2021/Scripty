@@ -1,113 +1,269 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/organisms/EditorWithSEO.module.scss
+@import "../../App.css";
+// As classes .editorLayout, .mainContentArea, .focusModeLayoutActive são reutilizadas
+// do EditorWithMetrics.module.scss através da importação `editorLayoutStyles` no TSX.
 
-.editorWrapper {
+.seoAnalysisPanel {
+  flex: 1.5;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
-  padding: 2rem 2rem 2rem 3rem;
-}
-
-.titleSection {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 1rem;
-  gap: 4rem;
-}
-
-.titleColumn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-
-  &:first-child {
-    justify-content: flex-start;
-  }
-
-  &:last-child {
-    justify-content: flex-end;
-  }
-}
-
-.editorTitle,
-.seoTitle {
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: vars.$text-primary-dark;
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-  display: inline-block;
-  vertical-align: middle;
-
-  [data-theme='light'] & {
-    color: vars.$text-primary-light;
-  }
-}
-
-.contentSection {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  gap: 4rem;
-  height: 100%;
-}
-
-.editorColumn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: 800px;
-}
-
-.editor {
-  flex: 1;
-  width: 100%;
-  min-height: 400px;
-  padding: 1.5rem;
-  border: 1px solid vars.$text-secondary-dark;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background-color: var(--bg-container-dark);
   border-radius: 12px;
-  background: vars.$card-dark;
-  color: vars.$text-primary-dark;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  resize: none;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--border-color-dark);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) var(--bg-container-dark);
 
-  &:focus {
-    border-color: vars.$action-color;
-    outline: none;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(vars.$action-color, 0.2);
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: var(--bg-container-dark); border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 3px; border: 1px solid var(--bg-container-dark); }
+
+  [data-theme='light'] & {
+    background-color: var(--bg-container-light);
+    border-color: var(--border-color-light);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    scrollbar-color: var(--action-highlight-light) var(--bg-container-light);
+    &::-webkit-scrollbar-track { background: var(--bg-container-light); }
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); border: 1px solid var(--bg-container-light); }
+  }
+}
+
+.panelTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main-dark);
+  margin: 0 0 0.1rem 0;
+  [data-theme='light'] & { color: var(--text-main-light); }
+}
+
+.panelSubtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary-dark);
+  margin: 0 0 1rem 0;
+  [data-theme='light'] & { color: var(--text-secondary-light); }
+}
+
+.feedbackContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex-grow: 1;
+}
+
+.feedbackCard {
+  background-color: var(--bg-card-dark);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border-color-dark);
+  border-left-width: 4px;
+  [data-theme='light'] & {
+    background-color: var(--bg-card-light);
+    border-color: var(--border-color-light);
+  }
+}
+
+.feedbackTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main-dark);
+  margin: 0 0 0.4rem 0;
+  [data-theme='light'] & { color: var(--text-main-light); }
+}
+
+.feedbackText {
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark);
+  line-height: 1.5;
+  margin: 0 0 0.6rem 0;
+  [data-theme='light'] & { color: var(--text-secondary-light); }
+}
+
+.statusBom { border-left-color: var(--success-dark) !important; [data-theme='light'] & { border-left-color: var(--success-light) !important; } }
+.statusRegular { border-left-color: #faad14 !important; }
+.statusRuim { border-left-color: #f5222d !important; }
+.statusNA { border-left-color: var(--border-color-dark) !important; [data-theme='light'] & { border-left-color: var(--border-color-light) !important; }}
+
+.details {
+  summary {
+    cursor: pointer; font-size: 0.8rem; color: var(--action-highlight-dark); font-weight: 500;
+    margin-top: 0.25rem; display: inline-block; padding: 0.2rem 0.4rem;
+    border-radius: 4px; transition: background-color 0.2s ease;
+    &:hover { background-color: rgba(180, 151, 255, 0.1); }
+    &::marker { content: "+ "; font-size: 0.8em; }
+    [data-theme='light'] & {
+        color: var(--action-highlight-light);
+        &:hover { background-color: rgba(180, 151, 255, 0.1); }
+    }
+  }
+  &[open] summary::marker { content: "- "; }
+}
+
+.wordList, .headingsList {
+  list-style: none; padding-left: 0.5rem; margin: 0.5rem 0 0 0.5rem;
+  font-size: 0.8rem; color: var(--text-secondary-dark); line-height: 1.5;
+  word-break: break-word; max-height: 120px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
+  border-top: 1px dashed var(--border-color-dark); padding-top: 0.5rem;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 2px; }
+  li { margin-bottom: 0.3rem; }
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    scrollbar-color: var(--action-highlight-light) var(--bg-card-light);
+    border-top-color: var(--border-color-light);
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); }
+  }
+}
+
+.keywordInfo {
+  display: flex; align-items: center; margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  // background-color: rgba(var(--bg-main-rgb), 0.03); // Defina --bg-main-rgb se for usar
+  background-color: rgba(211, 215, 222, 0.03); // Fallback se --bg-main-rgb não estiver definido
+  border: 1px solid var(--border-color-dark);
+  border-radius: 6px;
+  [data-theme='light'] & {
+    // background-color: rgba(var(--bg-main-rgb-light), 0.03);
+    background-color: rgba(51, 51, 51, 0.03); // Fallback
+    border-color: var(--border-color-light);
+  }
+}
+
+.keywordLabel {
+  font-weight: 500; margin-right: 0.5rem; color: var(--text-main-dark);
+  font-size: 0.8rem;
+  [data-theme='light'] & { color: var(--text-main-light); }
+}
+
+.keywordValue {
+  color: var(--action-highlight-dark); font-weight: 600; font-size: 0.8rem;
+  [data-theme='light'] & { color: var(--action-highlight-light); }
+}
+
+// Estilos para o botão de detalhes customizado e chevron (similares ao EditorWithStyle)
+.detailsWrapper {
+  margin-top: 0.75rem; 
+}
+
+.summaryButton {
+  background: none;
+  border: none;
+  padding: 0.3rem 0.5rem; 
+  margin: 0; 
+  width: 100%; 
+  text-align: left; 
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--action-highlight-dark);
+  font-weight: 500;
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(180, 151, 255, 0.1); 
   }
 
   [data-theme='light'] & {
-    border: 1px solid vars.$text-secondary-light;
-    background: vars.$card-light;
-    color: vars.$text-primary-light;
+    color: var(--action-highlight-light);
+    &:hover {
+      background-color: rgba(180, 151, 255, 0.1); 
+    }
   }
 }
 
-.seoColumn {
-  flex: 1;
-  max-width: 450px;
+.summaryChevron {
+  display: inline-block; 
+  margin-left: 0.5rem;
+  font-size: 0.8em; 
+  line-height: 1; 
+  color: inherit; 
+}
+
+// Estilos para listas dentro dos detalhes (LSI, Títulos)
+.wordList, .headingsList { // .headingsList é para a lista de títulos potenciais
+  list-style: none;
+  padding-left: 0.75rem; 
+  margin: 0.5rem 0 0 0; 
+  font-size: 0.8rem;
+  color: var(--text-secondary-dark);
+  line-height: 1.5; // Ajustado para melhor leitura de listas
+  word-break: break-word; 
+  max-height: 120px; 
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--action-highlight-dark) var(--bg-card-dark);
+  // border-top: 1px dashed var(--border-color-dark-soft, rgba(48, 54, 64, 0.3)); // Opcional
+  padding-top: 0.5rem;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-dark); border-radius: 2px; }
+
+  li { 
+    margin-bottom: 0.3rem; 
+    line-height: 1.4; // Para itens da lista de títulos
+  }
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    scrollbar-color: var(--action-highlight-light) var(--bg-card-light);
+    // border-top-color: var(--border-color-light-soft, rgba(224, 217, 209, 0.3));
+    &::-webkit-scrollbar-thumb { background-color: var(--action-highlight-light); }
+  }
+}
+
+// .wordList já está definido no EditorWithStyle.module.scss, 
+// mas pode ser que precise de pequenos ajustes se o contexto aqui for diferente.
+// Se for idêntico, não precisa repetir.
+
+// Estilos para .keywordInfo, .keywordLabel, .keywordValue que você já tem
+// Ajustar o .keywordInfo para ter um espaçamento melhor se tiver subValue
+.keywordInfo {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-}
+  align-items: baseline; // Alinhar pela baseline do texto
+  flex-wrap: wrap; // Permitir quebra de linha se necessário
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background-color: rgba(211, 215, 222, 0.03); 
+  border: 1px solid var(--border-color-dark);
+  border-radius: 6px;
+  font-size: 0.8rem; // Tamanho base para os textos aqui
 
-.focusMode {
-  .editorColumn {
-    flex: 1;
-    margin: 0 auto;
-    max-width: 900px;
-  }
-
-  .seoColumn {
-    opacity: 0;
-    transform: translateX(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+  [data-theme='light'] & {
+    background-color: rgba(51, 51, 51, 0.03); 
+    border-color: var(--border-color-light);
   }
 }
+
+.keywordLabel {
+  font-weight: 500; 
+  margin-right: 0.5rem; 
+  color: var(--text-main-dark);
+  [data-theme='light'] & { color: var(--text-main-light); }
+}
+
+.keywordValue {
+  color: var(--action-highlight-dark); 
+  font-weight: 600; 
+  margin-right: 0.75rem; // Espaço antes do subValue
+  [data-theme='light'] & { color: var(--action-highlight-light); }
+}
+
+.keywordSubValue {
+    font-size: 0.9em; // Um pouco menor que o valor principal
+    color: var(--text-secondary-dark);
+    opacity: 0.8;
+    [data-theme='light'] & { color: var(--text-secondary-light); }
+}
+
+// Reutilizar .emptyStateAdvancedMetrics do EditorWithMetrics.module.scss

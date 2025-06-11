@@ -1,0 +1,129 @@
+// src/components/organisms/ProfileThresholdGuide.module.scss
+
+.profileGuide {
+  background-color: var(--bg-container-dark);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+
+  [data-theme='light'] & {
+    background-color: var(--bg-container-light);
+    border-color: var(--border-color-light);
+  }
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color-dark);
+
+  [data-theme='light'] & { border-bottom-color: var(--border-color-light); }
+}
+
+.profileIcon {
+  font-size: 1.8rem;
+  color: var(--action-highlight-dark);
+  margin-right: 1.25rem;
+  // ... (outros estilos para alinhar)
+}
+
+.profileInfo {
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    color: var(--text-main-dark);
+  }
+  p {
+    font-size: 0.9rem;
+    color: var(--text-secondary-dark);
+    margin: 0;
+  }
+  [data-theme='light'] & {
+    h3 { color: var(--text-main-light); }
+    p { color: var(--text-secondary-light); }
+  }
+}
+
+.thresholdGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.thresholdGroup {
+  h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary-dark);
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--border-color-dark);
+  }
+  [data-theme='light'] & {
+    h4 {
+      color: var(--text-secondary-light);
+      border-bottom-color: var(--border-color-light);
+    }
+  }
+}
+
+.thresholdItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.thresholdLabel {
+  color: var(--text-secondary-dark);
+  [data-theme='light'] & { color: var(--text-secondary-light); }
+}
+
+.thresholdValue {
+  font-weight: 600;
+  color: var(--text-main-dark);
+  
+  &.better { // Limiar mais flexível
+    color: var(--success-dark);
+    [data-theme='light'] & { color: var(--success-light); }
+  }
+  &.stricter { // Limiar mais rigoroso
+    color: #faad14; // Laranja/Amarelo para atenção
+  }
+  [data-theme='light'] & { color: var(--text-main-light); }
+}
+
+.comparisonIndicator {
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.profileFooter {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color-dark);
+  font-size: 0.85rem;
+  [data-theme='light'] & { border-top-color: var(--border-color-light); }
+}
+
+.profileNote {
+  color: var(--text-secondary-dark);
+  font-style: italic;
+  strong { font-style: normal; }
+  .better { color: var(--success-dark); font-weight: 500; font-style: normal; }
+  .stricter { color: #faad14; font-weight: 500; font-style: normal; }
+  
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+    .better { color: var(--success-light); }
+  }
+}

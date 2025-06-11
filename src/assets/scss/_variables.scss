@@ -18,3 +18,6 @@ $success-color-light: #70d2a0;
 // Outras cores que podem estar sendo usadas
 $gray-medium: #a0a5af; // Para tema escuro (ajuste se necessário para o claro)
 $white: #ffffff;
+
+$breakpoint-tablet: 992px;  // Para tablets em modo paisagem e ecrãs menores
+$breakpoint-mobile: 768px;   // Para tablets em modo retrato e telemóveis grandes

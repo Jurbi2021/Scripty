@@ -1,5 +1,5 @@
 // src/components/atoms/Text.tsx
-import React, { ReactNode } from 'react';
+import React, { ReactNode, CSSProperties } from 'react'; // Adicionar CSSProperties
 
 interface TextProps {
   children: ReactNode;
@@ -7,6 +7,10 @@ interface TextProps {
   weight?: 'normal' | 'bold' | 'semibold';
   color?: string;
   className?: string;
+  // <<< MUDANÇA AQUI: Adicionadas as novas tags permitidas >>>
+  as?: 'p' | 'span' | 'div' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'label' | 'dt' | 'dd';
+  style?: CSSProperties; // <<< ADICIONADA A PROP 'style'
+  htmlFor?: string; // Para usar com as="label"
 }
 
 const sizeClasses = {
@@ -25,16 +29,28 @@ const Text: React.FC<TextProps> = ({
   children,
   size = 'medium',
   weight = 'normal',
-  color = 'inherit',
+  color,
   className = '',
+  as: Component = 'p',
+  style, // <<< ADICIONADO
+  htmlFor // <<< ADICIONADO
 }) => {
+  const inlineStyle = color ? { ...style, color } : style;
+  
+  // Adiciona a prop 'htmlFor' apenas se o componente for um 'label'
+  const componentProps: { [key: string]: any } = {
+    className: `${sizeClasses[size]} ${weightClasses[weight]} ${className}`,
+    style: inlineStyle,
+  };
+
+  if (Component === 'label' && htmlFor) {
+    componentProps.htmlFor = htmlFor;
+  }
+
   return (
-    <p
-      className={`${sizeClasses[size]} ${weightClasses[weight]} ${className}`}
-      style={{ color }}
-    >
+    <Component {...componentProps}>
       {children}
-    </p>
+    </Component>
   );
 };
 

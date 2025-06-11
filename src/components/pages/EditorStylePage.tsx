@@ -7,7 +7,6 @@ const EditorStylePage: React.FC = () => {
   return (
     <DashboardLayout>
       <div className={styles.page}>
-        <h1>Análise de Estilo</h1>
         <EditorWithStyle />
       </div>
     </DashboardLayout>

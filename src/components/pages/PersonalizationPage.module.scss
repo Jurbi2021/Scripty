@@ -1,14 +1,67 @@
-@use '../../assets/scss/variables' as vars;
+// src/components/pages/PersonalizationPage.module.scss
+@import '../../App.css'; // Para usar as variáveis CSS
 
 .page {
-  h1 {
-    color: vars.$text-primary-dark;
-    margin-bottom: 1rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; // Espaço entre a secção do seletor e os painéis abaixo
+  height: 100%;
+}
+
+.section {
+  // Estilos para a seção do seletor de perfil, se necessário
+}
+
+.sectionTitle {
+  color: var(--text-main-dark);
+  margin-bottom: 0.5rem;
 
   [data-theme='light'] & {
-    h1 {
-      color: vars.$text-primary-light;
-    }
+    color: var(--text-main-light);
+  }
+}
+
+.sectionDescription {
+  color: var(--text-secondary-dark);
+  margin-bottom: 1.5rem;
+  max-width: 600px; // Para melhor legibilidade
+
+  [data-theme='light'] & {
+    color: var(--text-secondary-light);
+  }
+}
+
+.panelsContainer {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr; 
+  gap: 2.5rem;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; // Espaço entre o seletor e o guia
+}
+
+//.panelWrapper {
+  // Estilo para o container de cada painel
+//}
+
+.panelTitle {
+  color: var(--text-main-dark);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color-dark);
+  font-size: 1.1rem; // Ajuste de tamanho para subtítulos de painel
+
+  [data-theme='light'] & {
+    color: var(--text-main-light);
+    border-bottom-color: var(--border-color-light);
   }
 }

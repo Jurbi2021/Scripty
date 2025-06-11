@@ -1,0 +1,103 @@
+// src/components/atoms/Toast.module.scss
+@import '../../App.css'; // Para usar as variáveis CSS globais
+
+.toast {
+// Posicionamento (mantenha ou ajuste conforme necessário)
+// position: fixed;
+// bottom: 30px;
+// left: 50%;
+// transform: translateX(-50%);
+// z-index: 2000;
+
+// Mais transparência no background
+background-color: rgba(var(--bg-card-rgb-dark), 0.85); // Use a variável RGB e ajuste a opacidade
+color: var(--text-main-dark);
+padding: 1.2rem 2rem; // Aumentando o padding
+border-radius: 12px; // Aumentando o border-radius para um visual mais suave
+box-shadow: 0 2px 8px rgba(0,0,0,0.15); // Box shadow mais sutil
+font-size: 1rem; // Aumentando um pouco a fonte
+display: flex;
+align-items: center;
+gap: 1.5rem; // Aumentando o gap entre mensagem e botão
+backdrop-filter: blur(10px); // Adiciona um efeito de blur no fundo para ajudar na leitura
+
+// Remove a borda lateral
+border-left: none;
+
+&.toastSuccess {
+// Pode adicionar um ícone ou um indicador visual diferente aqui, se desejar
+// Exemplo com cor sutil no texto:
+color: var(--text-main-dark);
+button.toastClose {
+color: var(--success-dark);
+&:hover {
+color: var(--success-dark);
+background-color: rgba(var(--success-rgb-dark), 0.1);
+}
+}
+}
+
+&.toastError {
+color: var(--danger-color-dark, #f5222d);
+button.toastClose {
+color: var(--danger-color-dark, #f5222d);
+&:hover {
+color: var(--danger-color-dark, #f5222d);
+background-color: rgba(var(--danger-rgb-dark), 0.1);
+}
+}
+}
+
+// Estilos para o tema claro (se necessário, ajuste a opacidade das cores claras também)
+&, &[data-theme='light'] {
+background-color: rgba(var(--bg-card-rgb-light), 0.85);
+color: var(--text-main-light);
+backdrop-filter: blur(8px);
+
+&.toastSuccess {
+  color: var(--success-light);
+  button.toastClose {
+    color: var(--success-light);
+    &:hover {
+      color: var(--success-light);
+      background-color: rgba(var(--success-rgb-light), 0.1);
+    }
+  }
+}
+&.toastError {
+  color: var(--danger-color-light, #e11d48);
+  button.toastClose {
+    color: var(--danger-color-light, #e11d48);
+    &:hover {
+      color: rgba(var(--danger-rgb-light), 0.1);
+    }
+  }
+}
+}
+}
+
+.toastClose {
+background: none;
+border: none;
+font-size: 1.5rem; // Aumentando o tamanho do ícone de fechar
+line-height: 1;
+padding: 0.4rem 0.6rem;
+margin-left: auto;
+cursor: pointer;
+border-radius: 6px;
+color: var(--text-secondary-dark); // Cor padrão
+
+&:hover {
+// A cor do hover e o background agora são definidos no bloco pai para Success/Error
+color: var(--text-main-dark);
+background-color: rgba(var(--text-main-rgb-dark), 0.1);
+}
+
+&, &[data-theme='light'] {
+color: var(--text-secondary-light);
+&:hover {
+color: var(--text-main-light);
+background-color: rgba(var(--text-main-rgb-light), 0.08);
+}
+}
+}
