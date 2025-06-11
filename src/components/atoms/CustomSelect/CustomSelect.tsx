@@ -9,8 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 export interface SelectOption {
   value: string;
   label: string;
-  icon: boolean; // Indica se a opção deve ter um ícone
+  icon?: React.ReactNode; // 'icon' é opcional
 }
+
 
 interface CustomSelectProps {
   options: SelectOption[];

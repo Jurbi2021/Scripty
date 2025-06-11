@@ -46,7 +46,7 @@ const allReadabilityIndicesOptions: { key: ReadabilityIndexKey; label: string }[
 ];
 
 const EditorWithMetrics: React.FC = () => {
-  const [basicMetrics, setBasicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
+  const [basicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
   const { 
   preferences, 
   isFocusMode, 
@@ -60,7 +60,6 @@ const EditorWithMetrics: React.FC = () => {
 
   useEffect(() => {
   const handler = setTimeout(() => {
-    const newBasicMetrics = calculateBasicMetrics(text); // 'text' deve ser o global
     const newAdvancedMetrics = calculateAdvancedMetrics(text, lexico, styleAnalysis, thresholds);
     setAdvancedMetricsData(newAdvancedMetrics);
     }, 300);

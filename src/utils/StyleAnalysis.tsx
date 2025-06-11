@@ -103,7 +103,7 @@ const PARTICIPLES: string[] = [
   // Add more common participles if needed
 ];
 
-const ADVERB_ENDINGS: string[] = ['mente'];
+//const ADVERB_ENDINGS: string[] = ['mente'];
 // Reviewed list of common adverbs
 const COMMON_ADVERBS: string[] = [
   'não', 'mais', 'muito', 'já', 'quando', 'mesmo', 'depois', 'ainda', 'bem',
@@ -173,19 +173,19 @@ const STOP_WORDS: string[] = [
 ];
 
 // Default thresholds (serão substituídos pelos thresholds do perfil selecionado)
-const DEFAULT_THRESHOLDS = {
-  passiveVoicePercent: 5,
-  adverbPercent: 4,
-  complexSentencePercent: 15,
-  repetitionGlobalPercent: 1.5,
-  complexWordCountThreshold: 20,
-  complexSyllableAvgThreshold: 1.8,
-  complexConjunctionThreshold: 3,
-  repetitionWindowSize: 100,
-  repetitionThresholdWindow: 3,
-  shannonIndexLowThreshold: 2.5,
-  shannonIndexHighThreshold: 3.5
-};
+//const DEFAULT_THRESHOLDS = {
+//  passiveVoicePercent: 5,
+//  adverbPercent: 4,
+//  complexSentencePercent: 15,
+//  repetitionGlobalPercent: 1.5,
+//  complexWordCountThreshold: 20,
+//  complexSyllableAvgThreshold: 1.8,
+//  complexConjunctionThreshold: 3,
+//  repetitionWindowSize: 100,
+//  repetitionThresholdWindow: 3,
+//  shannonIndexLowThreshold: 2.5,
+//  shannonIndexHighThreshold: 3.5
+// };
 
 // --- Helper Functions ---
 

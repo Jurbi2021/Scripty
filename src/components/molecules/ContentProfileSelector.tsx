@@ -31,6 +31,7 @@ const ContentProfileSelector: React.FC<ContentProfileSelectorProps> = ({
   const profileOptions: SelectOption[] = availableProfiles.map(profile => ({
     value: profile.id,
     label: profile.name,
+    icon: profile.icon ? iconMap[profile.icon] : <FaFileAlt /> 
   }));
 
   // Renderização do seletor em modo compacto
