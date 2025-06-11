@@ -42,7 +42,6 @@ const menuItems: { view: View; label: string }[] = [
   { view: 'style', label: 'Análise de Estilo' },
   { view: 'seo', label: 'Análise de SEO' },
   { view: 'personalization', label: 'Personalizar' },
-  { view: 'help', label: 'Central de Ajuda' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }) => {
