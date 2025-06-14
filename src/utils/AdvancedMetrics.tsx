@@ -330,7 +330,6 @@ interface Lexico {
 
 const analyzeSentiment = (text: string, lexico: Lexico): SentimentScore => {
   const words = getWords(text);
-  const sentences = getSentences(text);
   
   if (words.length === 0) {
     return { neg: 0, neu: 1, pos: 0, compound: 0, sentiment: "neutro" };
@@ -493,7 +492,7 @@ const analyzeConciseness = (text: string, sentences: string[], thresholds: Thres
 };
 
 // --- Formality Analysis ---
-const analyzeFormality = (words: string[], lexico: Lexico, thresholds: ThresholdConfig): FormalityResult => {
+const analyzeFormality = (words: string[], thresholds: ThresholdConfig): FormalityResult => {
   if (words.length === 0) {
     return { 
       formalityLevel: "neutro", 
@@ -569,7 +568,7 @@ const analyzeFormality = (words: string[], lexico: Lexico, thresholds: Threshold
 };
 
 // --- Tone Analysis ---
-const analyzeTone = (text: string, words: string[], thresholds: ThresholdConfig): ToneAnalysisResult => {
+const analyzeTone = (words: string[], thresholds: ThresholdConfig): ToneAnalysisResult => {
   if (words.length === 0) {
     return { 
       type: "neutro", 
@@ -708,8 +707,8 @@ export const calculateAdvancedMetrics = (text: string, lexico: Lexico, styleAnal
   // Novas métricas também recebem os thresholds
   const clarityResult = analyzeClarity(totalWords, totalSentences, complexWordsForFog, thresholds);
   const concisenessResult = analyzeConciseness(cleanedText, sentencesArray, thresholds);
-  const formalityResult = analyzeFormality(wordsArray, lexico, thresholds);
-  const toneResult = analyzeTone(cleanedText, wordsArray, thresholds);
+  const formalityResult = analyzeFormality(wordsArray, thresholds);
+  const toneResult = analyzeTone(wordsArray, thresholds);
 
   return {
     readability,

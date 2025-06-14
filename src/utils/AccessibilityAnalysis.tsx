@@ -1,4 +1,3 @@
-import { BasicMetrics } from './BasicMetrics';
 
 // Interfaces para os resultados de análise de acessibilidade
 export interface CognitiveAccessibilityResult {

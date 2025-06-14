@@ -4,7 +4,7 @@ import styles from './MainLayout.module.scss';
 import Sidebar from '../organisms/Sidebar';
 import Header from '../organisms/Header';
 
-type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
+type View = 'metrics' | 'style' | 'seo' | 'accessibility' | 'personalization' | 'help';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -23,6 +23,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onNavigate, initialVi
     if (initialView === 'metrics') headerTitle = "Editor Principal";
     else if (initialView === 'style') headerTitle = "Análise de Estilo";
     else if (initialView === 'seo') headerTitle = "Análise de SEO";
+    else if (initialView === 'accessibility') headerTitle = "Análise de Acessibilidade";
     else if (initialView === 'personalization') headerTitle = "Personalização";
     else if (initialView === 'help') headerTitle = "Central de Ajuda";
   }

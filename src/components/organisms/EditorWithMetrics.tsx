@@ -1,9 +1,9 @@
 // src/components/organisms/EditorWithMetrics.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styles from './EditorWithMetrics.module.scss';
 import editorLayoutStyles from './EditorWithMetrics.module.scss';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import {  Mousewheel, Pagination, Navigation } from 'swiper/modules';
+import { Mousewheel, Pagination, Navigation } from 'swiper/modules';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaLightbulb } from 'react-icons/fa';
 
@@ -12,17 +12,9 @@ import MetricsToolbar from '../molecules/MetricsToolbar';
 import { useContentProfile } from '../../contexts/ContentProfileContext';
 
 import {
-  calculateBasicMetrics,
-  BasicMetricsData,
-} from '../../utils/BasicMetrics';
-import {
   calculateAdvancedMetrics,
   ReadabilityIndices,
-  SentimentScore,
-  ToneAnalysisResult,
-  ClarityResult,
-  ConcisenessResult,
-  FormalityResult
+  SentimentScore
 } from '../../utils/AdvancedMetrics';
 import lexicoData from '../../utils/lexico.json';
 
