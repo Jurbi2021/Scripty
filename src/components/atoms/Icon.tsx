@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaEdit, FaSearch, FaCog, FaQuestionCircle, FaSignOutAlt, FaChevronRight, FaUser, FaPenFancy, FaChevronLeft } from 'react-icons/fa';
+import { FaEdit, FaSearch, FaCog, FaQuestionCircle, FaSignOutAlt, FaChevronRight, FaUser, FaPenFancy, FaChevronLeft, FaUniversalAccess } from 'react-icons/fa';
 import styles from './Icon.module.scss';
 
 interface IconProps {
@@ -15,6 +15,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   metrics: FaEdit,
   style: FaPenFancy,   // Usando FaPenFancy como discutido
   seo: FaSearch,
+  accessibility: FaUniversalAccess,
   personalization: FaCog,
   
   // Chaves para o footer da sidebar

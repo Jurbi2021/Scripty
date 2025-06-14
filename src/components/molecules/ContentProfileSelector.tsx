@@ -1,6 +1,7 @@
 // src/components/molecules/ContentProfileSelector.tsx
 import React from 'react';
 import { useContentProfile } from '../../contexts/ContentProfileContext';
+import { useToast } from '../../contexts/ToastContext';
 import styles from './ContentProfileSelector.module.scss';
 import { FaFileAlt, FaBlog, FaFileContract, FaHashtag, FaBullhorn, FaWrench } from 'react-icons/fa';
 import CustomSelect, { SelectOption } from '../atoms/CustomSelect/CustomSelect';
@@ -26,6 +27,22 @@ const ContentProfileSelector: React.FC<ContentProfileSelectorProps> = ({
   compact = false 
 }) => {
   const { currentProfile, setProfileById, availableProfiles } = useContentProfile();
+  const { showToast } = useToast();
+
+  // Função para lidar com a mudança de perfil
+  const handleProfileChange = (profileId: string) => {
+    // Não mostrar toast se for o mesmo perfil
+    if (profileId === currentProfile.id) return;
+    
+    // Obter o perfil selecionado para mostrar o nome no toast
+    const selectedProfile = availableProfiles.find(p => p.id === profileId);
+    
+    // Atualizar o perfil
+    setProfileById(profileId);
+    
+    // Mostrar toast de confirmação
+    showToast(`Perfil alterado para ${selectedProfile?.name}`, 'success');
+  };
 
   // Mapear os perfis disponíveis para o formato que o CustomSelect espera
   const profileOptions: SelectOption[] = availableProfiles.map(profile => ({
@@ -38,10 +55,9 @@ const ContentProfileSelector: React.FC<ContentProfileSelectorProps> = ({
   if (compact) {
     return (
       <div className={`${styles.compactSelector} ${className}`}>
-        {/* <<< SUBSTITUÍDO o <select> pelo <CustomSelect> >>> */}
         <CustomSelect
           value={currentProfile.id}
-          onValueChange={setProfileById}
+          onValueChange={handleProfileChange}
           options={profileOptions}
           placeholder="Selecione um Perfil"
         />
@@ -62,7 +78,7 @@ const ContentProfileSelector: React.FC<ContentProfileSelectorProps> = ({
           <div 
             key={profile.id}
             className={`${styles.profileCard} ${currentProfile.id === profile.id ? styles.selected : ''}`}
-            onClick={() => setProfileById(profile.id)}
+            onClick={() => handleProfileChange(profile.id)}
           >
             <div className={styles.profileIcon}>
               {profile.icon && iconMap[profile.icon] ? iconMap[profile.icon] : <FaFileAlt />}

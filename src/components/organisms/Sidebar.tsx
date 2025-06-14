@@ -28,7 +28,7 @@ const useWindowSize = () => {
   return size;
 };
 
-type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
+type View = 'metrics' | 'style' | 'seo' | 'accessibility' | 'personalization' | 'help';
 
 interface SidebarProps {
   onNavigate: (view: View) => void;
@@ -41,6 +41,7 @@ const menuItems: { view: View; label: string }[] = [
   { view: 'metrics', label: 'Editor de Texto' },
   { view: 'style', label: 'Análise de Estilo' },
   { view: 'seo', label: 'Análise de SEO' },
+  { view: 'accessibility', label: 'Acessibilidade' },
   { view: 'personalization', label: 'Personalizar' },
 ];
 

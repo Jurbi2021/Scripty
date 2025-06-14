@@ -33,6 +33,7 @@ const styleLabels: Record<StyleMetricKey, string> = {
 const GAPS_LEVELS_ADVANCED_READABILITY = ['Difícil', 'Médio', 'Ruim']; // Adicionado 'Médio'
 const GAPS_LEVELS_REDUNDANCY = ['Ruim', 'Regular']; // Já incluía 'Regular'
 const GAPS_LEVELS_STYLE = ['Ruim', 'Regular']; // Adicionado 'Regular'
+const GAPS_LEVELS_ADVANCED_METRICS = ['Ruim', 'Regular']; // Para as novas métricas avançadas
 
 export const generateAIPrompt = (
   text: string,
@@ -78,6 +79,52 @@ export const generateAIPrompt = (
         !(advancedMetrics.feedbackComprimento.toLowerCase().includes("ideal") || 
           advancedMetrics.feedbackComprimento.toLowerCase().includes("ótimo"))) {
         // Não vamos adicionar à lista principal para não poluir, mas fica a ideia se quiser refinar
+    }
+
+    // NOVAS MÉTRICAS AVANÇADAS
+
+    // Tom do Texto
+    if (advancedMetrics.tone && advancedMetrics.tone.level && 
+        GAPS_LEVELS_ADVANCED_METRICS.includes(advancedMetrics.tone.level)) {
+      collectedFeedbacks.push({
+        source: 'Tom do Texto',
+        message: advancedMetrics.tone.feedback,
+        level: advancedMetrics.tone.level,
+      });
+      includedFeedbackTypes.add('Tom do Texto');
+    }
+
+    // Formalidade
+    if (advancedMetrics.formality && advancedMetrics.formality.level && 
+        GAPS_LEVELS_ADVANCED_METRICS.includes(advancedMetrics.formality.level)) {
+      collectedFeedbacks.push({
+        source: 'Formalidade',
+        message: advancedMetrics.formality.feedback,
+        level: advancedMetrics.formality.level,
+      });
+      includedFeedbackTypes.add('Formalidade');
+    }
+
+    // Clareza
+    if (advancedMetrics.clarity && advancedMetrics.clarity.level && 
+        GAPS_LEVELS_ADVANCED_METRICS.includes(advancedMetrics.clarity.level)) {
+      collectedFeedbacks.push({
+        source: 'Clareza',
+        message: advancedMetrics.clarity.feedback,
+        level: advancedMetrics.clarity.level,
+      });
+      includedFeedbackTypes.add('Clareza');
+    }
+
+    // Concisão
+    if (advancedMetrics.conciseness && advancedMetrics.conciseness.level && 
+        GAPS_LEVELS_ADVANCED_METRICS.includes(advancedMetrics.conciseness.level)) {
+      collectedFeedbacks.push({
+        source: 'Concisão',
+        message: advancedMetrics.conciseness.feedback,
+        level: advancedMetrics.conciseness.level,
+      });
+      includedFeedbackTypes.add('Concisão');
     }
   }
 

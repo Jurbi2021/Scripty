@@ -37,6 +37,12 @@ export interface RedundancyResult {
   feedback: string;
 }
 
+export interface ToneAnalysisResult {
+  type: "formal" | "informal" | "técnico" | "persuasivo" | "neutro";
+  level: string;
+  feedback: string;
+}
+
 export interface ClarityResult {
   score: number; // 0-100, higher is clearer
   level: string;
@@ -45,14 +51,15 @@ export interface ClarityResult {
 
 export interface ConcisenessResult {
   verbosePhrasesFound: { phrase: string; suggestion: string, sentenceIndex: number }[];
-  count: number;
+  verbosePhraseCount: number;
   level: string;
   feedback: string;
 }
 
 export interface FormalityResult {
-  level: "muito formal" | "formal" | "neutro" | "informal" | "muito informal";
-  score: number; // e.g., -2 to +2 or 0-100
+  formalityLevel: "muito formal" | "formal" | "neutro" | "informal" | "muito informal";
+  score: number; // e.g., -100 to +100
+  level: string;
   feedback: string;
 }
 
@@ -63,15 +70,19 @@ export interface AdvancedMetricsData {
   textLengthChars: number;
   sentiment: SentimentScore;
   feedbackComprimento: string;
-  clarity: ClarityResult; // Added
-  conciseness: ConcisenessResult; // Added
-  formality: FormalityResult; // Added
+  clarity: ClarityResult;
+  conciseness: ConcisenessResult;
+  formality: FormalityResult;
+  tone: ToneAnalysisResult; // Adicionado
 }
 
 // --- Lexical Resources (Placeholders - to be expanded or loaded from lexico.json) ---
-//const FORMAL_WORDS = ["outrossim", "destarte", "hodiernamente", "doravante", "porquanto", "entrementes", "comunique-se", "cumpra-se", "respeitosamente", "cordialmente"];
-//const INFORMAL_WORDS = ["tipo", "mano", "mina", "valeu", "falou", "aí", "né", "tá", "pra", "vc", "pq", "tb", "blz"];
-//const CONTRACTIONS = ["pra", "pro", "pras", "pros", "num", "numa", "nuns", "numas", "dum", "duma", "duns", "dumas", "tô", "tá", "tamos", "tão"];
+const FORMAL_WORDS = ["outrossim", "destarte", "hodiernamente", "doravante", "porquanto", "entrementes", "comunique-se", "cumpra-se", "respeitosamente", "cordialmente"];
+const INFORMAL_WORDS = ["tipo", "mano", "mina", "valeu", "falou", "aí", "né", "tá", "pra", "vc", "pq", "tb", "blz"];
+const CONTRACTIONS = ["pra", "pro", "pras", "pros", "num", "numa", "nuns", "numas", "dum", "duma", "duns", "dumas", "tô", "tá", "tamos", "tão"];
+const TECHNICAL_WORDS = ["algoritmo", "implementação", "metodologia", "paradigma", "framework", "infraestrutura", "otimização", "parametrização", "protocolo", "requisito"];
+const PERSUASIVE_WORDS = ["incrível", "extraordinário", "revolucionário", "essencial", "fundamental", "crucial", "imperdível", "exclusivo", "limitado", "garantido"];
+
 const VERBOSE_PHRASES: { [key: string]: string } = {
   "devido ao fato de que": "porque",
   "com o objetivo de": "para",
@@ -103,7 +114,6 @@ const countPolysyllables = (words: string[]): number => {
 const getSentences = (text: string): string[] => {
     return text
         .replace(/([.!?]+|\n+)\s*/g, '$1|') // Add delimiter after sentence-ending punctuation or newlines
-
         .split("|")
         .map(s => s.trim())
         .filter(s => s.length > 0);
@@ -313,188 +323,372 @@ const calculateRedundancy = (words: string[], thresholds: ThresholdConfig): Redu
 // --- Sentiment Analysis ---
 interface Lexico {
   positive: string[]; negative: string[]; intensifiers: string[]; negations: string[];
-  positiveEmojis: string[]; negativeEmojis: string[];
   bigramsPositive?: string[]; bigramsNegative?: string[];
-  // Add lists for tone/formality if lexico is expanded
-  formalWords?: string[]; informalWords?: string[]; contractions?: string[];
+  positiveEmojis?: string[]; negativeEmojis?: string[];
+  synonyms?: { [key: string]: string[] };
 }
 
 const analyzeSentiment = (text: string, lexico: Lexico): SentimentScore => {
-  if (!text || !text.trim() || !lexico) {
+  const words = getWords(text);
+  const sentences = getSentences(text);
+  
+  if (words.length === 0) {
     return { neg: 0, neu: 1, pos: 0, compound: 0, sentiment: "neutro" };
   }
-  const normalizedText = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ").replace(/\s+/g, " ").trim();
-  const words = normalizedText.split(" ");
-  const emojis = text.match(/[\p{Emoji}]/gu) || [];
-  let positiveScore = 0, negativeScore = 0, negationActive = false, negationCounter = 0;
-  const NEGATION_WINDOW = 3;
-  const WEIGHTS = { word: 1.0, intensifier: 1.5, negation: -1.5, emoji: 1.5 }; // Adjusted weights
 
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    if (lexico.negations.includes(word)) { negationActive = true; negationCounter = NEGATION_WINDOW; continue; }
-    const isIntensifier = lexico.intensifiers.includes(word);
-    let wordScore = 0;
-    if (lexico.positive.includes(word)) { wordScore = WEIGHTS.word * (isIntensifier ? WEIGHTS.intensifier : 1.0); }
-    else if (lexico.negative.includes(word)) { wordScore = -WEIGHTS.word * (isIntensifier ? WEIGHTS.intensifier : 1.0); }
-    if (negationActive && wordScore !== 0) { wordScore *= WEIGHTS.negation; }
-    if (wordScore > 0) positiveScore += wordScore;
-    else if (wordScore < 0) negativeScore += Math.abs(wordScore);
-    if (negationActive) { negationCounter--; if (negationCounter <= 0) negationActive = false; }
+  let posCount = 0, negCount = 0, neuCount = 0;
+  let compound = 0;
+
+  // Simplified sentiment analysis
+  words.forEach(word => {
+    const lowerWord = word.toLowerCase();
+    if (lexico.positive.includes(lowerWord)) {
+      posCount++;
+    } else if (lexico.negative.includes(lowerWord)) {
+      negCount++;
+    } else {
+      neuCount++;
+    }
+  });
+
+  // Check for emojis if available
+  if (lexico.positiveEmojis && lexico.negativeEmojis) {
+    lexico.positiveEmojis.forEach(emoji => {
+      if (text.includes(emoji)) posCount += 2; // Emojis have stronger weight
+    });
+    lexico.negativeEmojis.forEach(emoji => {
+      if (text.includes(emoji)) negCount += 2; // Emojis have stronger weight
+    });
   }
-  for (const emoji of emojis) {
-    if (lexico.positiveEmojis.includes(emoji)) positiveScore += WEIGHTS.emoji;
-    else if (lexico.negativeEmojis.includes(emoji)) negativeScore += WEIGHTS.emoji;
+
+  // Check for bigrams if available
+  if (lexico.bigramsPositive && lexico.bigramsNegative) {
+    for (let i = 0; i < words.length - 1; i++) {
+      const bigram = `${words[i]} ${words[i+1]}`.toLowerCase();
+      if (lexico.bigramsPositive.includes(bigram)) {
+        posCount += 2; // Bigrams have stronger weight
+      } else if (lexico.bigramsNegative.includes(bigram)) {
+        negCount += 2; // Bigrams have stronger weight
+      }
+    }
   }
-  const totalScore = positiveScore + negativeScore;
-  const compound = totalScore === 0 ? 0 : (positiveScore - negativeScore) / Math.sqrt(Math.pow(positiveScore - negativeScore, 2) + 15); // VADER-like compound
+
+  // Calculate normalized scores
+  const total = posCount + negCount + neuCount;
+  const pos = posCount / total;
+  const neg = negCount / total;
+  const neu = neuCount / total;
   
+  // Calculate compound score (-1 to 1)
+  compound = (posCount - negCount) / (posCount + negCount + 0.001);
+  compound = Math.max(-1, Math.min(1, compound));
+
+  // Determine sentiment
   let sentiment: "positivo" | "negativo" | "neutro" = "neutro";
-  if (compound >= 0.05) sentiment = "positivo";
-  else if (compound <= -0.05) sentiment = "negativo";
+  if (compound > 0.05) {
+    sentiment = "positivo";
+  } else if (compound < -0.05) {
+    sentiment = "negativo";
+  }
 
-  return {
-    neg: parseFloat((negativeScore / (totalScore || 1)).toFixed(3)), 
-    neu: parseFloat((totalScore === 0 ? 1 : 1 - (positiveScore + negativeScore) / totalScore).toFixed(3)), 
-    pos: parseFloat((positiveScore / (totalScore || 1)).toFixed(3)), 
-    compound: parseFloat(compound.toFixed(4)), 
-    sentiment 
-  };
-};
-
-// --- Tone, Clarity, Conciseness, Formality ---
-
-const analyzeClarity = (totalWords: number, totalSentences: number, complexWords: number, thresholds: ThresholdConfig): ClarityResult => {
-    let score = 50; // Base score
-    if (totalWords > 0 && totalSentences > 0) {
-        const avgSentenceLength = totalWords / totalSentences;
-        const percentComplexWords = (complexWords / totalWords) * 100;
-
-        if (avgSentenceLength <= 15) score += 20;
-        else if (avgSentenceLength <= 20) score += 10;
-        else if (avgSentenceLength > 25) score -= (avgSentenceLength - 25) * 0.5; // Penalty for very long sentences
-
-        if (percentComplexWords <= 5) score += 20;
-        else if (percentComplexWords <= 10) score += 10;
-        else if (percentComplexWords > 15) score -= (percentComplexWords - 15) * 0.5; // Penalty for many complex words
-        
-        score = Math.max(0, Math.min(100, score));
-    }
-    score = parseFloat(score.toFixed(1));
-   let level = "N/A", feedback = "Texto muito curto para análise de clareza.";
-if (totalWords > 0) {
-    if (score >= thresholds.clarityScoreMin + 15) { // Ex: se o mínimo para Bom é 60, Excelente é >= 75
-        level = "Excelente"; 
-        feedback = "Excelente clareza! O texto é direto e fácil de entender."; 
-    } else if (score >= thresholds.clarityScoreMin) { // <<< USA O LIMIAR DO PERFIL
-        level = "Bom"; 
-        feedback = "Boa clareza. O texto é geralmente compreensível."; 
-    } else { 
-        level = "Regular"; 
-        feedback = "Clareza regular. Considere usar frases mais curtas e palavras mais simples."; 
-    }
-}
-return { score, level, feedback };
-};
-
-const analyzeConciseness = (text: string, sentences: string[], thresholds: ThresholdConfig): ConcisenessResult => {
-    const verbosePhrasesFound: ConcisenessResult["verbosePhrasesFound"] = [];
-    const lowerText = text.toLowerCase();
-
-    Object.entries(VERBOSE_PHRASES).forEach(([verbose, concise]) => {
-        let startIndex = lowerText.indexOf(verbose);
-        while (startIndex !== -1) {
-            // Find which sentence this phrase belongs to
-            let sentenceIndex = -1;
-            let cumulativeLength = 0;
-            for(let i=0; i < sentences.length; i++) {
-                const sentenceText = sentences[i];
-                if (startIndex >= cumulativeLength && startIndex < cumulativeLength + sentenceText.length) {
-                    sentenceIndex = i + 1;
-                    break;
-                }
-                cumulativeLength += sentenceText.length + 1; // +1 for separator
-            }
-            verbosePhrasesFound.push({ phrase: verbose, suggestion: concise, sentenceIndex });
-            startIndex = lowerText.indexOf(verbose, startIndex + verbose.length);
-        }
-    });
-
-    const count = verbosePhrasesFound.length;
-    let level = "Excelente", feedback = "Excelente! O texto parece conciso e direto.";
-
-    // <<< USA O LIMIAR DO PERFIL >>>
-    if (count > 0 && count <= thresholds.verbosePhrasesMax) { 
-        level = "Bom"; 
-        feedback = `Bom. Encontrada(s) ${count} expressão(ões) que pode(m) ser mais concisa(s).`; 
-    } else if (count > thresholds.verbosePhrasesMax) { 
-        level = "Regular"; // Ou "Ruim", dependendo da sua preferência
-        feedback = `Atenção: Encontrada(s) ${count} expressões prolixas. Tente usar alternativas mais diretas.`; 
-    }
-
-    return { verbosePhrasesFound, count, level, feedback };
-};
-
-const analyzeFormality = (words: string[], lexico: Lexico, thresholds: ThresholdConfig): FormalityResult => {
-    let formalityScore = 0; // -100 (very informal) to +100 (very formal)
-    const wordCount = words.length;
-    if (wordCount === 0) return { level: "neutro", score: 0, feedback: "Texto muito curto." };
-
-    words.forEach(word => {
-        const lowerWord = word.toLowerCase();
-        if (lexico.formalWords?.includes(lowerWord)) formalityScore += 2;
-        if (lexico.informalWords?.includes(lowerWord)) formalityScore -= 2;
-        if (lexico.contractions?.includes(lowerWord)) formalityScore -= 1;
-    });
-
-    // Normalize score to a percentage of max possible deviation
-    const normalizedScore = (formalityScore / (wordCount * 2)) * 100; // Max deviation is 2 per word
-    const score = parseFloat(Math.max(-100, Math.min(100, normalizedScore)).toFixed(1));
-
-    let level: FormalityResult["level"] = "neutro";
-    let feedback = "";
-
-    if (score > thresholds.formalityMax + 20) { // Ex: Muito acima do máximo para formal
-        level = "muito formal"; feedback = "O texto tem um nível de formalidade muito alto."; 
-    } else if (score > thresholds.formalityMax) { 
-        level = "formal"; feedback = "O texto apresenta um nível de formalidade alto."; 
-    } else if (score < thresholds.formalityMin - 20) { // Ex: Muito abaixo do mínimo para informal
-        level = "muito informal"; feedback = "O texto é muito informal, adequado para conversas casuais."; 
-    } else if (score < thresholds.formalityMin) { 
-        level = "informal"; feedback = "O texto tem um tom informal."; 
-    } else { // Se estiver dentro de [formalityMin, formalityMax]
-        level = "neutro"; feedback = "O nível de formalidade do texto é neutro e adequado para este perfil."; 
-    }
-
-    return { level, score, feedback };
+  return { pos, neg, neu, compound, sentiment };
 };
 
 // --- Text Length Feedback ---
-const getTextLengthFeedback = (totalWords: number, thresholds: ThresholdConfig): string => {
-    if (totalWords === 0) return "";
-    if (totalWords < thresholds.minWords) return `Texto muito curto. O ideal para este perfil é acima de ${thresholds.minWords} palavras.`;
-    if (totalWords <= thresholds.optimalMaxWords) return `Comprimento (${totalWords} palavras) adequado para este perfil.`;
-    return `Texto longo (${totalWords} palavras). Considere se é possível encurtar ou dividir.`;
+const getTextLengthFeedback = (wordCount: number, thresholds: ThresholdConfig): string => {
+  if (wordCount === 0) {
+    return "";
+  } else if (wordCount < thresholds.minWords) {
+    return `Texto muito curto. Recomendamos pelo menos ${thresholds.minWords} palavras para uma análise completa.`;
+  } else if (wordCount < thresholds.optimalMinWords) {
+    return `Texto curto. Para melhor impacto, considere expandir para pelo menos ${thresholds.optimalMinWords} palavras.`;
+  } else if (wordCount <= thresholds.optimalMaxWords) {
+    return `Comprimento ideal! Entre ${thresholds.optimalMinWords} e ${thresholds.optimalMaxWords} palavras é perfeito para este tipo de conteúdo.`;
+  } else if (wordCount <= thresholds.maxWords) {
+    return `Texto um pouco longo. Considere revisar para maior concisão, idealmente abaixo de ${thresholds.optimalMaxWords} palavras.`;
+  } else {
+    return `Texto muito longo. Recomendamos dividir em partes menores ou reduzir para menos de ${thresholds.maxWords} palavras.`;
+  }
 };
 
-// --- Main Calculation Function ---
-export const calculateAdvancedMetrics = (
-  text: string, 
-  lexico: Lexico,
-  styleAnalysisData: StyleAnalysisData, // <<< Recebe os dados de estilo
-  thresholds: ThresholdConfig           // <<< Recebe os limiares dinâmicos
-): AdvancedMetricsData => {
+// --- Clarity Analysis ---
+const analyzeClarity = (totalWords: number, totalSentences: number, complexWords: number, thresholds: ThresholdConfig): ClarityResult => {
+  if (totalWords === 0) {
+    return { score: 0, level: "N/A", feedback: "Digite algum texto para análise de clareza." };
+  }
+
+  // Calculate clarity score (0-100)
+  const avgWordsPerSentence = totalWords / Math.max(1, totalSentences);
+  const complexWordRatio = complexWords / Math.max(1, totalWords);
+  
+  // Penalize for very long sentences and high complex word ratio
+  const sentencePenalty = avgWordsPerSentence > 20 ? Math.min(30, (avgWordsPerSentence - 20) * 1.5) : 0;
+  const complexityPenalty = complexWordRatio > 0.2 ? Math.min(30, (complexWordRatio - 0.2) * 150) : 0;
+  
+  // Base score starts high and gets reduced by penalties
+  let score = 100 - sentencePenalty - complexityPenalty;
+  score = Math.max(0, Math.min(100, score));
+  score = parseFloat(score.toFixed(1));
+
+  // Determine level and feedback based on score and thresholds
+  let level = "N/A", feedback = "";
+  if (score >= thresholds.clarityScoreMin + 15) {
+    level = "Excelente";
+    feedback = "Texto muito claro e fácil de entender. Mantém um bom equilíbrio entre simplicidade e precisão.";
+  } else if (score >= thresholds.clarityScoreMin) {
+    level = "Bom";
+    feedback = "Texto claro. A maioria dos leitores conseguirá entender sem dificuldade.";
+  } else if (score >= thresholds.clarityScoreMin - 15) {
+    level = "Regular";
+    feedback = "Clareza moderada. Considere simplificar algumas frases e usar palavras mais comuns.";
+  } else {
+    level = "Ruim";
+    feedback = "Texto pouco claro. Recomenda-se simplificar frases longas e reduzir o uso de palavras complexas.";
+  }
+
+  return { score, level, feedback };
+};
+
+// --- Conciseness Analysis ---
+const analyzeConciseness = (text: string, sentences: string[], thresholds: ThresholdConfig): ConcisenessResult => {
+  const verbosePhrasesFound: { phrase: string; suggestion: string, sentenceIndex: number }[] = [];
+  
+  // Check for verbose phrases in each sentence
+  sentences.forEach((sentence, sentenceIndex) => {
+    const lowerSentence = sentence.toLowerCase();
+    
+    Object.entries(VERBOSE_PHRASES).forEach(([phrase, suggestion]) => {
+      if (lowerSentence.includes(phrase)) {
+        verbosePhrasesFound.push({
+          phrase,
+          suggestion,
+          sentenceIndex
+        });
+      }
+    });
+  });
+  
+  const verbosePhraseCount = verbosePhrasesFound.length;
+  
+  // Determine level and feedback based on count and thresholds
+  let level = "N/A", feedback = "";
+  if (text.length === 0) {
+    level = "N/A";
+    feedback = "Digite algum texto para análise de concisão.";
+  } else if (verbosePhraseCount === 0) {
+    level = "Excelente";
+    feedback = "Texto muito conciso. Não foram encontradas expressões verbosas.";
+  } else if (verbosePhraseCount <= thresholds.verbosePhrasesMax) {
+    level = "Bom";
+    feedback = `Texto relativamente conciso. Foram encontradas ${verbosePhraseCount} expressões que poderiam ser mais diretas.`;
+  } else if (verbosePhraseCount <= thresholds.verbosePhrasesMax * 2) {
+    level = "Regular";
+    feedback = `Texto moderadamente verboso. Considere revisar as ${verbosePhraseCount} expressões identificadas para maior concisão.`;
+  } else {
+    level = "Ruim";
+    feedback = `Texto muito verboso. Recomenda-se revisar as ${verbosePhraseCount} expressões identificadas para tornar o texto mais direto e impactante.`;
+  }
+  
+  return { verbosePhrasesFound, verbosePhraseCount, level, feedback };
+};
+
+// --- Formality Analysis ---
+const analyzeFormality = (words: string[], lexico: Lexico, thresholds: ThresholdConfig): FormalityResult => {
+  if (words.length === 0) {
+    return { 
+      formalityLevel: "neutro", 
+      score: 0, 
+      level: "N/A", 
+      feedback: "Digite algum texto para análise de formalidade." 
+    };
+  }
+  
+  // Count formal and informal markers
+  let formalCount = 0;
+  let informalCount = 0;
+  
+  words.forEach(word => {
+    const lowerWord = word.toLowerCase();
+    
+    // Check for formal words
+    if (FORMAL_WORDS.includes(lowerWord)) {
+      formalCount += 2; // Stronger weight for formal markers
+    }
+    
+    // Check for informal words and contractions
+    if (INFORMAL_WORDS.includes(lowerWord)) {
+      informalCount += 2;
+    }
+    if (CONTRACTIONS.includes(lowerWord)) {
+      informalCount += 1;
+    }
+    
+    // Other informal markers
+    if (lowerWord.endsWith('inho') || lowerWord.endsWith('inha') || 
+        lowerWord.endsWith('zinho') || lowerWord.endsWith('zinha')) {
+      informalCount += 1;
+    }
+  });
+  
+  // Calculate formality score (-100 to +100, negative is informal, positive is formal)
+  const totalMarkers = formalCount + informalCount;
+  let score = 0;
+  
+  if (totalMarkers > 0) {
+    score = ((formalCount - informalCount) / Math.max(1, words.length)) * 100;
+    score = Math.max(-100, Math.min(100, score));
+  }
+  
+  score = parseFloat(score.toFixed(1));
+  
+  // Determine formality level
+  let formalityLevel: "muito formal" | "formal" | "neutro" | "informal" | "muito informal" = "neutro";
+  
+  if (score > 30) formalityLevel = "muito formal";
+  else if (score > 10) formalityLevel = "formal";
+  else if (score > -10) formalityLevel = "neutro";
+  else if (score > -30) formalityLevel = "informal";
+  else formalityLevel = "muito informal";
+  
+  // Determine level and feedback based on thresholds
+  let level = "N/A", feedback = "";
+  
+  // Use thresholds to determine if the formality is appropriate for the content type
+  if (score >= thresholds.formalityMin && score <= thresholds.formalityMax) {
+    level = "Bom";
+    feedback = `Nível de formalidade adequado para este tipo de conteúdo (${formalityLevel}).`;
+  } else if (score < thresholds.formalityMin) {
+    level = "Regular";
+    feedback = `Texto mais informal do que o recomendado para este tipo de conteúdo. Considere um tom mais formal.`;
+  } else {
+    level = "Regular";
+    feedback = `Texto mais formal do que o recomendado para este tipo de conteúdo. Considere um tom mais acessível.`;
+  }
+  
+  return { formalityLevel, score, level, feedback };
+};
+
+// --- Tone Analysis ---
+const analyzeTone = (text: string, words: string[], thresholds: ThresholdConfig): ToneAnalysisResult => {
+  if (words.length === 0) {
+    return { 
+      type: "neutro", 
+      level: "N/A", 
+      feedback: "Digite algum texto para análise de tom." 
+    };
+  }
+  
+  // Count markers for different tones
+  let formalCount = 0;
+  let informalCount = 0;
+  let technicalCount = 0;
+  let persuasiveCount = 0;
+  
+  words.forEach(word => {
+    const lowerWord = word.toLowerCase();
+    
+    // Check for formal words
+    if (FORMAL_WORDS.includes(lowerWord)) {
+      formalCount += 1;
+    }
+    
+    // Check for informal words
+    if (INFORMAL_WORDS.includes(lowerWord)) {
+      informalCount += 1;
+    }
+    
+    // Check for technical words
+    if (TECHNICAL_WORDS.includes(lowerWord)) {
+      technicalCount += 1;
+    }
+    
+    // Check for persuasive words
+    if (PERSUASIVE_WORDS.includes(lowerWord)) {
+      persuasiveCount += 1;
+    }
+  });
+  
+  // Normalize counts by text length
+  const normalizedFormal = formalCount / Math.max(1, words.length) * 100;
+  const normalizedInformal = informalCount / Math.max(1, words.length) * 100;
+  const normalizedTechnical = technicalCount / Math.max(1, words.length) * 100;
+  const normalizedPersuasive = persuasiveCount / Math.max(1, words.length) * 100;
+  
+  // Determine dominant tone
+  const toneScores = [
+    { type: "formal", score: normalizedFormal },
+    { type: "informal", score: normalizedInformal },
+    { type: "técnico", score: normalizedTechnical },
+    { type: "persuasivo", score: normalizedPersuasive }
+  ];
+  
+  // Sort by score descending
+  toneScores.sort((a, b) => b.score - a.score);
+  
+  // If highest score is significant, use that tone, otherwise neutral
+  const dominantTone = toneScores[0].score > 2 ? toneScores[0].type : "neutro";
+  
+  // Determine if tone is appropriate based on thresholds and content type
+  let level = "Bom";
+  let feedback = "";
+  
+  // Different content types prefer different tones
+  const contentTypePreference = {
+    default: ["neutro", "formal"],
+    blog: ["informal", "persuasivo"],
+    formal_report: ["formal", "técnico"],
+    social_media: ["informal", "persuasivo"],
+    marketing: ["persuasivo", "informal"]
+  };
+  
+  // Get current profile ID from thresholds (this is a simplification, in reality you'd pass the profile ID)
+  let currentProfileId = "default";
+  if (thresholds.formalityMin < -20) currentProfileId = "blog";
+  else if (thresholds.formalityMin > 5) currentProfileId = "formal_report";
+  else if (thresholds.formalityMin < -40) currentProfileId = "social_media";
+  else if (thresholds.formalityMin < -15 && thresholds.formalityMax > 5) currentProfileId = "marketing";
+  
+  const preferredTones = contentTypePreference[currentProfileId as keyof typeof contentTypePreference] || contentTypePreference.default;
+  
+  if (preferredTones.includes(dominantTone as any)) {
+    level = "Excelente";
+    feedback = `Tom ${dominantTone} é ideal para este tipo de conteúdo.`;
+  } else if (dominantTone === "neutro") {
+    level = "Bom";
+    feedback = `Tom neutro é adequado para a maioria dos conteúdos, mas você pode considerar um tom ${preferredTones[0]} para maior impacto.`;
+  } else {
+    level = "Regular";
+    feedback = `O tom ${dominantTone} pode não ser o mais adequado para este tipo de conteúdo. Considere um tom mais ${preferredTones[0]}.`;
+  }
+  
+  return { 
+    type: dominantTone as "formal" | "informal" | "técnico" | "persuasivo" | "neutro", 
+    level, 
+    feedback 
+  };
+};
+
+// --- Main Function ---
+export const calculateAdvancedMetrics = (text: string, lexico: Lexico, styleAnalysisData: StyleAnalysisData, thresholds: ThresholdConfig): AdvancedMetricsData => {
+  if (!text || text.trim().length === 0) {
+    return getEmptyAdvancedMetrics();
+  }
+
   const cleanedText = text.trim();
   const basicMetrics = calculateBasicMetrics(cleanedText);
-  const { words: totalWords, sentences: totalSentences, charsNoSpaces: totalLetters } = basicMetrics;
   const wordsArray = getWords(cleanedText);
   const sentencesArray = getSentences(cleanedText);
+  
+  const totalWords = wordsArray.length;
+  const totalSentences = sentencesArray.length;
   const totalSyllables = wordsArray.reduce((sum, word) => sum + countSyllables(word), 0);
+  const totalLetters = wordsArray.reduce((sum, word) => sum + word.length, 0);
+  
   const complexWordsForFog = countComplexWords(wordsArray);
-  const polysyllablesForSmog = countPolysyllables(wordsArray)
+  const polysyllablesForSmog = countPolysyllables(wordsArray);
 
-  const gunningFogResult = calculateGunningFog(totalWords, totalSentences, complexWordsForFog, thresholds);
   const fleschKincaidResult = calculateFleschKincaidReadingEase(totalWords, totalSentences, totalSyllables, thresholds);
+  const gunningFogResult = calculateGunningFog(totalWords, totalSentences, complexWordsForFog, thresholds);
   const smogResult = calculateSmogIndex(totalSentences, polysyllablesForSmog, thresholds);
   const colemanLiauResult = calculateColemanLiauIndex(totalWords, totalSentences, totalLetters, thresholds);
   const gulpeaseResult = calculateGulpeaseIndex(totalWords, totalSentences, totalLetters);
@@ -512,12 +706,12 @@ export const calculateAdvancedMetrics = (
   const feedbackComprimentoResult = getTextLengthFeedback(totalWords, thresholds);
 
   // Novas métricas também recebem os thresholds
-  
   const clarityResult = analyzeClarity(totalWords, totalSentences, complexWordsForFog, thresholds);
   const concisenessResult = analyzeConciseness(cleanedText, sentencesArray, thresholds);
-  const formalityResult = analyzeFormality(wordsArray, lexico, thresholds); 
+  const formalityResult = analyzeFormality(wordsArray, lexico, thresholds);
+  const toneResult = analyzeTone(cleanedText, wordsArray, thresholds);
 
-return {
+  return {
     readability,
     redundancy: redundancyResult,
     textLengthWords: totalWords,
@@ -527,6 +721,7 @@ return {
     clarity: clarityResult,
     conciseness: concisenessResult,
     formality: formalityResult,
+    tone: toneResult,
   };
 };
 
@@ -545,8 +740,8 @@ export const getEmptyAdvancedMetrics = (): AdvancedMetricsData => {
     sentiment: { neg: 0, neu: 1, pos: 0, compound: 0, sentiment: "neutro" },
     feedbackComprimento: "",
     clarity: { score: 0, level: "N/A", feedback: "Digite algum texto para análise." },
-    conciseness: { verbosePhrasesFound: [], count: 0, level: "N/A", feedback: "Digite algum texto para análise." },
-    formality: { level: "neutro", score: 0, feedback: "Digite algum texto para análise." },
+    conciseness: { verbosePhrasesFound: [], verbosePhraseCount: 0, level: "N/A", feedback: "Digite algum texto para análise." },
+    formality: { formalityLevel: "neutro", score: 0, level: "N/A", feedback: "Digite algum texto para análise." },
+    tone: { type: "neutro", level: "N/A", feedback: "Digite algum texto para análise." },
   }
 };
-

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import EditorMetricsPage from '../components/pages/EditorMetricsPage';
 import EditorStylePage from '../components/pages/EditorStylePage';
 import EditorSEOPage from '../components/pages/EditorSEOPage';
+import EditorAccessibilityPage from '../components/pages/EditorAccessibilityPage';
 import HelpCenterPage from '../components/pages/HelpCenterPage';
 import PersonalizationPage from '../components/pages/PersonalizationPage';
 import LoginPage from '../components/pages/LoginPage';
@@ -86,6 +87,10 @@ const AnimatedRoutes: React.FC = () => {
           <Route
             path="/editor/seo"
             element={ <motion.div style={{ width: '100%', height: '100%' }} variants={pageVariants} initial="initial" animate="in" exit="out" transition={pageTransition} > <EditorSEOPage /> </motion.div> }
+          />
+          <Route
+            path="/editor/accessibility"
+            element={ <motion.div style={{ width: '100%', height: '100%' }} variants={pageVariants} initial="initial" animate="in" exit="out" transition={pageTransition} > <EditorAccessibilityPage /> </motion.div> }
           />
           <Route
             path="/personalization"

@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useEditor } from '../../contexts/EditorContext';
 import WelcomeModal from '../organisms/WelcomeModal'; // Importar o modal de boas-vindas
 
-type View = 'metrics' | 'style' | 'seo' | 'personalization' | 'help';
+type View = 'metrics' | 'style' | 'seo' | 'accessibility' | 'personalization' | 'help';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,6 +17,7 @@ interface DashboardLayoutProps {
 const getActiveViewFromPathname = (pathname: string): View => {
   if (pathname.startsWith('/editor/style')) return 'style';
   if (pathname.startsWith('/editor/seo')) return 'seo';
+  if (pathname.startsWith('/editor/accessibility')) return 'accessibility';
   if (pathname.startsWith('/personalization')) return 'personalization';
   if (pathname.startsWith('/help')) return 'help';
   if (pathname.startsWith('/editor/metrics') || pathname === '/') return 'metrics';
@@ -53,6 +54,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
       case 'metrics': navigate('/editor/metrics'); break;
       case 'style': navigate('/editor/style'); break;
       case 'seo': navigate('/editor/seo'); break;
+      case 'accessibility': navigate('/editor/accessibility'); break;
       case 'personalization': navigate('/personalization'); break;
       case 'help': navigate('/help'); break;
       default: navigate('/');
@@ -69,6 +71,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, headerTitle
       case 'metrics': pageSpecificHeaderTitle = "Editor Principal"; break;
       case 'style': pageSpecificHeaderTitle = "Análise de Estilo"; break;
       case 'seo': pageSpecificHeaderTitle = "Análise de SEO"; break;
+      case 'accessibility': pageSpecificHeaderTitle = "Análise de Acessibilidade"; break;
       case 'personalization': pageSpecificHeaderTitle = "Personalização"; break;
       default: pageSpecificHeaderTitle = "Scripty";
     }

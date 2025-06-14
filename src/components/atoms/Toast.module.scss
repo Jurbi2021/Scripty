@@ -12,7 +12,7 @@
 // Mais transparência no background
 background-color: rgba(var(--bg-card-rgb-dark), 0.85); // Use a variável RGB e ajuste a opacidade
 color: var(--text-main-dark);
-padding: 1.2rem 2rem; // Aumentando o padding
+padding: 1.2rem 2.5rem; // Aumentando o padding horizontal
 border-radius: 12px; // Aumentando o border-radius para um visual mais suave
 box-shadow: 0 2px 8px rgba(0,0,0,0.15); // Box shadow mais sutil
 font-size: 1rem; // Aumentando um pouco a fonte
@@ -20,6 +20,9 @@ display: flex;
 align-items: center;
 gap: 1.5rem; // Aumentando o gap entre mensagem e botão
 backdrop-filter: blur(10px); // Adiciona um efeito de blur no fundo para ajudar na leitura
+min-width: 600px; // Largura mínima para evitar toasts muito estreitos
+max-width: 1200px; // Largura máxima para manter legibilidade em telas grandes
+width: auto; // Permite que o toast cresça conforme o conteúdo
 
 // Remove a borda lateral
 border-left: none;

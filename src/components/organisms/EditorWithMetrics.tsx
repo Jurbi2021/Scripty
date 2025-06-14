@@ -18,7 +18,11 @@ import {
 import {
   calculateAdvancedMetrics,
   ReadabilityIndices,
-  SentimentScore
+  SentimentScore,
+  ToneAnalysisResult,
+  ClarityResult,
+  ConcisenessResult,
+  FormalityResult
 } from '../../utils/AdvancedMetrics';
 import lexicoData from '../../utils/lexico.json';
 
@@ -46,25 +50,27 @@ const allReadabilityIndicesOptions: { key: ReadabilityIndexKey; label: string }[
 ];
 
 const EditorWithMetrics: React.FC = () => {
-  const [basicMetrics] = useState<BasicMetricsData>(calculateBasicMetrics(''));
   const { 
-  preferences, 
-  isFocusMode, 
-  text,                 // <<< ADICIONADO para ler do contexto
-  setText,              // <<< ADICIONADO para atualizar o contexto
-  advancedMetrics,      
-  setAdvancedMetricsData,
-  styleAnalysis,
+    preferences, 
+    isFocusMode, 
+    text,                 
+    setText,              
+    advancedMetrics,      
+    setAdvancedMetricsData,
+    styleAnalysis,
+    basicMetrics,         // Agora vem diretamente do contexto
   } = useEditor();
   const { thresholds } = useContentProfile();
 
+  // Removido o useEffect para atualizar métricas básicas, pois agora isso é feito no contexto
+  // Mantemos apenas o useEffect para métricas avançadas
   useEffect(() => {
-  const handler = setTimeout(() => {
-    const newAdvancedMetrics = calculateAdvancedMetrics(text, lexico, styleAnalysis, thresholds);
-    setAdvancedMetricsData(newAdvancedMetrics);
+    const handler = setTimeout(() => {
+      const newAdvancedMetrics = calculateAdvancedMetrics(text, lexico, styleAnalysis, thresholds);
+      setAdvancedMetricsData(newAdvancedMetrics);
     }, 300);
-  return () => clearTimeout(handler);
-}, [text, lexico, setAdvancedMetricsData, styleAnalysis, thresholds]);
+    return () => clearTimeout(handler);
+  }, [text, lexico, setAdvancedMetricsData, styleAnalysis, thresholds]);
 
   const formatSentiment = (sentiment: SentimentScore): string => {
     const score = sentiment.compound;
@@ -85,6 +91,22 @@ const EditorWithMetrics: React.FC = () => {
       case 'regular': return styles.levelRegular;
       case 'ruim': return styles.levelRuim;
       default: return styles.levelNA || '';
+    }
+  };
+
+  // Função para determinar a classe de nível para o comprimento do texto
+  const getTextLengthLevelClass = (): string => {
+    if (!advancedMetrics || advancedMetrics.textLengthWords === 0) return styles.levelNA;
+    
+    // Verifica se o texto está dentro dos limites ideais definidos nos thresholds
+    if (advancedMetrics.textLengthWords >= thresholds.optimalMinWords && 
+        advancedMetrics.textLengthWords <= thresholds.optimalMaxWords) {
+      return styles.levelExcelente; // Verde para comprimento ideal
+    } else if (advancedMetrics.textLengthWords >= thresholds.minWords && 
+               advancedMetrics.textLengthWords <= thresholds.maxWords) {
+      return styles.levelBom; // Amarelo para comprimento aceitável
+    } else {
+      return styles.levelRuim; // Vermelho para comprimento fora dos limites
     }
   };
 
@@ -156,6 +178,10 @@ const EditorWithMetrics: React.FC = () => {
     preferences.advancedMetrics.showLengthCard ||
     preferences.advancedMetrics.showRedundancyCard ||
     preferences.advancedMetrics.showSentimentCard ||
+    preferences.advancedMetrics.showToneCard ||
+    preferences.advancedMetrics.showFormalityCard ||
+    preferences.advancedMetrics.showClarityCard ||
+    preferences.advancedMetrics.showConcisenessCard ||
     (preferences.advancedMetrics.showReadabilityCarousel && readabilityIndicesToDisplay.length > 0);
 
   return (
@@ -185,8 +211,8 @@ const EditorWithMetrics: React.FC = () => {
         <TextArea
          className={editorLayoutStyles.editorAreaAdapter}
          placeholder="Comece a escrever seu texto aqui..."
-          value={text} // <<< Usa o 'text' do contexto
-         onChange={(e) => setText(e.target.value)} // <<< Chama o 'setText' do contexto
+          value={text}
+         onChange={(e) => setText(e.target.value)}
          rows={15}
         />
       </div>
@@ -227,7 +253,7 @@ const EditorWithMetrics: React.FC = () => {
                         initial={{ opacity: 0.5 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.textLengthWords < 300 ? 'ruim' : advancedMetrics.textLengthWords <= 2000 ? 'bom' : 'ruim')}`}>
+                        className={`${styles.metricFeedback} ${getTextLengthLevelClass()}`}>
                         {advancedMetrics.feedbackComprimento || 'Digite para feedback.'}
                       </motion.p>
                     </div>
@@ -288,6 +314,146 @@ const EditorWithMetrics: React.FC = () => {
                         className={styles.metricHighlightLarge}>
                           {formatSentiment(advancedMetrics.sentiment)}
                         </motion.p>
+                    </div>
+                  </motion.div>
+                )}
+                
+                {/* Card para Tom */}
+                {preferences.advancedMetrics.showToneCard && advancedMetrics.tone && (
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={4} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <span className={styles.advancedCardTitle}>Tom do Texto</span>
+                    <div className={styles.advancedCardContent}>
+                      <p>
+                        Tipo:{" "}
+                        <motion.span
+                          key={`tone-value-${advancedMetrics.tone.type}`} 
+                          variants={valueChangeVariants}
+                          initial="initial"
+                          animate="animate"
+                          className={styles.metricHighlight}
+                        >
+                          {advancedMetrics.tone.type.charAt(0).toUpperCase() + advancedMetrics.tone.type.slice(1) || 'N/A'}
+                        </motion.span>
+                      </p>
+                      <motion.p
+                        key={`tone-feedback-${advancedMetrics.tone.level}`}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.tone.level)}`}>
+                        {advancedMetrics.tone.feedback || 'Digite para feedback.'}
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Card para Formalidade */}
+                {preferences.advancedMetrics.showFormalityCard && advancedMetrics.formality && (
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={5} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <span className={styles.advancedCardTitle}>Formalidade</span>
+                    <div className={styles.advancedCardContent}>
+                      <p>
+                        Nível:{" "}
+                        <motion.span
+                          key={`formality-value-${advancedMetrics.formality.formalityLevel}`} 
+                          variants={valueChangeVariants}
+                          initial="initial"
+                          animate="animate"
+                          className={styles.metricHighlight}
+                        >
+                          {advancedMetrics.formality.formalityLevel.charAt(0).toUpperCase() + advancedMetrics.formality.formalityLevel.slice(1) || 'N/A'}
+                        </motion.span>
+                      </p>
+                      <motion.p
+                        key={`formality-feedback-${advancedMetrics.formality.level}`}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.formality.level)}`}>
+                        {advancedMetrics.formality.feedback || 'Digite para feedback.'}
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Card para Clareza */}
+                {preferences.advancedMetrics.showClarityCard && advancedMetrics.clarity && (
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={6} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <span className={styles.advancedCardTitle}>Clareza</span>
+                    <div className={styles.advancedCardContent}>
+                      <p>
+                        Índice:{" "}
+                        <motion.span
+                          key={`clarity-value-${advancedMetrics.clarity.score}`} 
+                          variants={valueChangeVariants}
+                          initial="initial"
+                          animate="animate"
+                          className={styles.metricHighlight}
+                        >
+                          {advancedMetrics.clarity.score?.toFixed(1) || 'N/A'}
+                        </motion.span>
+                      </p>
+                      <motion.p
+                        key={`clarity-feedback-${advancedMetrics.clarity.level}`}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.clarity.level)}`}>
+                        {advancedMetrics.clarity.feedback || 'Digite para feedback.'}
+                      </motion.p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Card para Concisão */}
+                {preferences.advancedMetrics.showConcisenessCard && advancedMetrics.conciseness && (
+                  <motion.div 
+                    className={`${styles.advancedGridItem} ${styles.advancedCard}`} 
+                    custom={7} 
+                    variants={gridItemCardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <span className={styles.advancedCardTitle}>Concisão</span>
+                    <div className={styles.advancedCardContent}>
+                      <p>
+                        Expressões verbosas:{" "}
+                        <motion.span
+                          key={`conciseness-value-${advancedMetrics.conciseness.verbosePhraseCount}`} 
+                          variants={valueChangeVariants}
+                          initial="initial"
+                          animate="animate"
+                          className={styles.metricHighlight}
+                        >
+                          {advancedMetrics.conciseness.verbosePhraseCount || '0'}
+                        </motion.span>
+                      </p>
+                      <motion.p
+                        key={`conciseness-feedback-${advancedMetrics.conciseness.level}`}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`${styles.metricFeedback} ${getLevelClass(advancedMetrics.conciseness.level)}`}>
+                        {advancedMetrics.conciseness.feedback || 'Digite para feedback.'}
+                      </motion.p>
                     </div>
                   </motion.div>
                 )}
@@ -362,30 +528,31 @@ const EditorWithMetrics: React.FC = () => {
               </motion.div>
             ) : (
               text.length > 0 && !shouldShowAnyAdvancedCard ? (
-                   <motion.div 
-                      key="empty-metrics-config" 
-                      className={styles.emptyStateAdvancedMetrics} 
-                      variants={emptyStateVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit" 
-                    >
-                      <FaLightbulb />
-                      <p>Nenhuma métrica avançada selecionada para exibição. Ajuste na página de personalização.</p>
-                  </motion.div>
-              ) : text.length === 0 ? (
-                   <motion.div 
-                      key="empty-metrics-text" 
-                      className={styles.emptyStateAdvancedMetrics} 
-                      variants={emptyStateVariants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit" 
-                    >
-                      <FaLightbulb />
-                      <p>Suas métricas avançadas aparecerão aqui assim que você começar a digitar.</p>
-                  </motion.div>
-              ) : null
+                <motion.div 
+                  key="empty-metrics-config" 
+                  className={styles.emptyStateAdvancedMetrics} 
+                  variants={emptyStateVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <FaLightbulb className={styles.emptyStateIcon} />
+                  <p>Nenhuma métrica avançada está configurada para exibição.</p>
+                  <p>Acesse as configurações para personalizar quais métricas deseja visualizar.</p>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="empty-text" 
+                  className={styles.emptyStateAdvancedMetrics} 
+                  variants={emptyStateVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  <FaLightbulb className={styles.emptyStateIcon} />
+                  <p>Digite seu texto para ver as métricas avançadas.</p>
+                </motion.div>
+              )
             )}
           </AnimatePresence>
         </motion.div>

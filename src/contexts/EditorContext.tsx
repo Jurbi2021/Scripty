@@ -7,6 +7,7 @@ import { ScriptyPreferences, defaultScriptyPreferences } from '../utils/preferen
 import { AdvancedMetricsData, getEmptyAdvancedMetrics } from '../utils/AdvancedMetrics';
 import { StyleAnalysisData, getEmptyStyleAnalysis } from '../utils/StyleAnalysis';
 import { SeoAnalysisResult } from '../utils/SeoAnalysis';
+import { BasicMetricsData, calculateBasicMetrics } from '../utils/BasicMetrics';
 
 // Importar tipos e instância de autenticação do Firebase
 import { auth } from '../services/firebase';
@@ -32,20 +33,36 @@ interface EditorContextProps {
   resetPreferences: () => void;
   
   // Dados de Análise
+  basicMetrics: BasicMetricsData;
   advancedMetrics: AdvancedMetricsData;
   styleAnalysis: StyleAnalysisData;
   seoAnalysis: SeoAnalysisResult | null;
+  setBasicMetricsData: (data: BasicMetricsData) => void;
   setAdvancedMetricsData: (data: AdvancedMetricsData) => void;
   setStyleAnalysisData: (data: StyleAnalysisData) => void;
   setSeoAnalysisData: (data: SeoAnalysisResult | null) => void;
 
   // Funções de Reset para Análises (para evitar acúmulo de dados entre abas)
+  resetBasicMetricsData: () => void;
   resetAdvancedMetricsData: () => void;
   resetStyleAnalysisData: () => void;
   resetSeoAnalysisData: () => void;
 }
 
 const EditorContext = createContext<EditorContextProps | undefined>(undefined);
+
+// Função para criar métricas básicas vazias
+const getEmptyBasicMetrics = (): BasicMetricsData => ({
+  charsWithSpaces: 0,
+  charsNoSpaces: 0,
+  words: 0,
+  uniqueWords: 0,
+  sentences: 0,
+  paragraphs: 0,
+  avgWordsPerSentence: 0,
+  avgCharsPerWord: 0,
+  readingTime: '0 min'
+});
 
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // Estados
@@ -55,14 +72,23 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [text, setText] = useState('');
   const [preferences, setPreferences] = useState<ScriptyPreferences>(defaultScriptyPreferences);
 
+  const [basicMetrics, setBasicMetrics] = useState<BasicMetricsData>(getEmptyBasicMetrics());
   const [advancedMetrics, setAdvancedMetrics] = useState<AdvancedMetricsData>(getEmptyAdvancedMetrics());
   const [styleAnalysis, setStyleAnalysis] = useState<StyleAnalysisData>(getEmptyStyleAnalysis());
   const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysisResult | null>(null); 
 
-  // Efeito para persistir preferências no localStorage
+  // Efeito para atualizar métricas básicas quando o texto muda
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const newBasicMetrics = calculateBasicMetrics(text);
+      setBasicMetrics(newBasicMetrics);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [text]);
 
-    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, async (user) => { // A função de callback agora é async
+  // Efeito para persistir preferências no localStorage
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => { // A função de callback agora é async
       if (user) {
         // Usuário fez login
         console.log("Usuário logado:", user.email);
@@ -92,7 +118,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     return unsubscribe; // Limpeza ao desmontar
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     // Só tenta salvar se houver um usuário logado
     if (!currentUser || authLoading) {
       return;
@@ -130,10 +156,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     setPreferences(defaultScriptyPreferences);
   };
 
+  const setBasicMetricsData = (data: BasicMetricsData) => setBasicMetrics(data);
   const setAdvancedMetricsData = (data: AdvancedMetricsData) => setAdvancedMetrics(data);
   const setStyleAnalysisData = (data: StyleAnalysisData) => setStyleAnalysis(data);
   const setSeoAnalysisData = (data: SeoAnalysisResult | null) => setSeoAnalysis(data);
 
+  const resetBasicMetricsData = () => setBasicMetrics(getEmptyBasicMetrics());
   const resetAdvancedMetricsData = () => setAdvancedMetrics(getEmptyAdvancedMetrics());
   const resetStyleAnalysisData = () => setStyleAnalysis(getEmptyStyleAnalysis());
   const resetSeoAnalysisData = () => setSeoAnalysis(null);
@@ -141,16 +169,16 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   return (
     <EditorContext.Provider value={{
       currentUser, authLoading, isFocusMode, toggleFocusMode, text, setText, preferences,
-      updatePreferences, resetPreferences, advancedMetrics, styleAnalysis, seoAnalysis,
-      setAdvancedMetricsData, setStyleAnalysisData, setSeoAnalysisData,
-      resetAdvancedMetricsData, resetStyleAnalysisData, resetSeoAnalysisData
+      updatePreferences, resetPreferences, basicMetrics, advancedMetrics, styleAnalysis, seoAnalysis,
+      setBasicMetricsData, setAdvancedMetricsData, setStyleAnalysisData, setSeoAnalysisData,
+      resetBasicMetricsData, resetAdvancedMetricsData, resetStyleAnalysisData, resetSeoAnalysisData
     }}>
       {children}
     </EditorContext.Provider>
   );
 };
 
-  export const useEditor = (): EditorContextProps => {
+export const useEditor = (): EditorContextProps => {
   const context = useContext(EditorContext);
   if (!context) {
     throw new Error('useEditor deve ser usado dentro de um EditorProvider');

@@ -1,0 +1,398 @@
+// src/components/organisms/AccessibilityAnalysis.module.scss
+// Estado vazio
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary);
+  
+  .emptyIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+  
+  h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+  
+  p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+// Loading state
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary);
+  
+  .loadingSpinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--color-border);
+    border-top: 2px solid var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    font-size: 0.875rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Score geral - layout em grid de duas colunas
+.overallScore {
+  display: grid;
+  grid-template-columns: auto 1fr; // Primeira coluna auto (ícone), segunda flexível (texto)
+  gap: 1.5rem;
+  align-items: center;
+  grid-column: 1 / -1; // Ocupa toda a largura do grid pai
+  
+  .scoreCircle {
+    position: relative;
+    grid-column: 1; // Primeira coluna
+    justify-self: center; // Centraliza o ícone na sua coluna
+    
+    .scoreText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      
+      .scoreNumber {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-main-dark);
+        line-height: 1;
+        [data-theme='light'] & { color: var(--text-main-light); }
+      }
+      
+      .scoreLabel {
+        display: block;
+        font-size: 0.625rem;
+        color: var(--text-secondary-dark);
+        margin-top: 0.25rem;
+        [data-theme='light'] & { color: var(--text-secondary-light); }
+      }
+    }
+  }
+  
+  .scoreInfo {
+    grid-column: 2; // Segunda coluna
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main-dark);
+      margin-bottom: 0.5rem;
+      [data-theme='light'] & { color: var(--text-main-light); }
+    }
+    
+    .scoreLevel {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      width: fit-content;
+      
+      &[data-level="excelente"] {
+        background: rgba(88, 214, 163, 0.1);
+        color: #58d6a3;
+      }
+      
+      &[data-level="bom"] {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+      }
+      
+      &[data-level="regular"] {
+        background: rgba(249, 115, 22, 0.1);
+        color: #f97316;
+      }
+      
+      &[data-level="ruim"] {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+    }
+    
+    .scoreFeedback {
+      color: var(--text-secondary-dark);
+      line-height: 1.4;
+      margin: 0;
+      font-size: 0.875rem;
+      [data-theme='light'] & { color: var(--text-secondary-light); }
+    }
+  }
+}
+
+// Card de categoria - design minimalista e limpo
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  
+  // Quando não expandido, altura natural
+  &:not(.expanded) {
+    .categoryHeader {
+      padding-bottom: 0;
+    }
+  }
+  
+  &.expanded {
+    .categoryHeader {
+      padding-bottom: 0.75rem;
+    }
+  }
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding-bottom: 0;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  .categoryIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-container-dark);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    [data-theme='light'] & { background: var(--bg-container-light); }
+  }
+  
+  .categoryInfo {
+    flex: 1;
+    min-width: 0;
+    
+    h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main-dark);
+      margin-bottom: 0.2rem;
+      line-height: 1.2;
+      [data-theme='light'] & { color: var(--text-main-light); }
+    }
+    
+    .categoryScore {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .scoreValue {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary-dark);
+        [data-theme='light'] & { color: var(--text-secondary-light); }
+      }
+      
+      .levelBadge {
+        padding: 0.1rem 0.3rem;
+        border-radius: 6px;
+        font-size: 0.6rem;
+        font-weight: 500;
+        color: white;
+        white-space: nowrap;
+      }
+    }
+  }
+  
+  .expandIcon {
+    transition: transform 0.2s ease;
+    color: var(--text-secondary-dark);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    [data-theme='light'] & { color: var(--text-secondary-light); }
+    
+    &.expanded {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.categoryDetails {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color-dark);
+  margin-top: 0.75rem;
+  [data-theme='light'] & { border-color: var(--border-color-light); }
+  
+  .categoryFeedback {
+    color: var(--text-secondary-dark);
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    [data-theme='light'] & { color: var(--text-secondary-light); }
+  }
+  
+  .issuesGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    
+    // Scroll discreto apenas se necessário (mais de 6 itens)
+    max-height: 240px; // Aproximadamente 6 itens
+    overflow-y: auto;
+    
+    // Scrollbar muito discreta
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+    
+    .issueItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      background: var(--bg-container-dark);
+      border-radius: 6px;
+      border: 1px solid var(--border-color-dark);
+      [data-theme='light'] & { 
+        background: var(--bg-container-light);
+        border-color: var(--border-color-light);
+      }
+      
+      .issueLabel {
+        font-size: 0.75rem;
+        color: var(--text-secondary-dark);
+        font-weight: 500;
+        flex: 1;
+        margin-right: 0.5rem;
+        [data-theme='light'] & { color: var(--text-secondary-light); }
+      }
+      
+      .issueValue {
+        font-size: 0.8rem;
+        color: var(--text-main-dark);
+        font-weight: 600;
+        flex-shrink: 0;
+        [data-theme='light'] & { color: var(--text-main-light); }
+      }
+    }
+  }
+}
+
+// Sugestões prioritárias - design limpo
+.prioritySuggestions {
+  grid-column: 1 / -1; // Ocupa toda a largura do grid
+  
+  .suggestionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    // Scroll discreto apenas se necessário (mais de 4 sugestões)
+    max-height: 280px; // Aproximadamente 4 sugestões
+    overflow-y: auto;
+    
+    // Scrollbar muito discreta
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+  
+  .suggestionItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-container-dark);
+    border-radius: 6px;
+    border: 1px solid var(--border-color-dark);
+    transition: all 0.2s ease;
+    [data-theme='light'] & { 
+      background: var(--bg-container-light);
+      border-color: var(--border-color-light);
+    }
+    
+    &:hover {
+      border-color: var(--action-highlight-dark);
+      transform: translateY(-1px);
+      [data-theme='light'] & { border-color: var(--action-highlight-light); }
+    }
+    
+    .suggestionNumber {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: var(--action-highlight-dark);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      [data-theme='light'] & { background: var(--action-highlight-light); }
+    }
+    
+    .suggestionText {
+      flex: 1;
+      color: var(--text-secondary-dark);
+      line-height: 1.4;
+      font-size: 0.85rem;
+      [data-theme='light'] & { color: var(--text-secondary-light); }
+    }
+  }
+}
+

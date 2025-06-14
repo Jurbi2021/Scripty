@@ -1,39 +1,13 @@
 // src/components/organisms/Header.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './Header.module.scss';
 import { useEditor } from '../../contexts/EditorContext';
+import { useToast } from '../../contexts/ToastContext'; // Importar o contexto de Toast
 import { FaLightbulb, FaQuestionCircle, FaArrowLeft, FaMagic } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom'; // <<< IMPORTAÇÃO CORRETA
-import { generateAIPrompt } from '../../utils/generateAIPrompt'; // Assegure-se que este arquivo existe/será criado
+import { useLocation } from 'react-router-dom';
+import { generateAIPrompt } from '../../utils/generateAIPrompt';
 import ContentProfileSelector from '../molecules/ContentProfileSelector';
-
-
-
-interface ToastProps {
-  message: string;
-  onDismiss: () => void;
-  type?: 'success' | 'error';
-}
-
-const Toast: React.FC<ToastProps> = ({ message, onDismiss, type = 'success' }) => {
-
-  return (
-    <motion.div 
-      className={`${styles.toast} ${type === 'error' ? styles.toastError : styles.toastSuccess}`}
-      initial={{ opacity: 0, y: 20, x: '-50%' }}
-      animate={{ opacity: 1, y: 0, x: '-50%' }}
-      exit={{ opacity: 0, y: 20, x: '-50%' }}
-      style={{ position: 'fixed', bottom: '30px', left: '50%', zIndex: 2000 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-    >
-      {message}
-      <button onClick={onDismiss} className={styles.toastClose}>×</button>
-    </motion.div>
-  );
-};
-// --- Fim da Definição do Componente Toast ---
-
 
 interface HeaderProps {
   title?: string;
@@ -61,13 +35,10 @@ const Header: React.FC<HeaderProps> = ({
     seoAnalysis
   } = useEditor();
   
-  const location = useLocation(); // <<< CHAMADA CORRETA DO HOOK, NO TOPO DO COMPONENTE
+  const location = useLocation();
+  const { showToast } = useToast(); // Usar o hook do contexto de Toast
   
   const focusButtonText = isFocusMode ? "Desativar Foco" : "Modo Foco";
-
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [showToast, setShowToast] = useState<boolean>(false);
 
   // Suas variantes de animação
   const buttonSpringTransition = { type: "spring" as const, stiffness: 400, damping: 17 };
@@ -76,12 +47,12 @@ const Header: React.FC<HeaderProps> = ({
     hover: { scale: 1.05, opacity: 1, transition: buttonSpringTransition },
     tap: { scale: 0.95, transition: buttonSpringTransition }
   };
-  const titleVariants = { /* ... (sua definição, se diferente da última enviada) ... */ 
+  const titleVariants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
     exit: { opacity: 0, y: 10, transition: { duration: 0.15, ease: "easeIn" } }
   };
-  const focusTextVariants = { /* ... (sua definição, se diferente da última enviada) ... */ 
+  const focusTextVariants = {
     initial: { opacity: 0, y: 5, width: 'auto' },
     animate: { opacity: 1, y: 0, width: 'auto', transition: { duration: 0.2, ease: "easeOut" } },
     exit: { opacity: 0, y: -5, width: 'auto', transition: { duration: 0.15, ease: "easeIn" } }
@@ -94,21 +65,12 @@ const Header: React.FC<HeaderProps> = ({
     text.trim().length > 0 &&
     (advancedMetrics.textLengthWords > 0 || seoAnalysis !== null || (styleAnalysis && styleAnalysis.passiveVoice.count > -1) ); // Condição de análise um pouco mais abrangente
 
-  const displayToast = (message: string, type: 'success' | 'error' = 'success', duration: number = 4000) => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-    setTimeout(() => { setShowToast(false); }, duration);
-    // A limpeza do timer pode ser gerenciada aqui, ou no useEffect do Toast se ele tiver um auto-dismiss interno.
-    // Para este exemplo, o displayToast controla o fechamento.
-  };
-
   const handleGenerateAIPrompt = async () => {
-    const currentPathname = location.pathname; // Usa o pathname obtido do hook no topo
+    const currentPathname = location.pathname;
     console.log("Header: handleGenerateAIPrompt INICIADA. Pathname:", currentPathname);
 
     if (!text.trim() || (advancedMetrics.textLengthWords === 0 && seoAnalysis === null && (!styleAnalysis || styleAnalysis.passiveVoice.count === -1))) {
-      displayToast("Por favor, digite um texto e aguarde a análise completa para gerar o prompt!", 'error');
+      showToast("Por favor, digite um texto e aguarde a análise completa para gerar o prompt!", 'error');
       return;
     }
 
@@ -120,11 +82,6 @@ const Header: React.FC<HeaderProps> = ({
         activeViewContextForPrompt = 'style';
       } else if (currentPathname.includes('/editor/seo')) {
         activeViewContextForPrompt = 'seo';
-      } else {
-         // Se não for uma página de editor conhecida e o modo abrangente estiver desligado,
-         // talvez seja melhor não gerar feedbacks específicos ou ter um comportamento padrão.
-         // Por ora, manter 'all' pode ser um fallback se a lógica de showAIPromptButton falhar em filtrar.
-         // No entanto, showAIPromptButton já deve prevenir isso.
       }
     }
     
@@ -132,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({
 
     if (typeof generateAIPrompt !== 'function') {
       console.error("Header: ERRO - generateAIPrompt não é uma função! Verifique a importação em Header.tsx e a exportação em generateAIPrompt.ts.");
-      displayToast("Erro ao preparar o prompt (função não encontrada).", 'error');
+      showToast("Erro ao preparar o prompt (função não encontrada).", 'error');
       return;
     }
     
@@ -152,10 +109,10 @@ const Header: React.FC<HeaderProps> = ({
       if (activeViewContextForPrompt === 'all' && includedFeedbacks.length === 0) {
         feedbackSummary = "Nenhum feedback crítico ou de melhoria foi identificado em todas as análises.";
       }
-      displayToast(`Prompt copiado! ${feedbackSummary}`, 'success', 6000); // Aumentei um pouco a duração
+      showToast(`Prompt copiado! ${feedbackSummary}`, 'success');
     } catch (err) {
       console.error('Falha ao copiar prompt: ', err);
-      displayToast('Erro ao copiar o prompt.', 'error');
+      showToast('Erro ao copiar o prompt.', 'error');
     }
   };
 
@@ -172,8 +129,6 @@ const Header: React.FC<HeaderProps> = ({
             <FaArrowLeft /> </motion.button>
         )}
           
-
-
         <AnimatePresence mode="wait">
           {title && (
             <motion.h1 key={title} className={styles.title} variants={titleVariants}
@@ -197,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({
           </motion.button>
         )}
 
-                {/* Ele só será mostrado se não estivermos no modo foco */}
+        {/* Ele só será mostrado se não estivermos no modo foco */}
         {!isFocusMode && (
            <ContentProfileSelector compact={true} className={styles.profileSelectorHeader} />
         )}
@@ -230,11 +185,7 @@ const Header: React.FC<HeaderProps> = ({
                 <FaQuestionCircle />
             </motion.button>
         )}
-            </div>
-      
-      <AnimatePresence>
-        {showToast && <Toast message={toastMessage} onDismiss={() => setShowToast(false)} type={toastType} />}
-      </AnimatePresence>
+      </div>
     </header>
   );
 };

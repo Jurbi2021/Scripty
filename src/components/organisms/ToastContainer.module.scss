@@ -1,0 +1,18 @@
+.toastContainer {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: auto;
+  max-width: 90vw;
+  pointer-events: none;
+  
+  /* Cada toast dentro do container terá seus próprios pointer-events */
+  & > div {
+    pointer-events: auto;
+  }
+}

@@ -17,10 +17,14 @@ export interface AdvancedMetricsPreferences {
   showRedundancyCard: boolean;
   showSentimentCard: boolean;
   showReadabilityCarousel: boolean;
+  showToneCard: boolean; // Adicionado
+  showFormalityCard: boolean; // Adicionado
+  showClarityCard: boolean; // Adicionado
+  showConcisenessCard: boolean; // Adicionado
   visibleReadabilityIndices: ReadabilityIndexKey[];
 }
 
-export interface AIPromptSettings { // <<< ADICIONAR ESTA INTERFACE
+export interface AIPromptSettings {
   generateComprehensivePrompt: boolean;
 }
 
@@ -46,7 +50,7 @@ export interface ScriptyPreferences {
   advancedMetrics: AdvancedMetricsPreferences;
   styleAnalysis: StyleAnalysisPreferences;
   seoAnalysis: SeoAnalysisPreferences;
-  aiPromptSettings: AIPromptSettings; // <<< ADICIONAR AQUI
+  aiPromptSettings: AIPromptSettings;
 }
 
 // Valores padrão para as preferências
@@ -61,6 +65,10 @@ export const defaultScriptyPreferences: ScriptyPreferences = {
     showRedundancyCard: true,
     showSentimentCard: true,
     showReadabilityCarousel: true,
+    showToneCard: true, // Adicionado
+    showFormalityCard: true, // Adicionado
+    showClarityCard: true, // Adicionado
+    showConcisenessCard: true, // Adicionado
   },
   styleAnalysis: {
     passiveVoice: { showCard: true, detailLevel: 'details_collapsed' },
@@ -76,7 +84,7 @@ export const defaultScriptyPreferences: ScriptyPreferences = {
     seoTextLength: { showCard: true },
     headingResult: { showCard: true },
   },
-  aiPromptSettings: { // <<< ADICIONAR AQUI
+  aiPromptSettings: {
     generateComprehensivePrompt: true,
   }
 };
