@@ -1,6 +1,10 @@
 @use '../../assets/scss/variables' as vars;
 
 .page {
+  height: 100%; // Garante que a página ocupe toda a altura disponível
+  display: flex;
+  flex-direction: column;
+  
   h1 {
     color: vars.$text-primary-dark;
     margin-bottom: 1rem;
@@ -12,3 +16,4 @@
     }
   }
 }
+

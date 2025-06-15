@@ -129,8 +129,6 @@ const AccessibilityCategory: React.FC<{
           >
             <p className={styles.categoryFeedback}>{result.feedback}</p>
             
-            {/* Removido o bloco de sugestões para evitar redundância */}
-            
             <div className={styles.issuesGrid}>
               {Object.entries(result.issues).map(([key, value]) => (
                 <div key={key} className={styles.issueItem}>
@@ -277,7 +275,7 @@ const AccessibilityAnalysis: React.FC = () => {
               </motion.div>
             ) : accessibilityData ? (
               <motion.div
-                className={editorLayoutStyles.advancedGridContainer}
+                className={styles.accessibilityContainer}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -285,29 +283,31 @@ const AccessibilityAnalysis: React.FC = () => {
               >
                 <AccessibilityOverallScore result={accessibilityData} />
                 
-                <AccessibilityCategory
-                  title="Acessibilidade Cognitiva"
-                  icon="🧠"
-                  result={accessibilityData.cognitive}
-                  isExpanded={expandedCategories.cognitive}
-                  onToggle={() => toggleCategory('cognitive')}
-                />
-                
-                <AccessibilityCategory
-                  title="Acessibilidade Visual"
-                  icon="👁️"
-                  result={accessibilityData.visual}
-                  isExpanded={expandedCategories.visual}
-                  onToggle={() => toggleCategory('visual')}
-                />
-                
-                <AccessibilityCategory
-                  title="Acessibilidade Linguística"
-                  icon="🗣️"
-                  result={accessibilityData.linguistic}
-                  isExpanded={expandedCategories.linguistic}
-                  onToggle={() => toggleCategory('linguistic')}
-                />
+                <div className={styles.categoriesContainer}>
+                  <AccessibilityCategory
+                    title="Acessibilidade Cognitiva"
+                    icon="🧠"
+                    result={accessibilityData.cognitive}
+                    isExpanded={expandedCategories.cognitive}
+                    onToggle={() => toggleCategory('cognitive')}
+                  />
+                  
+                  <AccessibilityCategory
+                    title="Acessibilidade Visual"
+                    icon="👁️"
+                    result={accessibilityData.visual}
+                    isExpanded={expandedCategories.visual}
+                    onToggle={() => toggleCategory('visual')}
+                  />
+                  
+                  <AccessibilityCategory
+                    title="Acessibilidade Linguística"
+                    icon="🗣️"
+                    result={accessibilityData.linguistic}
+                    isExpanded={expandedCategories.linguistic}
+                    onToggle={() => toggleCategory('linguistic')}
+                  />
+                </div>
                 
                 <PrioritySuggestions suggestions={accessibilityData.prioritySuggestions} />
               </motion.div>
@@ -331,4 +331,3 @@ const AccessibilityAnalysis: React.FC = () => {
 };
 
 export default AccessibilityAnalysis;
-
