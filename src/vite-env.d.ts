@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+/// <reference types="vite-plugin-svgr/client" />
 
 // Adicione as declarações abaixo para o Swiper
 declare module 'swiper/css';

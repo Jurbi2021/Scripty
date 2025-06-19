@@ -1,6 +1,8 @@
 // src/components/organisms/Sidebar.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './Sidebar.module.scss';
+import LogoScripty from '../../assets/images/Scripty-Color-Wide.svg?react';
+
 // Adicionar o ícone de logout
 import { FaChevronLeft, FaChevronRight, FaSun, FaMoon } from 'react-icons/fa'; 
 import { SidebarItem } from '../molecules/SidebarItem';
@@ -115,16 +117,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, initialView = 'metrics' }
       <div className={styles.logoSection}>
         <AnimatePresence>
           {isExpanded && (
-            <motion.span
-              className={styles.logoText}
+            <motion.div
+              className={styles.logoImage} 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20, transition: {duration: 0.15} }}
-              // Delay um pouco menor para o logo aparecer um pouco antes dos itens, ou sincronizado
-              transition={{ duration: 0.25, delay: 0.05, ease: "circOut" }} // Ajuste no ease e delay
+              transition={{ duration: 0.25, delay: 0.05, ease: "circOut" }}
             >
-              Scripty
-            </motion.span>
+              <LogoScripty />
+            </motion.div>
           )}
         </AnimatePresence>
         <motion.button
