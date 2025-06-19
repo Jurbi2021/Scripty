@@ -11,3 +11,8 @@ declare module '*.module.scss' {
   const classes: { readonly [key: string]: string };
   export default classes;
 }
+
+declare module '*.scss';
+
+// Declaração genérica para arquivos .css globais (como App.css e index.css)
+declare module '*.css';
